@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   docs:
-    uses: max-models/starlight-theme/.github/workflows/docs.yml@v0.1.0
+    uses: max-models/starlight-theme/.github/workflows/docs.yml@v0.3.0
     with:
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
