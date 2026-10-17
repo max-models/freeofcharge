@@ -28,9 +28,8 @@ bash setup_project.sh my-app
 rm setup_project.sh
 ```
 
-This replaces `freeofcharge` with `my-app` everywhere, moves
-`src/app` to `src/my_app`, and points the entry point, tests and docs at
-it.
+This replaces `freeofcharge` with `my-app` everywhere, moves `src/app`
+to `src/my_app`, and points the entry point, tests and docs at it.
 
 ## Install
 
@@ -112,9 +111,10 @@ make readme
 ## Releases
 
 Before merging a release to `main`, update the version in
-`pyproject.toml`, `src/freeofcharge/__init__.py` and `CITATION.cff` (including
-its release date), and add the release notes to `CHANGELOG.md`. The push
-to `main` creates a GitHub release with a `vX.Y.Z` tag and publishes the
-package to PyPI with trusted publishing (OIDC). The one-time PyPI and
-GitHub configuration is described in the [publishing
+`pyproject.toml`, `src/freeofcharge/__init__.py` and `CITATION.cff`
+(including its release date), and add the release notes to
+`CHANGELOG.md`. The push to `main` creates a GitHub release with a
+`vX.Y.Z` tag and publishes the package to PyPI with trusted publishing
+(OIDC). The one-time PyPI and GitHub configuration is described in the
+[publishing
 tutorial](https://max-models.github.io/freeofcharge/development/publishing/).
