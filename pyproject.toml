@@ -1,0 +1,75 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools", "wheel" ]
+
+[project]
+name = "template-python"
+version = "0.1.0"
+description = "Template python repository."
+readme = "README.md"
+keywords = [ "python" ]
+license = { file = "LICENSE.txt" }
+authors = [ { name = "Max" } ]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "numpy",
+]
+optional-dependencies.dev = [
+  "jupyterlab",
+  "pre-commit",
+  "pyproject-fmt",
+  "pyright",
+  "ruff",
+  "template-python[docs,test]",
+]
+optional-dependencies.docs = [
+  "griffe",
+  "ipykernel",
+  "matplotlib>=3.10.9",
+  "nbclient>=0.11",
+  "nbformat>=5.11.1",
+]
+optional-dependencies.test = [ "pytest", "pytest-cov" ]
+urls.Source = "https://github.com/max-models/template-python"
+scripts.template-python = "app.main:main"
+
+[tool.setuptools]
+package-data."*" = [ "py.typed" ]
+packages.find.where = [ "src" ]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+extend-include = [ "*.ipynb" ]
+# pycodestyle, pyflakes, isort, pyupgrade, bugbear and pydocstyle
+lint.select = [ "B", "D", "E", "F", "I", "UP", "W" ]
+lint.ignore = [ "E501" ]  # line length is handled by the formatter
+lint.per-file-ignores."**/tests/**" = [ "D" ]
+lint.per-file-ignores."*.ipynb" = [ "D" ]
+lint.per-file-ignores."docs/tools/*" = [ "D" ]
+lint.pydocstyle.convention = "google"
+
+[tool.pyright]
+include = [ "src" ]
+exclude = [ "**/tests" ]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
+
+[tool.pytest]
+ini_options.pythonpath = [ "src" ]
+ini_options.testpaths = [ "src" ]
+ini_options.addopts = "-ra"
+
+[tool.coverage]
+run.omit = [ "*/tests/*" ]
+run.source = [ "app" ]
+report.show_missing = true
