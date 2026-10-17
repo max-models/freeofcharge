@@ -100,9 +100,7 @@ def main() -> None:
     for order, source in enumerate(examples, start=1):
         title, summary = build_example(source, order)
         slug = re.sub(r"[^a-z0-9]+", "-", source.stem.lower()).strip("-")
-        listing.append(
-            f"- [{title}](/freeofcharge/full-examples/{slug}/): {summary}"
-        )
+        listing.append(f"- [{title}](/freeofcharge/full-examples/{slug}/): {summary}")
         print(f"[examples] {source} -> {CONTENT / slug}.mdx")
     CONTENT.mkdir(parents=True, exist_ok=True)
     (CONTENT / "index.md").write_text(

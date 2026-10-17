@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   docs:
-    uses: max-models/starlight-theme/.github/workflows/docs.yml@v0.3.0
+    uses: max-models/starlight-theme/.github/workflows/docs.yml@v0.3.1
     with:
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
@@ -31,7 +31,7 @@ jobs:
         tutorials/example-tutorial/index.html
         full-examples/index.html
         full-examples/sine-wave/index.html
-        api/app/index.html
-        api/app/main/index.html
+        api/freeofcharge/index.html
+        api/freeofcharge/main/index.html
         tutorials/example-tutorial/example_tutorial.ipynb
         full-examples/sine-wave/plot-1.png
