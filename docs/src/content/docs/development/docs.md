@@ -31,7 +31,7 @@ change them there, and update the version in `docs/package.json` and
 make docs-install     # npm packages and the Python docs extra
 make docs-notebooks   # execute tutorials/*.ipynb and convert them to pages
 make docs-examples    # run examples/*.py and publish their plots
-make docs-dev         # live preview at http://localhost:4321/template-python/
+make docs-dev         # live preview at http://localhost:4321/freeofcharge/
 make docs-build       # the static site in docs/dist, as in CI
 make docs-preview     # serve docs/dist
 make docs-clean       # remove generated pages and build output

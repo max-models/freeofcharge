@@ -64,7 +64,7 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
         filename = f"plot-{index}.png"
         plt.figure(number).savefig(output / filename, dpi=150, bbox_inches="tight")
         plots.append(
-            f"![Plot {index} from {title}](/template-python/full-examples/{slug}/{filename})"
+            f"![Plot {index} from {title}](/freeofcharge/full-examples/{slug}/{filename})"
         )
     plt.close("all")
     page = [
@@ -101,7 +101,7 @@ def main() -> None:
         title, summary = build_example(source, order)
         slug = re.sub(r"[^a-z0-9]+", "-", source.stem.lower()).strip("-")
         listing.append(
-            f"- [{title}](/template-python/full-examples/{slug}/): {summary}"
+            f"- [{title}](/freeofcharge/full-examples/{slug}/): {summary}"
         )
         print(f"[examples] {source} -> {CONTENT / slug}.mdx")
     CONTENT.mkdir(parents=True, exist_ok=True)

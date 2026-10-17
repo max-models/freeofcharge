@@ -1,15 +1,15 @@
-# template-python
+# freeofcharge
 
 
 <!-- README.md is generated from README.qmd: edit the .qmd and run `make readme`. -->
 
-[![Tests](https://github.com/max-models/template-python/actions/workflows/test_pytest.yml/badge.svg)](https://github.com/max-models/template-python/actions/workflows/test_pytest.yml)
+[![Tests](https://github.com/max-models/freeofcharge/actions/workflows/test_pytest.yml/badge.svg)](https://github.com/max-models/freeofcharge/actions/workflows/test_pytest.yml)
 [![Static
-analysis](https://github.com/max-models/template-python/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/max-models/template-python/actions/workflows/static_analysis.yml)
-[![Docs](https://github.com/max-models/template-python/actions/workflows/docs.yml/badge.svg)](https://max-models.github.io/template-python/)
-[![codecov](https://codecov.io/gh/max-models/template-python/branch/main/graph/badge.svg)](https://codecov.io/gh/max-models/template-python)
-[![PyPI](https://img.shields.io/pypi/v/template-python.png)](https://pypi.org/project/template-python/)
-[![Python](https://img.shields.io/pypi/pyversions/template-python.png)](https://pypi.org/project/template-python/)
+analysis](https://github.com/max-models/freeofcharge/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/max-models/freeofcharge/actions/workflows/static_analysis.yml)
+[![Docs](https://github.com/max-models/freeofcharge/actions/workflows/docs.yml/badge.svg)](https://max-models.github.io/freeofcharge/)
+[![codecov](https://codecov.io/gh/max-models/freeofcharge/branch/main/graph/badge.svg)](https://codecov.io/gh/max-models/freeofcharge)
+[![PyPI](https://img.shields.io/pypi/v/freeofcharge.png)](https://pypi.org/project/freeofcharge/)
+[![Python](https://img.shields.io/pypi/pyversions/freeofcharge.png)](https://pypi.org/project/freeofcharge/)
 
 Template repository for Python projects: a `src/` package with a console
 entry point, `pytest` tests, GitHub Actions for tests, static analysis,
@@ -17,7 +17,7 @@ tutorials, documentation and PyPI publishing, and an
 [Astro](https://astro.build/) +
 [Starlight](https://starlight.astro.build/) documentation site.
 
-Documentation: <https://max-models.github.io/template-python/>
+Documentation: <https://max-models.github.io/freeofcharge/>
 
 ## Use the template
 
@@ -28,7 +28,7 @@ bash setup_project.sh my-app
 rm setup_project.sh
 ```
 
-This replaces `template-python` with `my-app` everywhere, moves
+This replaces `freeofcharge` with `my-app` everywhere, moves
 `src/app` to `src/my_app`, and points the entry point, tests and docs at
 it.
 
@@ -38,7 +38,7 @@ With [uv](https://docs.astral.sh/uv/):
 
 ``` bash
 make install    # uv sync --extra dev, plus the pre-commit hooks
-uv run template-python
+uv run freeofcharge
 ```
 
 Or create and activate a Python environment (3.10 or newer):
@@ -58,7 +58,7 @@ pip install -e .
 Run the code with:
 
 ``` bash
-template-python
+freeofcharge
 ```
 
 The `test`, `docs` and `dev` extras install the test runner, the
@@ -96,7 +96,7 @@ Node 22 or newer.
 make docs-install     # npm packages and the Python docs extra
 make docs-notebooks   # execute tutorials/*.ipynb and convert them to pages
 make docs-examples    # run examples/*.py and publish their plots
-make docs-dev         # live preview at http://localhost:4321/template-python/
+make docs-dev         # live preview at http://localhost:4321/freeofcharge/
 make docs-build       # the static site in docs/dist
 ```
 
@@ -112,9 +112,9 @@ make readme
 ## Releases
 
 Before merging a release to `main`, update the version in
-`pyproject.toml`, `src/app/__init__.py` and `CITATION.cff` (including
+`pyproject.toml`, `src/freeofcharge/__init__.py` and `CITATION.cff` (including
 its release date), and add the release notes to `CHANGELOG.md`. The push
 to `main` creates a GitHub release with a `vX.Y.Z` tag and publishes the
 package to PyPI with trusted publishing (OIDC). The one-time PyPI and
 GitHub configuration is described in the [publishing
-tutorial](https://max-models.github.io/template-python/development/publishing/).
+tutorial](https://max-models.github.io/freeofcharge/development/publishing/).
