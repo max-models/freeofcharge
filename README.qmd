@@ -15,24 +15,61 @@ format:
 [![PyPI](https://img.shields.io/pypi/v/freeofcharge)](https://pypi.org/project/freeofcharge/)
 [![Python](https://img.shields.io/pypi/pyversions/freeofcharge)](https://pypi.org/project/freeofcharge/)
 
-Template repository for Python projects: a `src/` package with a console entry point,
-`pytest` tests, GitHub Actions for tests, static analysis, tutorials, documentation and
-PyPI publishing, and an [Astro](https://astro.build/) + [Starlight](https://starlight.astro.build/)
-documentation site.
+Neutral beams in tokamak plasmas: where a beam of fast hydrogen atoms is ionised, how much
+shines through onto the wall, and where the fast ions put their power and current as they
+slow down. Fast enough to sit inside a design optimisation of the injector, which is what it
+is for: the last stage of the max-models chain from the ion source through the accelerator
+and the neutralizer (picnic, wellbalanced) into the plasma.
+
+- **Equilibrium** (`Equilibrium`): the poloidal flux on an (R, Z) grid, from a G-EQDSK
+  file or the Solov'ev solution; the field, `rho = sqrt(psi_n)`, flux surfaces, shell
+  volumes and aspect ratios; the plasma boundary and the first wall as simgeometry polygons.
+- **Beam** (`NeutralBeam`): markers of fast atoms (positions, velocities, weights in atoms
+  per second, a plasmacoll `ParticleArrays`), from any source or as Gaussian beams with
+  core and halo divergence; `tangential_injection` for the beam axis.
+- **Stopping** (`SuzukiStopping`): the beam-stopping fit of Suzuki et al. (1998) for H, D,
+  T beams in hydrogen plasmas with He, B, C, N, O, Fe impurities, as in ASCOT5, whose
+  results the tests reproduce to 1e-10.
+- **Deposition** (`deposit`): every marker a straight line, attenuated step by step; the
+  birth profile on flux shells, sampled fast-ion births with their pitch, the shine-through
+  and where it meets the wall.
+- **Slowing down** (`slow_down`): classical (Stix) slowing down on the birth surface: the
+  heating of electrons and ions, the fast-ion density, pressure and energy, the pitch-angle
+  relaxation and the beam-driven current with the electron shielding and a trapped-electron
+  correction.
+
+Arrays live on the cunumpy backend (NumPy or CuPy); with MPI (maybempi) every rank traces
+its own markers and the profiles are summed once. Results convert to xarray datasets for
+plasma-plots.
+
+Not modelled: finite orbit width, prompt losses, charge-exchange losses of fast ions,
+anything 3D. To be checked against their sources (`injection_plan.md`, step 0): the
+trapped-electron correction (Start and Cordey's large-aspect-ratio fit) and the pitch-angle
+exponent, derived here from the collision rates rather than taken from Gaffey (1976).
 
 Documentation: <https://max-models.github.io/freeofcharge/>
 
-## Use the template
+## Example
 
-Create a repository from this template, then rename the package:
+```python
+import freeofcharge as foc
 
-```bash
-bash setup_project.sh my-app
-rm setup_project.sh
+# or foc.Equilibrium.from_geqdsk(path)
+equilibrium = foc.Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
+plasma = foc.Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
+origin, direction = foc.tangential_injection(5.3, 12.0)
+beam = foc.NeutralBeam.gaussian(
+    origin, direction, 1e6, 16.5e6, divergence=0.005, markers=2000
+)
+
+deposition = foc.deposit(beam, equilibrium, plasma)
+surfaces = equilibrium.flux_surfaces(deposition.rho_edges)
+steady = foc.slow_down(deposition, plasma, surfaces)
+print(deposition.shine_through_fraction, steady.driven_current)
 ```
 
-This replaces `freeofcharge` with `my-app` everywhere, moves `src/app` to `src/my_app`,
-and points the entry point, tests and docs at it.
+`examples/iter_like_injection.py` scans the density and plots the heating and current
+profiles.
 
 ## Install
 
@@ -40,34 +77,13 @@ With [uv](https://docs.astral.sh/uv/):
 
 ```bash
 make install    # uv sync --extra dev, plus the pre-commit hooks
-uv run freeofcharge
 ```
 
-Or create and activate a Python environment (3.10 or newer):
+Or with pip, in an environment with Python 3.10 or newer:
 
 ```bash
-python -m venv env
-source env/bin/activate
-pip install --upgrade pip
-```
-
-Install the code and requirements with pip:
-
-```bash
-pip install -e .
-```
-
-Run the code with:
-
-```bash
-freeofcharge
-```
-
-The `test`, `docs` and `dev` extras install the test runner, the documentation tooling and
-the linters:
-
-```bash
-pip install -e ".[dev]"
+pip install -e .          # the package
+pip install -e ".[dev]"   # with the test runner, docs tooling and linters
 ```
 
 ## Development
