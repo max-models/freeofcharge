@@ -27,11 +27,14 @@ jobs:
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
         getting-started/installation/index.html
+        getting-started/quickstart/index.html
         tutorials/index.html
-        tutorials/example-tutorial/index.html
+        tutorials/equilibrium-and-flux-surfaces/index.html
+        tutorials/injector-design-scan/index.html
         full-examples/index.html
-        full-examples/sine-wave/index.html
+        full-examples/iter-like-injection/index.html
         api/freeofcharge/index.html
-        api/freeofcharge/main/index.html
-        tutorials/example-tutorial/example_tutorial.ipynb
-        full-examples/sine-wave/plot-1.png
+        api/freeofcharge/deposition/index.html
+        tutorials/equilibrium-and-flux-surfaces/equilibrium_and_flux_surfaces.ipynb
+        tutorials/stopping-and-shine-through/1.png
+        full-examples/iter-like-injection/plot-1.png

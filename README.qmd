@@ -43,9 +43,9 @@ its own markers and the profiles are summed once. Results convert to xarray data
 plasma-plots.
 
 Not modelled: finite orbit width, prompt losses, charge-exchange losses of fast ions,
-anything 3D. To be checked against their sources (`injection_plan.md`, step 0): the
-trapped-electron correction (Start and Cordey's large-aspect-ratio fit) and the pitch-angle
-exponent, derived here from the collision rates rather than taken from Gaffey (1976).
+anything 3D. Still to be checked against their sources: the trapped-electron correction
+(Start and Cordey's large-aspect-ratio fit) and the pitch-angle exponent, derived here from
+the collision rates rather than taken from Gaffey (1976).
 
 Documentation: <https://max-models.github.io/freeofcharge/>
 
@@ -59,15 +59,22 @@ equilibrium = foc.Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
 plasma = foc.Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
 origin, direction = foc.tangential_injection(5.3, 12.0)
 beam = foc.NeutralBeam.gaussian(
-    origin, direction, 1e6, 16.5e6, divergence=0.005, markers=2000
+    origin, direction, 1e6, 16.5e6, width=0.3, divergence=0.005, markers=1000, seed=1
 )
 
-deposition = foc.deposit(beam, equilibrium, plasma)
+deposition = foc.deposit(
+    beam, equilibrium, plasma, step=0.02, births_per_marker=2, seed=2
+)
 surfaces = equilibrium.flux_surfaces(deposition.rho_edges)
 steady = foc.slow_down(deposition, plasma, surfaces)
+# 0.0008 and 0.97 MA
 print(deposition.shine_through_fraction, steady.driven_current)
 ```
 
+The [tutorials](https://max-models.github.io/freeofcharge/tutorials/) go from the
+equilibrium through the beam, its stopping and the slowing down to a design scan of the
+injector's energy and aiming, checking each step against closed forms and conservation
+laws.
 `examples/iter_like_injection.py` scans the density and plots the heating and current
 profiles.
 

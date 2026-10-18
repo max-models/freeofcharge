@@ -1,13 +1,17 @@
 ---
 title: freeofcharge
-description: Neutral beams in tokamak plasmas.
+description: Neutral beams in tokamak plasmas - deposition, shine-through, slowing down and current drive.
 template: splash
 hero:
-  tagline: Neutral beams in tokamak plasmas - deposition, shine-through, slowing down and current drive, fast enough for an optimiser.
+  tagline: Neutral beams in tokamak plasmas - where the beam is ionised, how much shines through onto the wall, and where the fast ions heat and drive current. Fast enough to sit inside an optimisation of the injector.
   actions:
     - text: Get started
       link: /freeofcharge/getting-started/installation/
       icon: right-arrow
+    - text: Tutorials
+      link: /freeofcharge/tutorials/
+      icon: open-book
+      variant: secondary
     - text: View on GitHub
       link: https://github.com/max-models/freeofcharge
       icon: external
@@ -20,25 +24,47 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <CardGrid>
 	<Card title="Equilibria" icon="open-book">
-		The flux from G-EQDSK files or the Solov'ev solution, flux surfaces, shell volumes, boundary and wall.
+		The poloidal flux from G-EQDSK files or the Solov'ev solution: the field, `rho = sqrt(psi_n)`, flux shells with their volumes and aspect ratios, the boundary and the first wall as simgeometry polygons.
 	</Card>
-	<Card title="Beam deposition" icon="rocket">
-		Markers on straight lines with Suzuki's stopping cross sections: birth profiles, fast-ion births and shine-through.
+	<Card title="Beams" icon="rocket">
+		Markers of fast atoms aimed with `tangential_injection`: Gaussian width and divergence, a halo, energy components.
+	</Card>
+	<Card title="Deposition" icon="star">
+		Every marker a straight line attenuated with Suzuki's stopping cross sections (as in ASCOT5): birth profiles, sampled fast-ion births with their pitch, shine-through and where it hits the wall.
 	</Card>
 	<Card title="Slowing down" icon="document">
-		Classical slowing down per flux surface: electron and ion heating, fast-ion pressure and the beam-driven current.
+		Classical (Stix) slowing down on the birth surface: heating of electrons and ions, fast-ion density and pressure, and the beam-driven current with electron shielding.
 	</Card>
 	<Card title="CPU, GPU, MPI" icon="setting">
-		Arrays on the cunumpy backend; markers split over MPI ranks, profiles summed once.
+		Arrays on the cunumpy backend (NumPy or CuPy); with MPI every rank traces its own markers and the profiles are summed once.
+	</Card>
+	<Card title="xarray output" icon="list-format">
+		Profiles convert to xarray datasets with units, ready for plasma-plots.
 	</Card>
 </CardGrid>
+
+## Where it fits
+
+freeofcharge is the last stage of the max-models chain of a neutral-beam injector, from the
+ion source to the plasma:
+
+1. **Ion source and extraction** - [picnic](https://github.com/max-models/picnic) (particle-in-cell)
+   and [wellbalanced](https://github.com/max-models/wellbalanced) (global and fluid models).
+2. **Neutralizer** - [plasmacoll](https://github.com/max-models/plasmacoll), the collisions of the
+   beam with the gas; freeofcharge's markers are plasmacoll `ParticleArrays`.
+3. **The plasma** - freeofcharge: deposition, shine-through, heating and current drive.
+
+The model is deliberately fast: straight lines and local slowing down, without orbit width,
+prompt losses, charge-exchange losses of fast ions or 3D effects. That is what a design scan
+over beam energy, aiming and density needs. For orbits and losses, the fast-ion births
+(positions, velocities and weights) can be the starting points of an orbit-following code.
 
 ## Start here
 
 <CardGrid>
-	<LinkCard title="Installation" href="/freeofcharge/getting-started/installation/" description="Create an environment and install the package." />
-	<LinkCard title="Quickstart" href="/freeofcharge/getting-started/quickstart/" description="Deposit a beam and slow down its fast ions." />
-	<LinkCard title="Tutorials" href="/freeofcharge/tutorials/" description="Executed notebooks with their outputs." />
-	<LinkCard title="Full examples" href="/freeofcharge/full-examples/" description="Complete scripts and their plots." />
+	<LinkCard title="Installation" href="/freeofcharge/getting-started/installation/" description="Install the package and its max-models dependencies." />
+	<LinkCard title="Quickstart" href="/freeofcharge/getting-started/quickstart/" description="Deposit a beam, slow down its fast ions, read off the current." />
+	<LinkCard title="Tutorials" href="/freeofcharge/tutorials/" description="From the equilibrium to an injector design scan, each step checked." />
+	<LinkCard title="Full examples" href="/freeofcharge/full-examples/" description="A 1 MeV beam in an ITER-sized plasma, with a density scan." />
 	<LinkCard title="API reference" href="/freeofcharge/api/freeofcharge/" description="Generated from the docstrings." />
 </CardGrid>
