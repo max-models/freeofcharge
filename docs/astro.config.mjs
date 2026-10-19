@@ -6,7 +6,7 @@ import { defineDocs } from '@max-models/starlight-theme';
 export default defineDocs({
 	repo: 'freeofcharge',
 	title: 'freeofcharge',
-	description: 'Template repository for Python projects.',
+	description: 'Neutral beams in tokamak plasmas: deposition, shine-through, slowing down and current drive.',
 	pythonPackage: 'freeofcharge',
 	nav: [
 		{ label: 'Getting started', link: '/getting-started/installation/' },

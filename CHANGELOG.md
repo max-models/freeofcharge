@@ -15,6 +15,17 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `deposit`: straight-line attenuation, birth profiles, sampled births, shine-through and wall hits.
 - `slow_down`: Stix slowing down per flux surface, heating, fast-ion pressure, pitch relaxation
   and beam-driven current.
+- Documentation: a landing page with the max-models injector chain, installation with the
+  max-models dependencies, a quickstart with its output, and five tutorials (equilibria and
+  flux coordinates, beam markers, stopping and shine-through, slowing down and current
+  drive, an injector design scan) that assert closed forms, conservation laws, symmetries
+  and trends, so the tutorial CI catches regressions.
+
+### Fixed
+
+- CI: simgeometry is installed from GitHub (`devel`), as it is not on PyPI, and `uv.lock`
+  is up to date.
+- The docs workflow smoke-tests pages that exist, not the template's.
 
 ## [0.1.0] - 2026-10-05
 
