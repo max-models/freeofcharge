@@ -150,3 +150,19 @@ def test_slowing_down_needs_the_same_shells(equilibrium):
     result = deposit(beam, equilibrium, plasma, step=5e-3)
     with pytest.raises(ValueError, match="shells"):
         slow_down(result, plasma, equilibrium.flux_surfaces(np.linspace(0, 1, 5)))
+
+
+def test_deposition_matches_the_ray_casting_reference():
+    """Numbers of the ray-casting boundary and wall tests, before the fast path."""
+    equilibrium = Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
+    plasma = Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
+    origin, direction = tangential_injection(5.3, 12.0)
+    beam = NeutralBeam.gaussian(
+        origin, direction, 1e6, 16.5e6, width=0.3, divergence=0.005, markers=200, seed=1
+    )
+    dep = deposit(beam, equilibrium, plasma, step=0.02, births_per_marker=1, seed=2)
+    assert dep.shine_through_power == pytest.approx(13792.142487461126, rel=1e-12)
+    assert dep.absorbed_power == pytest.approx(16486207.857512536, rel=1e-12)
+    assert float(np.asarray(dep.birth_rate)[10]) == pytest.approx(
+        2.692815512522941e18, rel=1e-12
+    )

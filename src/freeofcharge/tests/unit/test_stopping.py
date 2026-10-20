@@ -71,3 +71,32 @@ def test_constant_stopping_broadcasts():
     sigma = ConstantStopping(1e-20)(np.ones(4), 1e19, np.ones((3, 1)), [], [], [])
     assert sigma.shape == (3, 4)
     assert np.all(sigma == 1e-20)
+
+
+@pytest.mark.parametrize("te", [1e3, 5e3, 1e4])
+def test_suzuki_published_fits_step_at_100_kev_per_amu(te):
+    """The two published fits differ by a few per cent where they meet."""
+    raw = SuzukiStopping(blend=1.0)
+    below, above = raw(np.array([99.999e3, 100.0e3]), 5e19, te, [5e19], [2], [1])
+    assert 0.01 < abs(above / below - 1.0) < 0.05
+
+
+@pytest.mark.parametrize("te", [1e3, 5e3, 1e4])
+def test_suzuki_blend_makes_the_cross_section_continuous(te):
+    stopping = SuzukiStopping()
+    energies = np.geomspace(80e3, 125e3, 2001)
+    sigma = stopping(energies, 5e19, te, [5e19], [2], [1])
+    # neighbouring points 0.02 % apart in energy: no jump left
+    assert np.max(np.abs(np.diff(np.log(sigma)))) < 1e-3
+    # outside the window the fits are as published
+    raw = SuzukiStopping(blend=1.0)
+    outside = np.array([85e3, 115e3])
+    np.testing.assert_array_equal(
+        stopping(outside, 5e19, te, [5e19], [2], [1]),
+        raw(outside, 5e19, te, [5e19], [2], [1]),
+    )
+
+
+def test_suzuki_blend_must_be_a_factor_between_one_and_two():
+    with pytest.raises(ValueError, match="blend"):
+        SuzukiStopping(blend=0.9)

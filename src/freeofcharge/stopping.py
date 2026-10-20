@@ -64,6 +64,7 @@ class ConstantStopping:
 # impurities, without the magnetic-field column (a negligible effect). As
 # implemented in ASCOT5 (src/suzuki.c, LGPL-3.0), whose results the tests
 # reproduce; the Li and Be rows are left out there, being equal in the paper.
+# STELLOPT (LIBSTELL suzuki_sigma.f90) has the same hydrogen coefficients.
 _A_HIGH = np.array(
     [
         [12.7, 1.25, 0.452, 0.0105, 0.547, -0.102, 0.360, -0.0298, -0.0959, 4.21e-3],
@@ -308,7 +309,24 @@ class SuzukiStopping:
     O or Fe impurities in the Z_eff ranges of the fit. A hydrogen species is
     picked by its mass number (1 to 3); with several, their cross sections are
     averaged with their densities.
+
+    The paper fits 10 to 100 and 100 to 10000 keV/amu separately (its tables 3
+    and 2), and the two fits do not meet at 100 keV/amu: they differ there by a
+    few per cent, with a sign that depends on T_e (+1.7 % at 1 keV and -4.4 %
+    at 10 keV, for 5e19 m^-3). The coefficients agree with ASCOT5 and STELLOPT,
+    so the step is in the published fit. Within a factor ``blend`` of 100
+    keV/amu, ``log sigma`` is interpolated linearly in ``log E`` between the
+    two fits, which makes the cross section continuous; ``blend=1`` gives the
+    fits as published.
     """
+
+    blend: float = 1.1
+    """Half-width of the blend window, as a factor on 100 keV/amu (1: none)."""
+
+    def __post_init__(self) -> None:
+        """Check the blend window."""
+        if not 1.0 <= self.blend <= 2.0:
+            raise ValueError("blend must be between 1 (none) and 2")
 
     def __call__(
         self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
@@ -320,12 +338,30 @@ class SuzukiStopping:
                 f"Suzuki's fit covers {_E_MIN_KEV} to {_E_MAX_KEV} keV/amu, "
                 f"got {e_kev.min()} to {e_kev.max()}"
             )
+        args = (e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges)
+        low = e_kev < _E_SPLIT_KEV
+        sigma = self._fit(*args, low)
+        if self.blend > 1.0:
+            lower, upper = _E_SPLIT_KEV / self.blend, _E_SPLIT_KEV * self.blend
+            window = (e_kev > lower) & (e_kev < upper)
+            if xp.any(window):
+                other = self._fit(*args, ~low)
+                sigma_low = xp.where(low, sigma, other)
+                sigma_high = xp.where(low, other, sigma)
+                w = (xp.log(e_kev) - np.log(lower)) / (np.log(upper) - np.log(lower))
+                blended = xp.exp((1.0 - w) * xp.log(sigma_low) + w * xp.log(sigma_high))
+                sigma = xp.where(window, blended, sigma)
+        return sigma
+
+    def _fit(
+        self, e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges, low
+    ) -> Any:
+        """Return ``sigma_s`` [m^2] from the low-energy table where ``low``."""
         ne = xp.asarray(ne, dtype=float)
         log_e = xp.log(e_kev)
         n19 = ne * 1.0e-19
         log_n = xp.log(xp.maximum(n19, 1.0e-30))
         u = xp.log(xp.asarray(te, dtype=float) * 1.0e-3)
-        low = e_kev < _E_SPLIT_KEV
 
         hydrogen = [i for i, z in enumerate(ion_charges) if z == 1]
         impurities = [i for i, z in enumerate(ion_charges) if z != 1]

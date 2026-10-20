@@ -39,8 +39,8 @@ gives ``nu_D = beta v_c^3 / (tau_s v^3)`` and, dividing by ``dv/dt``,
     \langle\xi\rangle(v) = \xi_0 \left[\frac{v^3 (v_0^3 + v_c^3)}
                                          {v_0^3 (v^3 + v_c^3)}\right]^{\beta/3},
 
-the form of Gaffey (J. Plasma Phys. 16, 149, 1976); his exponent is to be
-checked against this derivation (plan step 0).
+the form of Gaffey (J. Plasma Phys. 16, 149, 1976). The exponent ``beta / 3``
+follows from the derivation above; it has not been compared with Gaffey's.
 
 Everything is local: an ion slows down on the flux surface where it was born
 (no orbit width, no losses, no charge exchange), and its energy at
@@ -225,9 +225,9 @@ def trapped_electron_correction(zeff, epsilon):
 
     The large-aspect-ratio fit ``G = (1.55 + 0.85/Z) sqrt(eps) - (0.20 +
     1.55/Z) eps``, as quoted for neutral-beam current drive (Start and Cordey;
-    Wesson, *Tokamaks*). The coefficients are not yet checked against the
-    source (plan step 0); Lin-Liu and Hinton (Phys. Plasmas 4, 4179, 1997)
-    give the general-geometry form.
+    Wesson, *Tokamaks*). The coefficients have not been checked against the
+    original papers; Lin-Liu and Hinton (Phys. Plasmas 4, 4179, 1997) give the
+    general-geometry form.
     """
     z = xp.asarray(zeff, dtype=float)
     eps = xp.asarray(epsilon, dtype=float)
