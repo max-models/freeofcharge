@@ -31,6 +31,51 @@ from freeofcharge import geqdsk
 __all__ = ["Equilibrium", "FluxSurfaces"]
 
 
+class _StarShapedPolygon:
+    """Point-in-polygon for a polygon that is star-shaped about ``centre``.
+
+    Every ray from the centre crosses the boundary once, so a point is inside
+    exactly when it is on the centre's side of the one edge its angle falls on:
+    a binary search over the vertex angles instead of a ray-casting loop over
+    all edges, with the same answer away from the boundary itself.
+    """
+
+    def __init__(self, vertices: np.ndarray, centre: tuple[float, float]) -> None:
+        cx, cy = centre
+        x, y = vertices[:, 0], vertices[:, 1]
+        if np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y) < 0.0:
+            vertices = vertices[::-1]  # counter-clockwise
+        theta = np.mod(np.arctan2(vertices[:, 1] - cy, vertices[:, 0] - cx), 2 * np.pi)
+        start = int(np.argmin(theta))
+        vertices = np.roll(vertices, -start, axis=0)
+        theta = np.roll(theta, -start)
+        if not np.all(np.diff(theta) > 0.0):
+            raise ValueError("the polygon is not star-shaped about the centre")
+        self.centre = (float(cx), float(cy))
+        self._theta = xp.asarray(theta)
+        edge = np.roll(vertices, -1, axis=0) - vertices
+        self._ax, self._ay = xp.asarray(vertices[:, 0]), xp.asarray(vertices[:, 1])
+        self._ex, self._ey = xp.asarray(edge[:, 0]), xp.asarray(edge[:, 1])
+
+    @classmethod
+    def try_build(cls, vertices, centre) -> _StarShapedPolygon | None:
+        """Return the fast test, or None when the polygon is not star-shaped."""
+        try:
+            return cls(np.asarray(vertices, dtype=float), centre)
+        except ValueError:
+            return None
+
+    def contains(self, r, z):
+        """Return whether the points are strictly inside (same shape as ``r``)."""
+        cx, cy = self.centre
+        theta = xp.mod(xp.arctan2(z - cy, r - cx), 2.0 * np.pi)
+        # edge k runs from vertex k to k + 1; angles below vertex 0 belong to the
+        # closing edge from the last vertex
+        k = xp.searchsorted(self._theta, theta, side="right") - 1
+        k[k < 0] = self._theta.shape[0] - 1
+        return self._ex[k] * (z - self._ay[k]) - self._ey[k] * (r - self._ax[k]) > 0.0
+
+
 @dataclass(frozen=True)
 class FluxSurfaces:
     """Volumes and shapes of the shells between the radii ``rho_edges``."""
@@ -105,6 +150,12 @@ class Equilibrium:
         self.boundary = Polygon(vertices=np.asarray(boundary, dtype=float))
         self.wall = (
             None if wall is None else Polygon(vertices=np.asarray(wall, dtype=float))
+        )
+        # The boundary (and usually the wall) is star-shaped about the magnetic
+        # axis: test points against the one edge in their direction.
+        self._fast_boundary = _StarShapedPolygon.try_build(boundary, self.axis)
+        self._fast_wall = (
+            None if wall is None else _StarShapedPolygon.try_build(wall, self.axis)
         )
         # The gradient at the nodes from a cubic spline (fourth-order accurate),
         # then interpolated like psi.
@@ -267,6 +318,8 @@ class Equilibrium:
         """Return whether the points are inside the last closed flux surface."""
         r = xp.asarray(r, dtype=float)
         z = xp.asarray(z, dtype=float)
+        if self._fast_boundary is not None:
+            return self._fast_boundary.contains(r, z)
         return self.boundary.contains_points(xp.stack([r.ravel(), z.ravel()])).reshape(
             r.shape
         )
@@ -277,6 +330,8 @@ class Equilibrium:
         z = xp.asarray(z, dtype=float)
         if self.wall is None:
             return xp.ones(r.shape, dtype=bool)
+        if self._fast_wall is not None:
+            return self._fast_wall.contains(r, z)
         return self.wall.contains_points(xp.stack([r.ravel(), z.ravel()])).reshape(
             r.shape
         )

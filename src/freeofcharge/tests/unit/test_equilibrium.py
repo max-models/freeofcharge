@@ -119,3 +119,29 @@ def test_geqdsk_reads_numbers_that_run_together(tmp_path):
     data = read(path)
     assert data.psi.tolist() == [[-1.0, -1.25], [-1.5, -2.0]]
     assert data.psi_boundary == -2.0
+
+
+def test_star_shaped_inside_matches_the_polygon_test():
+    """The fast boundary and wall tests agree with ray casting on every polygon."""
+    from freeofcharge.equilibrium import _StarShapedPolygon
+
+    eq = Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
+    assert eq._fast_boundary is not None and eq._fast_wall is not None
+    rng = np.random.default_rng(0)
+    r, z = rng.uniform(3.0, 10.0, 200_000), rng.uniform(-7.0, 7.0, 200_000)
+    for polygon in (eq.boundary, eq.wall):
+        vertices = np.asarray(polygon.vertices)
+        slow = np.asarray(polygon.contains_points(np.stack([r, z])))
+        for order in (vertices, vertices[::-1], np.roll(vertices, 37, axis=0)):
+            fast = _StarShapedPolygon(order, eq.axis).contains(r, z)
+            np.testing.assert_array_equal(fast, slow)
+
+
+def test_a_polygon_that_is_not_star_shaped_falls_back():
+    from freeofcharge.equilibrium import _StarShapedPolygon
+
+    c_shape = np.array(
+        [[0, 0], [2, 0], [2, 2], [0, 2], [0, 1.5], [1.5, 1.5], [1.5, 0.5], [0, 0.5]],
+        dtype=float,
+    )
+    assert _StarShapedPolygon.try_build(c_shape, (1.75, 1.0)) is None
