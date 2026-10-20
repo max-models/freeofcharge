@@ -1244,8 +1244,8 @@ requires-dist = [
     { name = "nbclient", marker = "extra == 'docs'", specifier = ">=0.11" },
     { name = "nbformat", marker = "extra == 'docs'", specifier = ">=5.11.1" },
     { name = "numpy" },
-    { name = "plasma-plots", marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?rev=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?rev=devel" },
+    { name = "plasma-plots", marker = "extra == 'docs'", specifier = ">=0.2.3" },
+    { name = "plasmacoll", specifier = ">=0.2.0" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
@@ -1255,7 +1255,7 @@ requires-dist = [
     { name = "scipy" },
     { name = "simgeometry", specifier = ">=0.1.0" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
-    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?rev=devel" },
+    { name = "wellbalanced", marker = "extra == 'chain'", specifier = ">=0.1.0" },
     { name = "xarray" },
 ]
 provides-extras = ["dev", "docs", "chain", "test"]
@@ -2949,8 +2949,8 @@ wheels = [
 
 [[package]]
 name = "plasma-plots"
-version = "0.2.2"
-source = { git = "https://github.com/max-models/plasma-plots?rev=devel#6b0adfbddbead561190288dea88bba1554dcec6a" }
+version = "0.2.3"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipywidgets" },
     { name = "matplotlib", version = "3.10.9", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -2961,16 +2961,24 @@ dependencies = [
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/2e/1b/02ef9b81df2d03f088f6b48dadbc63af64210450b11eb02fdfca1886319e/plasma_plots-0.2.3.tar.gz", hash = "sha256:89b6a77bd782126088d466df5d5a318ee15f4f5f06f49a562be901e1e722ad1d", size = 480457, upload-time = "2026-10-20T12:00:36.454Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/4d/85ee0c8e8786857e7677deff9beb729cbbaef01c447809c1b55e2172006f/plasma_plots-0.2.3-py3-none-any.whl", hash = "sha256:c894b3f1bd8609da9df098687f199dc64c8697986c078bc49f976f3373ba053b", size = 375055, upload-time = "2026-10-20T12:00:34.695Z" },
+]
 
 [[package]]
 name = "plasmacoll"
-version = "0.1.0"
-source = { git = "https://github.com/max-models/plasmacoll?rev=devel#a5997f068c019e22a94a62296077688246d8a7c8" }
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cunumpy" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4f/9e/d0b809c569e0d33a124b21df7492ea1c22b32ff0f65327a9013481d1bc8d/plasmacoll-0.2.0.tar.gz", hash = "sha256:0dc4b3bfc1ef720b5d1aa1e6590ed8bca3eebbca2d3888da1a95f341c771a19a", size = 71228, upload-time = "2026-10-20T12:20:50.233Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/f4/a5e2164ce962d05059bc78e00f369f8605f874227b8558d3fdddea03e8eb/plasmacoll-0.2.0-py3-none-any.whl", hash = "sha256:2c90da42b37af61ceacd761e9ee18e63f260ac9fdaebeec0360256347a7fe80e", size = 85506, upload-time = "2026-10-20T12:20:48.621Z" },
 ]
 
 [[package]]
@@ -4310,7 +4318,7 @@ wheels = [
 [[package]]
 name = "wellbalanced"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/wellbalanced?rev=devel#16a469d23d86024040f284d0acf2ab51ebf71253" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
@@ -4321,6 +4329,10 @@ dependencies = [
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6a/8e/ef324a342ad6d455a0aa6a4c326bcb6f51372010b14de4fbe57c7085d250/wellbalanced-0.1.0.tar.gz", hash = "sha256:87284e5618e1a641bf0349ec4f603578a0dc41de79872ae68ce2a4bceadcd5a4", size = 98999, upload-time = "2026-10-20T12:33:08.419Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/93/8b/f1beb74ea76f0fa182dccb3db17c45791cb0f7776d8fe1515fa1cda05123/wellbalanced-0.1.0-py3-none-any.whl", hash = "sha256:37786f007e95e72435648ea04c5dd751cb1c3428593ad54af58beb3a45ee50b9", size = 107028, upload-time = "2026-10-20T12:33:06.647Z" },
 ]
 
 [[package]]
