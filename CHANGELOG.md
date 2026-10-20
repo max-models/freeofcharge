@@ -7,6 +7,12 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `freeofcharge.chain` and the `chain` extra (wellbalanced, tree-d-3d): a D- source from a
+  global model, slit extraction optics with a divergence V-curve, the gas neutralizer
+  (checked against its closed form) and the duct transmission; the example
+  `injector_chain.py` scans RF power and neutralizer line density end to end.
+- simgeometry comes from PyPI (`simgeometry>=0.1.0`).
+
 - `Equilibrium`: flux on an (R, Z) grid from G-EQDSK files or the Solov'ev solution, field,
   flux surfaces and shells, boundary and wall as simgeometry polygons; G-EQDSK reader and writer.
 - `NeutralBeam`: beam markers in a plasmacoll `ParticleArrays`, Gaussian beams with core and
