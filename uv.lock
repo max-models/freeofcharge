@@ -1236,7 +1236,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "scipy" },
-    { name = "simgeometry", git = "https://github.com/max-models/simgeometry?rev=devel" },
+    { name = "simgeometry", specifier = ">=0.1.0" },
     { name = "xarray" },
 ]
 provides-extras = ["dev", "docs", "test"]
@@ -3903,7 +3903,7 @@ wheels = [
 [[package]]
 name = "simgeometry"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/simgeometry?rev=devel#f093bb474352b52a0842fc892eacc2874d5a77b7" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cunumpy" },
     { name = "maybempi" },
@@ -3911,6 +3911,10 @@ dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bd/e6/d62d336630c3eb0720faf7b731169a4da1386ad7eb61036187546f1ae861/simgeometry-0.1.0.tar.gz", hash = "sha256:c964839c2d98624c9ff0d05254c7b6f5df76ba13e5c7e04755dfac968614d4e6", size = 71319, upload-time = "2026-10-20T10:48:48.671Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/8b/bb41043d114b5d01f9b204cd76da57d4961606c0d871d1e7c6073f91df2d/simgeometry-0.1.0-py3-none-any.whl", hash = "sha256:979fe6d480973788c28785b3ad2c8609a0980d9f7d5cc0a0841faf01cd4515aa", size = 98691, upload-time = "2026-10-20T10:48:47.364Z" },
 ]
 
 [[package]]
