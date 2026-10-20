@@ -39,6 +39,13 @@ accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
   density, pressure and energy, the pitch-angle relaxation and the
   beam-driven current with the electron shielding and a trapped-electron
   correction.
+- **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
+  stages before the plasma, from the other max-models codes: a
+  wellbalanced global model of the D- source, tree-d-3d slit optics
+  (divergence against perveance), the plasmacoll gas neutralizer and the
+  duct transmission. `examples/injector_chain.py` scans RF power and
+  neutralizer gas against the neutral power, driven current and
+  shine-through.
 
 Arrays live on the cunumpy backend (NumPy or CuPy); with MPI (maybempi)
 every rank traces its own markers and the profiles are summed once.
