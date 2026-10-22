@@ -26,9 +26,13 @@ other max-models codes, imported only when called (``pip install 'freeofcharge[c
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy.special import erf
+
+if TYPE_CHECKING:
+    from wellbalanced import GlobalState
 
 ELEMENTARY_CHARGE = 1.602176634e-19
 EPSILON_0 = 8.8541878128e-12
@@ -68,6 +72,7 @@ class Source:
         positive_flux: Positive-ion flux density to the plasma grid, ``h n_e u_B``
             [m^-2 s^-1].
         current_density: Extracted negative-ion current density [A/m^2].
+        state: The steady state of the global model, with every term of its balances.
     """
 
     rf_power: float
@@ -75,6 +80,7 @@ class Source:
     electron_temperature: float
     positive_flux: float
     current_density: float
+    state: GlobalState
 
 
 def deuterium_source(
@@ -161,6 +167,7 @@ def deuterium_source(
         electron_temperature=te,
         positive_flux=flux,
         current_density=extraction_ratio * ELEMENTARY_CHARGE * flux,
+        state=state,
     )
 
 

@@ -12,6 +12,12 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (checked against its closed form) and the duct transmission; the example
   `injector_chain.py` scans RF power and neutralizer line density end to end.
 - simgeometry comes from PyPI (`simgeometry>=0.1.0`).
+- The chain test (`tests/integration`): the injector chain end to end at a small size,
+  checking the units, shapes and species names between the stages and the power
+  bookkeeping, with errors that name the stage and package. The `Chain Test` workflow runs
+  it weekly, by hand, on `package-released` events from the other packages' releases, and
+  against both the latest PyPI releases and the devel branches.
+- `Source.state`: the wellbalanced steady state behind `deuterium_source`.
 
 - `Equilibrium`: flux on an (R, Z) grid from G-EQDSK files or the Solov'ev solution, field,
   flux surfaces and shells, boundary and wall as simgeometry polygons; G-EQDSK reader and writer.
@@ -29,6 +35,8 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- The max-models dependencies come from their devel branches (`[tool.uv.sources]`) on
+  `devel`, and from PyPI (`UV_NO_SOURCES`) for pull requests to and pushes on `main`.
 - `deposit` is about 5 times faster: the boundary and wall tests of `Equilibrium` use the
   star shape of the polygons about the magnetic axis (one edge per point instead of all of
   them), with ray casting kept for polygons that are not star-shaped. Results are identical.

@@ -1,0 +1,119 @@
+name: Chain Test
+
+# The injector chain (src/freeofcharge/tests/integration) against the latest PyPI releases
+# and against the devel branches of the packages it joins. See
+# docs/src/content/docs/development/chain-test.md.
+run-name: >-
+  Chain test${{ github.event_name == 'repository_dispatch' && format(' after {0} {1}',
+  github.event.client_payload.package, github.event.client_payload.version) || '' }}
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays, 05:00 UTC
+  workflow_dispatch:
+  # sent by the release workflows of the other packages, see the docs page above
+  repository_dispatch:
+    types: [package-released]
+  pull_request:
+    branches:
+      - main
+      - devel
+    paths:
+      - .github/workflows/chain_test.yml
+      - pyproject.toml
+      - src/freeofcharge/**
+
+permissions:
+  contents: read
+
+jobs:
+  chain:
+    name: chain (${{ matrix.flavour }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [pypi, devel]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      # After a release, PyPI can take a moment to serve the new version.
+      - name: Wait for the release on PyPI
+        if: matrix.flavour == 'pypi' && github.event_name == 'repository_dispatch'
+        env:
+          PACKAGE: ${{ github.event.client_payload.package }}
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          for _ in $(seq 20); do
+            curl --fail --silent "https://pypi.org/pypi/$PACKAGE/$VERSION/json" >/dev/null && exit 0
+            sleep 30
+          done
+          echo "::warning::$PACKAGE $VERSION is not on PyPI after 10 minutes"
+
+      # The latest releases, unpinned: no uv.lock and no [tool.uv.sources]. tree-d-3d has
+      # no PyPI release, so the optics stage is skipped and the beam line takes a fixed
+      # divergence.
+      - name: Install the latest PyPI releases
+        if: matrix.flavour == 'pypi'
+        env:
+          UV_NO_SOURCES: true
+        run: |
+          uv venv
+          uv pip install --refresh -e . wellbalanced pytest
+
+      # The devel branches from [tool.uv.sources], at their latest commits.
+      - name: Install the devel branches
+        if: matrix.flavour == 'devel'
+        run: uv sync --extra test --upgrade
+
+      - name: List the versions
+        env:
+          FLAVOUR: ${{ matrix.flavour }}
+          PACKAGE: ${{ github.event.client_payload.package }}
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          {
+            echo "### Chain test ($FLAVOUR)"
+            if [ -n "$PACKAGE" ]; then
+              echo "Triggered by the release of $PACKAGE $VERSION."
+            fi
+            echo '```'
+            uv pip freeze | grep -E '^(cunumpy|freeofcharge|maybempi|mpiarray|plasmacoll|scope-profiler|simgeometry|tree-d-3d|wellbalanced)( |=|@)'
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the chain
+        run: >-
+          .venv/bin/python -m pytest -p no:cacheprovider -v --junitxml=chain.xml
+          src/freeofcharge/tests/integration
+
+      # Each stage fixture raises a StageError naming its stage and package, and each
+      # interface assertion names the two stages it joins: list them in the summary.
+      - name: Summarize the stages
+        if: always() && hashFiles('chain.xml') != ''
+        run: |
+          .venv/bin/python - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
+          import xml.etree.ElementTree as ET
+
+          print("| test | result | message |")
+          print("|---|---|---|")
+          for case in ET.parse("chain.xml").iter("testcase"):
+              result, message = "passed", ""
+              for tag in ("failure", "error", "skipped"):
+                  node = case.find(tag)
+                  if node is not None:
+                      result = tag
+                      text = node.get("message") or ""
+                      stage = [line for line in text.splitlines() if "StageError" in line]
+                      message = (stage or text.splitlines() or [""])[0]
+              message = message.replace("|", "\\|")[:300]
+              print(f"| `{case.get('name')}` | {result} | {message} |")
+          EOF
