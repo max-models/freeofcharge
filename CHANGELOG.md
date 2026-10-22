@@ -7,6 +7,11 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `freeofcharge.ascot5` and `benchmarks/ascot5`: the ASCOT5 benchmark. The equilibrium,
+  plasma, wall and beam in a5py's input format (`B_2DS`, `plasma_1D`, `wall_2D`, one BBNBI5
+  beamlet per marker), a benchmark case of ASDEX Upgrade's size with a 60 keV deuterium beam,
+  a script that runs BBNBI5 and ASCOT5 on it, their results, and the comparison as the
+  example `ascot5_benchmark.py` and the documentation page "ASCOT5 benchmark".
 - `freeofcharge.chain` and the `chain` extra (wellbalanced, tree-d-3d): a D- source from a
   global model, slit extraction optics with a divergence V-curve, the gas neutralizer
   (checked against its closed form) and the duct transmission; the example

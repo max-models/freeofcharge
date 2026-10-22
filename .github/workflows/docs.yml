@@ -34,6 +34,8 @@ jobs:
         full-examples/index.html
         full-examples/iter-like-injection/index.html
         full-examples/injector-chain/index.html
+        full-examples/ascot5-benchmark/index.html
+        benchmarks/ascot5/index.html
         api/freeofcharge/index.html
         api/freeofcharge/deposition/index.html
         tutorials/equilibrium-and-flux-surfaces/equilibrium_and_flux_surfaces.ipynb
