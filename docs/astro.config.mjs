@@ -32,6 +32,10 @@ export default defineDocs({
 			items: [{ autogenerate: { directory: 'full-examples' } }],
 		},
 		{
+			label: 'Benchmarks',
+			items: [{ label: 'ASCOT5', slug: 'benchmarks/ascot5' }],
+		},
+		{
 			label: 'Development',
 			items: [
 				{ label: 'Building the docs', slug: 'development/docs' },

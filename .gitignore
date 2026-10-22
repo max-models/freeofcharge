@@ -174,3 +174,6 @@ junit/
 # Quarto
 .quarto/
 README_files/
+
+# ASCOT5 benchmark runs
+benchmarks/ascot5/work/
