@@ -36,6 +36,7 @@ export default defineDocs({
 			items: [
 				{ label: 'Building the docs', slug: 'development/docs' },
 				{ label: 'Publishing', slug: 'development/publishing' },
+				{ label: 'Chain test', slug: 'development/chain-test' },
 			],
 		},
 	],
