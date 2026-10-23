@@ -103,7 +103,14 @@ def test_freeofcharge_side_conserves_power(ours):
         "injected_power"
     ] == pytest.approx(ours["injected_power"], rel=1e-9)
     heating = np.sum(ours["electron_heating"]) + np.sum(ours["ion_heating"])
-    assert heating == pytest.approx(absorbed, rel=2e-2)
+    # the energy below max(2 T_i, 1 keV) goes to the thermal ions
+    assert 0.0 < ours["thermalised_power"] < 0.1 * absorbed
+    assert heating + ours["thermalised_power"] == pytest.approx(absorbed, rel=1e-9)
+    local = ascot5.without_orbits(ours)
+    assert local["fast_ions"] == ours["fast_ions"]
+    # trapped ions carry no current: the orbits carry less than the local pitch
+    assert 0.0 < ours["fast_ion_current"] < local["fast_ion_current"]
+    assert 0.0 < ours["trapped_births"] < 1.0
     shine = ours["scan_shine_through_fraction"]
     assert shine[0] > shine[1] > shine[2]
 

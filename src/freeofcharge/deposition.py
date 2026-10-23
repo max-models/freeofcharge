@@ -53,6 +53,8 @@ class Deposition:
     """``rho`` of each birth."""
     birth_pitch: object
     """``v_par / v`` of each birth (positive along B)."""
+    birth_field: object
+    """``|B|`` at each birth [T]."""
     mass_number: int
     rho_edges: np.ndarray
     birth_rate: np.ndarray
@@ -296,11 +298,13 @@ def deposit(
         birth_pitch = xp.sum(births.velocities * field, axis=1) / (speed * b_norm)
     else:
         birth_pitch = xp.zeros(0)
+        b_norm = xp.zeros(0)
 
     return Deposition(
         births=births,
         birth_rho=birth_rho,
         birth_pitch=birth_pitch,
+        birth_field=b_norm,
         mass_number=beam.mass_number,
         rho_edges=rho_edges,
         birth_rate=tallies[:, 0],

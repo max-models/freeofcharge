@@ -20,7 +20,7 @@ The two knobs pull against each other: more RF power gives more current but, pas
 optimum perveance, a more divergent beam, more of which the duct scrapes (65 % passes at
 1.1 MW); more gas neutralizes more of the beam up to the maximum and then re-ionizes it.
 The scan maps the neutral power delivered, the driven current and the power shone
-through onto the inboard wall over the two: the most current, 2.9 MA from 23 MW, comes
+through onto the inboard wall over the two: the most current, 2.0 MA from 23 MW, comes
 at 950 kW and a line density of 1.5e20 m^-2, next to the neutralizer's optimum.
 
 What is modelled, and what is not:

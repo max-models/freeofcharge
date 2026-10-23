@@ -5,6 +5,32 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- `slow_down`: each species has its own Coulomb logarithm (`coulomb_logarithms`, as ASCOT5
+  evaluates it), so the ion drag and the pitch-angle scattering grow by about a third
+  against the shared electron logarithm; the slowing down is integrated numerically in speed
+  (`slowing_down_moments`, Simpson's rule in `ln v`). On the ASCOT5 benchmark the fast-ion
+  content goes from 14% above ASCOT5 (without orbits) to 4% below, within the 4% by which
+  ASCOT5's moments overshoot its birth power.
+- `slow_down`: the current is that of the orbits (`orbit_average=True`, new module
+  `freeofcharge.trapping`): trapped ions carry none, passing ones their transit-averaged
+  pitch, and pitch-angle scattering is averaged over the orbit, its odd eigenmodes decaying
+  faster than Gaffey's single exponential. The ASCOT5 benchmark's fast-ion current goes from
+  2.66 to 1.18 times ASCOT5's. The rest is most likely the orbit width
+  (not yet shown).
+- `slow_down`: the fast ions can end at `max(thermal_factor T_i, minimum_energy)`, the rest
+  of their energy reported as `SlowingDown.thermalised_power`; the ASCOT5 benchmark uses
+  ASCOT5's end conditions (2 T_i, 1 keV).
+- The trapped-electron correction `G` is Sauter's `L31` with collisions from the surfaces'
+  trapped fraction, safety factor and collisionality (`sauter_trapped_electron_correction`,
+  Lin-Liu and Hinton 1997, Honda et al. 2012). The old fit is
+  `start_cordey_trapped_electron_correction`, now attributed to Mikkelsen and Singer's fit
+  of Start and Cordey's values; the hook takes `(surfaces, plasma)`.
+- `FluxSurfaces`: the field strength and flux-surface average weights on each shell centre,
+  the safety factor, the major radius and the trapped fraction; `Deposition.birth_field`.
+- The ITER-sized quickstart drives 0.59 MA instead of 0.97 MA.
+
 ### Added
 
 - `freeofcharge.ascot5` and `benchmarks/ascot5`: the ASCOT5 benchmark. The equilibrium,

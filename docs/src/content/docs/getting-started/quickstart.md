@@ -33,8 +33,8 @@ print(f"driven current {steady.driven_current / 1e6:.2f} MA")
 
 ```text
 shine-through 0.08 %
-electrons 10.9 MW, ions 5.6 MW
-driven current 0.97 MA
+electrons 10.2 MW, ions 6.3 MW
+driven current 0.59 MA
 ```
 
 It runs in a few seconds on a laptop.
@@ -48,7 +48,8 @@ It runs in a few seconds on a laptop.
    sections: the birth profile on flux shells (`deposition.power`, `birth_rate`), sampled
    fast-ion births with their pitch, and the shine-through, with where it hits the wall.
 4. `slow_down` slows the fast ions down on their flux surfaces (Stix): the heating of the
-   electrons and ions, the fast-ion density and pressure, and the beam-driven current.
+   electrons and ions, the fast-ion density and pressure, and the beam-driven current of
+   their orbits (17% of these ions are born trapped and carry none).
 
 `deposition.to_dataset(surfaces)` and `steady.to_dataset()` return the profiles as xarray
 datasets for plotting, for example with plasma-plots. More markers and a shorter `step`

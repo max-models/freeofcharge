@@ -31,7 +31,7 @@ from freeofcharge.beam import NeutralBeam, tangential_injection
 from freeofcharge.deposition import deposit
 from freeofcharge.equilibrium import Equilibrium, FluxSurfaces
 from freeofcharge.profiles import Plasma
-from freeofcharge.slowing_down import slow_down
+from freeofcharge.slowing_down import SlowingDown, slow_down
 
 __all__ = [
     "BenchmarkCase",
@@ -236,7 +236,8 @@ def benchmark_case(
     profiles with 5e19 m^-3 and 2.5 keV in the centre; one 2.5 MW beam of 60
     keV deuterium tangent to R = 1.0 m from R = 3.5 m, 10 cm wide with 10
     mrad divergence, injected along the field. The shine-through is also
-    scanned over the central density.
+    scanned over the central density. The fast ions are slowed down until
+    ``max(2 T_i, 1 keV)``.
 
     Args:
         markers: Beam markers (BBNBI5 beamlets).
@@ -264,6 +265,9 @@ def benchmark_case(
         "divergence": 0.01,
         "markers": markers,
         "seed": seed,
+        # the fast ions end at max(2 T_i, 1 keV), ASCOT5's end conditions
+        "thermal_factor": 2.0,
+        "minimum_energy": 1.0e3,
     }
     p = parameters
     equilibrium = Equilibrium.solovev(
@@ -296,6 +300,24 @@ def benchmark_case(
     )
 
 
+def _slowing_down_results(steady: SlowingDown, surfaces: FluxSurfaces) -> dict:
+    return {
+        "electron_heating": steady.electron_heating.tolist(),
+        "ion_heating": steady.ion_heating.tolist(),
+        "fast_ion_density": steady.fast_ion_density.tolist(),
+        "fast_ion_current_density": steady.fast_ion_current_density.tolist(),
+        "fast_ion_current": float(
+            np.sum(steady.fast_ion_current_density * surfaces.area)
+        ),
+        "current_density": steady.current_density.tolist(),
+        "driven_current": steady.driven_current,
+        "fast_ions": float(np.sum(steady.fast_ion_density * surfaces.volume)),
+        "stored_energy": steady.stored_energy,
+        "thermalised_power": steady.thermalised_power,
+        "trapped_births": steady.trapped_births,
+    }
+
+
 def run_freeofcharge(
     case: BenchmarkCase,
     *,
@@ -309,7 +331,9 @@ def run_freeofcharge(
     Per shell: the birth rate [1/s] and deposited power [W] (no sampling
     noise), the heating of electrons and ions [W], the fast-ion density
     [m^-3] and parallel current density [A/m^2]; the shine-through fraction
-    at each central density of the scan; the totals.
+    at each central density of the scan; the totals. The slowing down with
+    the current of the orbits (``orbit_average``) is at the top level, the
+    one with the local pitch under ``"local"``, as in the ASCOT5 file.
     """
     rho_edges = case.rho_edges
     if surfaces is None:
@@ -334,7 +358,12 @@ def run_freeofcharge(
         rho_edges=rho_edges,
         seed=seed,
     )
-    steady = slow_down(deposition, case.plasma, surfaces)
+    end = {
+        "thermal_factor": case.parameters.get("thermal_factor", 0.0),
+        "minimum_energy": case.parameters.get("minimum_energy", 0.0),
+    }
+    steady = slow_down(deposition, case.plasma, surfaces, **end)
+    local = slow_down(deposition, case.plasma, surfaces, orbit_average=False, **end)
     return {
         "code": "freeofcharge",
         "rho_edges": rho_edges.tolist(),
@@ -346,17 +375,8 @@ def run_freeofcharge(
         "shine_through_fraction": deposition.shine_through_fraction,
         "birth_rate": deposition.birth_rate.tolist(),
         "deposited_power": deposition.power.tolist(),
-        "electron_heating": steady.electron_heating.tolist(),
-        "ion_heating": steady.ion_heating.tolist(),
-        "fast_ion_density": steady.fast_ion_density.tolist(),
-        "fast_ion_current_density": steady.fast_ion_current_density.tolist(),
-        "fast_ion_current": float(
-            np.sum(steady.fast_ion_current_density * surfaces.area)
-        ),
-        "current_density": steady.current_density.tolist(),
-        "driven_current": steady.driven_current,
-        "fast_ions": float(np.sum(steady.fast_ion_density * surfaces.volume)),
-        "stored_energy": steady.stored_energy,
+        **_slowing_down_results(steady, surfaces),
+        "local": _slowing_down_results(local, surfaces),
     }
 
 
@@ -389,6 +409,7 @@ PROFILES = (
 #: Scalars compared.
 TOTALS = (
     "shine_through_fraction",
+    "thermalised_power",
     "fast_ions",
     "stored_energy",
     "fast_ion_current",
@@ -418,13 +439,14 @@ def shell_amounts(results: dict, name: str) -> np.ndarray:
     return values
 
 
-def without_orbits(reference: dict) -> dict:
-    """Return the ASCOT5 results with the slowing down of the run without orbits.
+def without_orbits(results: dict) -> dict:
+    """Return the results with the slowing down of the run without orbits.
 
     The deposition is the same; the slowing-down profiles and totals are those
-    stored under ``"local"``, where the markers stay at their birth points.
+    stored under ``"local"``: for ASCOT5 the markers stay at their birth
+    points, for freeofcharge the current is that of the local pitch.
     """
-    return {**reference, **reference["local"]}
+    return {**results, **results["local"]}
 
 
 def compare(ours: dict, reference: dict) -> dict:

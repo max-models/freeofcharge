@@ -17,7 +17,7 @@ psi_axis)``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import cunumpy as xp
@@ -88,11 +88,51 @@ class FluxSurfaces:
     """Poloidal cross-section area of each shell [m^2]."""
     inverse_aspect_ratio: np.ndarray
     """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre."""
+    field_strength: np.ndarray | None = field(default=None, repr=False)
+    """``|B|`` [T] at points around the surface at each shell centre, shape
+    ``(shells, points)``."""
+    surface_weight: np.ndarray | None = field(default=None, repr=False)
+    """Weights of those points in the flux-surface average, ``dl_p / B_p``
+    normalised to a sum of one (``dl_p`` the poloidal arc length)."""
+    safety_factor: np.ndarray | None = None
+    """``q = F / (2 pi) * oint dl_p / (R^2 B_p)`` at each shell centre."""
+    major_radius: np.ndarray | None = None
+    """``(R_max + R_min) / 2`` of the surface at each shell centre [m]."""
 
     @property
     def rho(self) -> np.ndarray:
         """Return the shell centres."""
         return 0.5 * (self.rho_edges[1:] + self.rho_edges[:-1])
+
+    def surface_average(self, values) -> np.ndarray:
+        """Return the flux-surface average of ``values`` given at the field points."""
+        if self.surface_weight is None:
+            raise ValueError("these surfaces have no field points")
+        return np.sum(self.surface_weight * values, axis=-1)
+
+    @property
+    def trapped_fraction(self) -> np.ndarray:
+        r"""Return the trapped-particle fraction of each surface centre.
+
+        .. math::
+
+            f_t = 1 - \frac{3}{4} \langle B^2 \rangle \int_0^{1/B_\max}
+                  \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}
+
+        (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995), by Gauss-Legendre
+        quadrature in ``lambda``.
+        """
+        if self.field_strength is None or self.surface_weight is None:
+            raise ValueError("these surfaces have no field points")
+        b = self.field_strength / self.field_strength.max(axis=1, keepdims=True)
+        nodes, weights = np.polynomial.legendre.leggauss(64)
+        # lambda B_max = 1 - s^2 resolves the square-root end point
+        s = 0.5 * (nodes + 1.0)
+        lam = 1.0 - s**2
+        root = np.sqrt(np.maximum(1.0 - lam[None, :, None] * b[:, None, :], 0.0))
+        average = np.sum(self.surface_weight[:, None, :] * root, axis=-1)
+        integral = np.sum(0.5 * weights * lam * 2.0 * s / average, axis=-1)
+        return 1.0 - 0.75 * self.surface_average(b**2) * integral
 
     def shell_index(self, rho):
         """Return the shell of each ``rho``, -1 outside ``[0, 1)``."""
@@ -404,11 +444,15 @@ class Equilibrium:
             xp.stack([r0 + distance * cos_t, z0 + distance * sin_t], axis=1)
         )
 
-    def flux_surfaces(self, rho_edges, resolution: int = 400) -> FluxSurfaces:
-        """Return the volumes, areas and inverse aspect ratios of the shells.
+    def flux_surfaces(
+        self, rho_edges, resolution: int = 400, field_points: int = 256
+    ) -> FluxSurfaces:
+        """Return the volumes, areas, shapes and fields of the shells.
 
         The volumes and areas are sums over a ``resolution``-squared grid of
-        cells covering the last closed surface.
+        cells covering the last closed surface; the field strength, the
+        flux-surface average weights and the safety factor come from
+        ``field_points`` points on the surface through each shell centre.
         """
         rho_edges = np.asarray(rho_edges, dtype=float)
         vertices = self.boundary.vertices
@@ -430,9 +474,35 @@ class Equilibrium:
         )
         centres = 0.5 * (rho_edges[1:] + rho_edges[:-1])
         epsilon = np.empty(n_shells)
+        major = np.empty(n_shells)
+        q = np.empty(n_shells)
+        strength = np.empty((n_shells, field_points))
+        weight = np.empty((n_shells, field_points))
         for k, rho in enumerate(centres):
-            surface = self.flux_surface(rho**2, points=128)
+            surface = self.flux_surface(rho**2, points=field_points)
             r_min, r_max = surface[:, 0].min(), surface[:, 0].max()
             epsilon[k] = (r_max - r_min) / (r_max + r_min)
+            major[k] = 0.5 * (r_max + r_min)
+            b_r, b_z, b_phi = (
+                xp.to_numpy(b)
+                for b in self.magnetic_field(surface[:, 0], surface[:, 1])
+            )
+            b_pol = np.hypot(b_r, b_z)
+            # arc length of each point: half the distance between its neighbours
+            arc = 0.5 * np.hypot(
+                *(np.roll(surface, -1, axis=0) - np.roll(surface, 1, axis=0)).T
+            )
+            strength[k] = np.sqrt(b_pol**2 + b_phi**2)
+            weight[k] = arc / b_pol / np.sum(arc / b_pol)
+            q[k] = np.sum(arc * np.abs(b_phi) / (surface[:, 0] * b_pol)) / (2.0 * np.pi)
         sums = xp.to_numpy(sums)
-        return FluxSurfaces(rho_edges, sums[:, 0], sums[:, 1], epsilon)
+        return FluxSurfaces(
+            rho_edges,
+            sums[:, 0],
+            sums[:, 1],
+            epsilon,
+            field_strength=strength,
+            surface_weight=weight,
+            safety_factor=q,
+            major_radius=major,
+        )

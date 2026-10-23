@@ -35,10 +35,12 @@ accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
   births with their pitch, the shine-through and where it meets the
   wall.
 - **Slowing down** (`slow_down`): classical (Stix) slowing down on the
-  birth surface: the heating of electrons and ions, the fast-ion
-  density, pressure and energy, the pitch-angle relaxation and the
-  beam-driven current with the electron shielding and a trapped-electron
-  correction.
+  birth surface with a Coulomb logarithm per species: the heating of
+  electrons and ions, the fast-ion density, pressure and energy, and the
+  current of the orbits (trapped ions carry none, pitch-angle scattering
+  averaged over the orbit), shielded by the electrons with Sauter’s
+  trapped-electron correction. Checked against ASCOT5 on an ASDEX
+  Upgrade-sized case.
 - **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
   stages before the plasma, from the other max-models codes: a
   wellbalanced global model of the D- source, tree-d-3d slit optics
@@ -52,10 +54,7 @@ every rank traces its own markers and the profiles are summed once.
 Results convert to xarray datasets for plasma-plots.
 
 Not modelled: finite orbit width, prompt losses, charge-exchange losses
-of fast ions, anything 3D. Still to be checked against their sources:
-the trapped-electron correction (Start and Cordey’s large-aspect-ratio
-fit) and the pitch-angle exponent, derived here from the collision rates
-rather than taken from Gaffey (1976).
+of fast ions, anything 3D.
 
 Documentation: <https://max-models.github.io/freeofcharge/>
 
@@ -77,7 +76,7 @@ deposition = foc.deposit(
 )
 surfaces = equilibrium.flux_surfaces(deposition.rho_edges)
 steady = foc.slow_down(deposition, plasma, surfaces)
-# 0.0008 and 0.97 MA
+# 0.0008 and 0.59 MA
 print(deposition.shine_through_fraction, steady.driven_current)
 ```
 
