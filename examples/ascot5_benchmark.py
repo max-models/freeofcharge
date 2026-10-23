@@ -7,12 +7,16 @@ freeofcharge and compared with the ASCOT5 results stored in
 the shine-through along the same lines (one beamlet per freeofcharge marker)
 with the same stopping cross sections (Suzuki's fit), so the deposition agrees
 to within its Monte Carlo noise. ascot5_main slows the ions down twice, as
-guiding centres with Monte Carlo Coulomb collisions until 2 T_i: once
-following their orbits, and once without orbits, the markers staying where
-they were born as in freeofcharge's local model. The heating agrees with both
-to 4%; the fast-ion current agrees with the run without orbits to 15% and is
-2.7 times that of the run with orbits, since about 40% of the ions are born
-on trapped orbits (see the documentation page "ASCOT5 benchmark").
+guiding centres with Monte Carlo Coulomb collisions until max(2 T_i, 1 keV):
+once following their orbits, and once without orbits, the markers staying
+where they were born. freeofcharge slows them down on their birth surfaces to
+the same end, with a Coulomb logarithm per species, and gives the current of
+their orbits (44% are born trapped and carry none) or, for the run without
+orbits, of their local pitch. The heating and the fast-ion content agree with
+the run without orbits to 5%, within the 4% by which ASCOT5's moments add up
+to more than its birth power; the current of the local pitch to 2%; the
+current of the orbits is 18% above ASCOT5's, the orbit width that freeofcharge
+leaves out (see the documentation page "ASCOT5 benchmark").
 """
 
 from pathlib import Path
@@ -32,13 +36,19 @@ reference = ascot5.load_results(
 local = ascot5.without_orbits(reference)
 case = ascot5.benchmark_case(markers=reference["parameters"]["markers"])
 ours = ascot5.run_freeofcharge(case)
+ours_local = ascot5.without_orbits(ours)
 print(ascot5.format_comparison(ascot5.compare(ours, reference)))
 print()
-print(ascot5.format_comparison(ascot5.compare(ours, local), "ASCOT5 local"))
+print(ascot5.format_comparison(ascot5.compare(ours_local, local), "ASCOT5 local"))
 
 rho_edges = np.asarray(ours["rho_edges"])
 rho = 0.5 * (rho_edges[1:] + rho_edges[:-1])
-runs = {"freeofcharge": ours, "ASCOT5": reference, "ASCOT5, no orbits": local}
+runs = {
+    "freeofcharge": ours,
+    "ASCOT5": reference,
+    "freeofcharge, local pitch": ours_local,
+    "ASCOT5, no orbits": local,
+}
 
 
 def profile(name: str, scale: float, long_name: str, units: str, codes) -> xr.DataArray:
