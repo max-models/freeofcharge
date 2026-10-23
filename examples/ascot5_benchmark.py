@@ -15,8 +15,8 @@ their orbits (44% are born trapped and carry none) or, for the run without
 orbits, of their local pitch. The heating and the fast-ion content agree with
 the run without orbits to 5%, within the 4% by which ASCOT5's moments add up
 to more than its birth power; the current of the local pitch to 2%; the
-current of the orbits is 18% above ASCOT5's, the orbit width that freeofcharge
-leaves out (see the documentation page "ASCOT5 benchmark").
+current of the orbits is 18% above ASCOT5's, most likely from the orbit width
+that freeofcharge leaves out (see the documentation page "ASCOT5 benchmark").
 """
 
 from pathlib import Path

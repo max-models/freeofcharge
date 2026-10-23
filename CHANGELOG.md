@@ -17,7 +17,8 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `freeofcharge.trapping`): trapped ions carry none, passing ones their transit-averaged
   pitch, and pitch-angle scattering is averaged over the orbit, its odd eigenmodes decaying
   faster than Gaffey's single exponential. The ASCOT5 benchmark's fast-ion current goes from
-  2.66 to 1.18 times ASCOT5's; the rest is the orbit width.
+  2.66 to 1.18 times ASCOT5's. The rest is most likely the orbit width
+  (not yet shown).
 - `slow_down`: the fast ions can end at `max(thermal_factor T_i, minimum_energy)`, the rest
   of their energy reported as `SlowingDown.thermalised_power`; the ASCOT5 benchmark uses
   ASCOT5's end conditions (2 T_i, 1 keV).

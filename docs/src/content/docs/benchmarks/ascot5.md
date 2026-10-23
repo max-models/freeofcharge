@@ -128,8 +128,13 @@ the heating and the density of a shell share (it is which births the 1000 marker
   surface. A 60 keV deuteron in 2.5 T has a Larmor radius of 2 cm and banana widths of several
   cm, not small next to the central shells: ASCOT5's current density is flat inside rho = 0.2,
   where freeofcharge's is 20% to 50% above it shell by shell, and near the axis the orbits are
-  potatoes, not bananas. ASCOT5's statistical error on the current, from 1000
-  markers of which 44% carry none, is about 4%.
+  potatoes, not bananas. That the orbit width is the cause is likely but not shown. The test is
+  a field scan in ASCOT5: in this Solov'ev case the field scales the orbit widths as 1/B and
+  changes nothing else, so freeofcharge's answer stays the same. A first try (300 markers each, at
+  2.5 T and 10 T) gave 44 and 52 kA, but about half of the markers reached the CPU-time limit
+  before thermalising (20 of 1000 in the stored run), so those currents are cut short and do not
+  settle the question. The ASCOT5 current with orbits is also noisy: 44% of the markers carry
+  almost none, and the profile varies by tens of percent per shell.
 - **The electron heating with orbits (9% below ASCOT5).** Following the orbits moves 5% of the
   heating from the ions to the electrons in ASCOT5 (1.227 against 1.171 MW to the electrons); a
   local model has no such shift.
