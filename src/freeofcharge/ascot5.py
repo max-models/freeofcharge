@@ -192,6 +192,13 @@ def shell_sums(rho, values, rho_edges) -> tuple[np.ndarray, np.ndarray]:
     return total, np.sqrt(square)
 
 
+def _parabolic_plasma(parameters: dict, ne0: float) -> Plasma:
+    p = parameters
+    return Plasma.parabolic(
+        ne0, p["te0"], p["ti0"], ions=p["ions"], points=p["profile_points"]
+    )
+
+
 # ----------------------------------------------------------------------
 # The case and the freeofcharge side
 # ----------------------------------------------------------------------
@@ -206,19 +213,12 @@ class BenchmarkCase:
     beam: NeutralBeam
     rho_edges: np.ndarray
     densities: np.ndarray
-    """Central electron densities of the shine-through scan [m^-3]."""
     parameters: dict = field(default_factory=dict)
+    """Central electron densities of the shine-through scan [m^-3]."""
 
     def plasma_at(self, ne0: float) -> Plasma:
         """Return the case's plasma with the central density ``ne0``."""
         return _parabolic_plasma(self.parameters, ne0)
-
-
-def _parabolic_plasma(parameters: dict, ne0: float) -> Plasma:
-    p = parameters
-    return Plasma.parabolic(
-        ne0, p["te0"], p["ti0"], ions=p["ions"], points=p["profile_points"]
-    )
 
 
 def benchmark_case(

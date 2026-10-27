@@ -81,22 +81,22 @@ class FluxSurfaces:
     """Volumes and shapes of the shells between the radii ``rho_edges``."""
 
     rho_edges: np.ndarray
-    """Shell edges in ``rho``, increasing from 0 to 1."""
     volume: np.ndarray
-    """Volume of each shell [m^3]."""
     area: np.ndarray
-    """Poloidal cross-section area of each shell [m^2]."""
     inverse_aspect_ratio: np.ndarray
-    """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre."""
     field_strength: np.ndarray | None = field(default=None, repr=False)
+    surface_weight: np.ndarray | None = field(default=None, repr=False)
+    safety_factor: np.ndarray | None = None
+    major_radius: np.ndarray | None = None
+    """Shell edges in ``rho``, increasing from 0 to 1."""
+    """Volume of each shell [m^3]."""
+    """Poloidal cross-section area of each shell [m^2]."""
+    """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre."""
     """``|B|`` [T] at points around the surface at each shell centre, shape
     ``(shells, points)``."""
-    surface_weight: np.ndarray | None = field(default=None, repr=False)
     """Weights of those points in the flux-surface average, ``dl_p / B_p``
     normalised to a sum of one (``dl_p`` the poloidal arc length)."""
-    safety_factor: np.ndarray | None = None
     """``q = F / (2 pi) * oint dl_p / (R^2 B_p)`` at each shell centre."""
-    major_radius: np.ndarray | None = None
     """``(R_max + R_min) / 2`` of the surface at each shell centre [m]."""
 
     @property

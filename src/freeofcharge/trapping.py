@@ -93,20 +93,20 @@ class PitchModes:
     """Odd eigenmodes of the bounce-averaged pitch-angle scattering, per shell."""
 
     lam: np.ndarray
-    """Nodes in ``lambda`` from 0 to ``lambda_c``, shape ``(shells, nodes)``."""
     rates: np.ndarray
+    modes: np.ndarray
+    projections: np.ndarray
+    b_birth_scale: np.ndarray
+    field: np.ndarray
+    line_weight: np.ndarray
+    """Nodes in ``lambda`` from 0 to ``lambda_c``, shape ``(shells, nodes)``."""
     """Decay rates ``kappa_k`` in units of ``nu_D``, shape ``(shells, modes)``;
     the last is the rate given to the remainder (see :meth:`amplitudes`)."""
-    modes: np.ndarray
     """``F_k`` on the nodes, normalised with the weight ``T``, zero at
     ``lambda_c``; shape ``(shells, modes - 1, nodes)``."""
-    projections: np.ndarray
     """``(F_k, 1 / T)``, shape ``(shells, modes - 1)``."""
-    b_birth_scale: np.ndarray
     """``B_min`` of each shell [T], to turn the field at a birth into ``b``."""
-    field: np.ndarray
     """``B / B_min`` along the field line of each shell."""
-    line_weight: np.ndarray
     """Shares of the field-line length of those points."""
 
     def amplitudes(self, shell, pitch, field_strength):
