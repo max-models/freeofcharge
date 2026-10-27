@@ -24,6 +24,7 @@ jobs:
   docs:
     uses: max-models/starlight-theme/.github/workflows/docs.yml@v0.5.0
     with:
+      node-version: "24"
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
         getting-started/installation/index.html
