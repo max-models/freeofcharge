@@ -48,23 +48,23 @@ class Deposition:
     """
 
     births: ParticleArrays
-    """Birth positions ``(N, 3)``, velocities and weights [ions/s]."""
     birth_rho: object
-    """``rho`` of each birth."""
     birth_pitch: object
-    """``v_par / v`` of each birth (positive along B)."""
     birth_field: object
-    """``|B|`` at each birth [T]."""
     mass_number: int
     rho_edges: np.ndarray
     birth_rate: np.ndarray
-    """Ions born per second in each shell."""
     power: np.ndarray
-    """Beam power deposited in each shell [W]."""
     injected_power: float
     absorbed_power: float
     shine_through_power: float
     wall_hits: ParticleArrays | None
+    """Birth positions ``(N, 3)``, velocities and weights [ions/s]."""
+    """``rho`` of each birth."""
+    """``v_par / v`` of each birth (positive along B)."""
+    """``|B|`` at each birth [T]."""
+    """Ions born per second in each shell."""
+    """Beam power deposited in each shell [W]."""
     """Where the shine-through meets the wall: positions, velocities, weights
     [atoms/s]; None without a wall."""
 

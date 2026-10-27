@@ -30,21 +30,21 @@ class GEqdsk:
     r: np.ndarray
     z: np.ndarray
     psi: np.ndarray
-    """Flux, shape ``(len(r), len(z))``."""
     psi_axis: float
     psi_boundary: float
     fpol: np.ndarray
     axis: tuple[float, float]
     boundary: np.ndarray
-    """Vertices ``(n, 2)``."""
     limiter: np.ndarray
-    """Vertices ``(n, 2)``, possibly empty."""
     description: str = ""
     b_centre: float = 0.0
     r_centre: float = 0.0
     current: float = 0.0
     pressure: np.ndarray = field(default_factory=lambda: np.zeros(0))
     q: np.ndarray = field(default_factory=lambda: np.zeros(0))
+    """Flux, shape ``(len(r), len(z))``."""
+    """Vertices ``(n, 2)``."""
+    """Vertices ``(n, 2)``, possibly empty."""
 
 
 def _numbers(lines: list[str], count: int, start: int) -> tuple[np.ndarray, int]:

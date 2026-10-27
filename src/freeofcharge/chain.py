@@ -171,39 +171,6 @@ def deuterium_source(
     )
 
 
-def slit_divergence(
-    perveances,
-    *,
-    rays: int = 24,
-    iterations: int = 8,
-    panel: float = 0.05,
-    dt: float = 0.02,
-) -> tuple[np.ndarray, np.ndarray]:
-    """The rms divergence [rad] of a slit beamlet, and its transmitted share, per perveance.
-
-    Code units ``eps0 = |q| / m = 1``, gap ``d = 1`` and extraction voltage ``V = 1``;
-    angles do not depend on the scale. The ions start at the emitter, a strip of
-    half-width ``w = 0.5`` between plasma-electrode wings at 50 degrees from the axis
-    (steeper than Pierce's 67.5, so that the vacuum field focuses; potential 0), with
-    the current density ``perveance * J_CL`` across it; they are accelerated over the
-    gap to an extraction electrode at ``V`` (a slit of half-width ``2 w``, thickness
-    ``0.2``). The steady beam is the fixed point of tracing the rays, turning them into
-    line charges for tree-d-3d's tree code and solving the electrodes' response,
-    under-relaxed. The divergence is the rms of ``v_y / v_x`` of the rays one gap past
-    the extraction electrode; rays that reach a plate first are intercepted, and the
-    transmitted share is the fraction of rays (of the current) that get through. With
-    the default resolution the fixed point converges up to a perveance of about 0.5;
-    beyond, the beam reaches the extraction electrode and the iteration no longer
-    settles, so do not trust the results there.
-    """
-    perveances = np.atleast_1d(np.asarray(perveances, dtype=float))
-    results = [
-        _SlitGun(p, rays=rays, panel=panel, dt=dt).divergence(iterations)
-        for p in perveances
-    ]
-    return np.array([r[0] for r in results]), np.array([r[1] for r in results])
-
-
 class _SlitGun:
     """The rays of one slit beamlet at normalized perveance ``p``; see ``slit_divergence``."""
 
@@ -326,6 +293,39 @@ class _SlitGun:
         if not through.any():
             return float("nan"), 0.0
         return float(np.sqrt(np.mean(angles[through] ** 2))), float(through.mean())
+
+
+def slit_divergence(
+    perveances,
+    *,
+    rays: int = 24,
+    iterations: int = 8,
+    panel: float = 0.05,
+    dt: float = 0.02,
+) -> tuple[np.ndarray, np.ndarray]:
+    """The rms divergence [rad] of a slit beamlet, and its transmitted share, per perveance.
+
+    Code units ``eps0 = |q| / m = 1``, gap ``d = 1`` and extraction voltage ``V = 1``;
+    angles do not depend on the scale. The ions start at the emitter, a strip of
+    half-width ``w = 0.5`` between plasma-electrode wings at 50 degrees from the axis
+    (steeper than Pierce's 67.5, so that the vacuum field focuses; potential 0), with
+    the current density ``perveance * J_CL`` across it; they are accelerated over the
+    gap to an extraction electrode at ``V`` (a slit of half-width ``2 w``, thickness
+    ``0.2``). The steady beam is the fixed point of tracing the rays, turning them into
+    line charges for tree-d-3d's tree code and solving the electrodes' response,
+    under-relaxed. The divergence is the rms of ``v_y / v_x`` of the rays one gap past
+    the extraction electrode; rays that reach a plate first are intercepted, and the
+    transmitted share is the fraction of rays (of the current) that get through. With
+    the default resolution the fixed point converges up to a perveance of about 0.5;
+    beyond, the beam reaches the extraction electrode and the iteration no longer
+    settles, so do not trust the results there.
+    """
+    perveances = np.atleast_1d(np.asarray(perveances, dtype=float))
+    results = [
+        _SlitGun(p, rays=rays, panel=panel, dt=dt).divergence(iterations)
+        for p in perveances
+    ]
+    return np.array([r[0] for r in results]), np.array([r[1] for r in results])
 
 
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:

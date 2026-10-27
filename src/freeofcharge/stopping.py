@@ -328,30 +328,23 @@ class SuzukiStopping:
         if not 1.0 <= self.blend <= 2.0:
             raise ValueError("blend must be between 1 (none) and 2")
 
-    def __call__(
-        self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
-    ) -> Any:
-        """Return ``sigma_s`` [m^2]; raise ValueError outside the fit."""
-        e_kev = xp.asarray(energy_per_amu, dtype=float) * 1.0e-3
-        if xp.any((e_kev < _E_MIN_KEV) | (e_kev >= _E_MAX_KEV)):
+    @staticmethod
+    def _impurity_coefficients(z: int, zeff, low) -> Any:
+        """Return the B row of impurity ``z`` for each point (last axis 12)."""
+        zeff = xp.asarray(zeff, dtype=float)
+        shape = np.broadcast_shapes(zeff.shape, np.shape(low))
+        rows = xp.full(shape, -1, dtype=int)
+        for row, (z_row, zmin, zmax) in enumerate(_IMPURITIES):
+            if z_row == z:
+                rows = xp.where((zeff > zmin) & (zeff < zmax), row, rows)
+        if xp.any(rows < 0):
             raise ValueError(
-                f"Suzuki's fit covers {_E_MIN_KEV} to {_E_MAX_KEV} keV/amu, "
-                f"got {e_kev.min()} to {e_kev.max()}"
+                f"Suzuki's fit has no data for impurity Z = {z} at "
+                f"Z_eff = {zeff.min()} to {zeff.max()}"
             )
-        args = (e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges)
-        low = e_kev < _E_SPLIT_KEV
-        sigma = self._fit(*args, low)
-        if self.blend > 1.0:
-            lower, upper = _E_SPLIT_KEV / self.blend, _E_SPLIT_KEV * self.blend
-            window = (e_kev > lower) & (e_kev < upper)
-            if xp.any(window):
-                other = self._fit(*args, ~low)
-                sigma_low = xp.where(low, sigma, other)
-                sigma_high = xp.where(low, other, sigma)
-                w = (xp.log(e_kev) - np.log(lower)) / (np.log(upper) - np.log(lower))
-                blended = xp.exp((1.0 - w) * xp.log(sigma_low) + w * xp.log(sigma_high))
-                sigma = xp.where(window, blended, sigma)
-        return sigma
+        return xp.where(
+            low[..., None], xp.asarray(_B_LOW)[rows], xp.asarray(_B_HIGH)[rows]
+        )
 
     def _fit(
         self, e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges, low
@@ -429,20 +422,27 @@ class SuzukiStopping:
             sigma_z = 0.0
         return sigma_h * (1.0 + (zeff - 1.0) * sigma_z) * 1.0e-4
 
-    @staticmethod
-    def _impurity_coefficients(z: int, zeff, low) -> Any:
-        """Return the B row of impurity ``z`` for each point (last axis 12)."""
-        zeff = xp.asarray(zeff, dtype=float)
-        shape = np.broadcast_shapes(zeff.shape, np.shape(low))
-        rows = xp.full(shape, -1, dtype=int)
-        for row, (z_row, zmin, zmax) in enumerate(_IMPURITIES):
-            if z_row == z:
-                rows = xp.where((zeff > zmin) & (zeff < zmax), row, rows)
-        if xp.any(rows < 0):
+    def __call__(
+        self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
+    ) -> Any:
+        """Return ``sigma_s`` [m^2]; raise ValueError outside the fit."""
+        e_kev = xp.asarray(energy_per_amu, dtype=float) * 1.0e-3
+        if xp.any((e_kev < _E_MIN_KEV) | (e_kev >= _E_MAX_KEV)):
             raise ValueError(
-                f"Suzuki's fit has no data for impurity Z = {z} at "
-                f"Z_eff = {zeff.min()} to {zeff.max()}"
+                f"Suzuki's fit covers {_E_MIN_KEV} to {_E_MAX_KEV} keV/amu, "
+                f"got {e_kev.min()} to {e_kev.max()}"
             )
-        return xp.where(
-            low[..., None], xp.asarray(_B_LOW)[rows], xp.asarray(_B_HIGH)[rows]
-        )
+        args = (e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges)
+        low = e_kev < _E_SPLIT_KEV
+        sigma = self._fit(*args, low)
+        if self.blend > 1.0:
+            lower, upper = _E_SPLIT_KEV / self.blend, _E_SPLIT_KEV * self.blend
+            window = (e_kev > lower) & (e_kev < upper)
+            if xp.any(window):
+                other = self._fit(*args, ~low)
+                sigma_low = xp.where(low, sigma, other)
+                sigma_high = xp.where(low, other, sigma)
+                w = (xp.log(e_kev) - np.log(lower)) / (np.log(upper) - np.log(lower))
+                blended = xp.exp((1.0 - w) * xp.log(sigma_low) + w * xp.log(sigma_high))
+                sigma = xp.where(window, blended, sigma)
+        return sigma

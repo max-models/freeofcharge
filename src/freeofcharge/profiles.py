@@ -17,10 +17,10 @@ class IonSpecies:
     """A thermal ion species."""
 
     mass_number: int
-    """Atomic mass number (1 to 3 for hydrogen isotopes)."""
     charge: int
-    """Charge number."""
     density: np.ndarray
+    """Atomic mass number (1 to 3 for hydrogen isotopes)."""
+    """Charge number."""
     """Density on :attr:`Plasma.rho` [m^-3]."""
 
     @property
@@ -38,14 +38,14 @@ class Plasma:
     """
 
     rho: np.ndarray
-    """Increasing radius grid, from 0 to 1."""
     ne: np.ndarray
-    """Electron density [m^-3]."""
     te: np.ndarray
-    """Electron temperature [eV]."""
     ti: np.ndarray
-    """Ion temperature [eV]."""
     ions: Mapping[str, IonSpecies] = field(default_factory=dict)
+    """Increasing radius grid, from 0 to 1."""
+    """Electron density [m^-3]."""
+    """Electron temperature [eV]."""
+    """Ion temperature [eV]."""
     """Ion species by name."""
 
     def __post_init__(self) -> None:

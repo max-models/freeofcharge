@@ -502,25 +502,25 @@ class SlowingDown:
 
     rho_edges: np.ndarray
     electron_heating: np.ndarray
-    """Power to the electrons in each shell [W]."""
     ion_heating: np.ndarray
-    """Power to the ions in each shell, while the ions are fast [W]."""
     fast_ion_density: np.ndarray
-    """[m^-3]."""
     fast_ion_pressure: np.ndarray
-    """Isotropic estimate, two thirds of the energy density [Pa]."""
     fast_ion_current_density: np.ndarray
-    """Parallel current density of the fast ions [A/m^2] (positive along B)."""
     current_density: np.ndarray
+    driven_current: float
+    stored_energy: float
+    thermalised_power: float = 0.0
+    trapped_births: float = 0.0
+    """Power to the electrons in each shell [W]."""
+    """Power to the ions in each shell, while the ions are fast [W]."""
+    """[m^-3]."""
+    """Isotropic estimate, two thirds of the energy density [Pa]."""
+    """Parallel current density of the fast ions [A/m^2] (positive along B)."""
     """Net beam-driven parallel current density, with the electron shielding
     [A/m^2]."""
-    driven_current: float
     """Sum of the current density times the shell areas [A]."""
-    stored_energy: float
     """Fast-ion energy content [J]."""
-    thermalised_power: float = 0.0
     """Energy rate the ions still have when they join the thermal ions [W]."""
-    trapped_births: float = 0.0
     """Share of the births on trapped orbits (zero orbit width)."""
 
     def to_dataset(self) -> xr.Dataset:
