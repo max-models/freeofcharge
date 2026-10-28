@@ -143,8 +143,11 @@ the heating and the density of a shell share (it is which births the 1000 marker
   default `sauter_trapped_electron_correction`), from the trapped fraction of each surface. a5py's
   `currentdrive` moment uses the same `L31` but evaluates the collisionality with
   `(R / r)^(3/4)` where Sauter's formula has `(r / R)^(-3/2)`, which makes it nearly
-  collisionless here. Without collisions freeofcharge's `G` gives 45.0 kA with orbits (driven over
-  fast-ion current 0.65, ASCOT5 0.63) instead of 38.9 kA. Compare the fast-ion currents.
+  collisionless here; it also leaves out the `Z` of Sauter's collisionality. With a5py's
+  collisionality in freeofcharge's `G` (`nu_e*` times `eps^2.25 / Z_eff`) the driven current of
+  the local pitch is 0.98 of ASCOT5's without orbits instead of 0.87, and the one of the orbits
+  1.19 instead of 1.04, the ratio of the fast-ion currents: the 4% agreement with orbits was the
+  18% of the orbit width against the 11% of the shielding. Compare the fast-ion currents.
 
 ## Reproducing the ASCOT5 side
 
@@ -182,6 +185,22 @@ python examples/ascot5_benchmark.py
 ```
 
 prints both tables and plots the profiles.
+
+The field scan for the orbit width: `--toroidal-field` scales the Solov'ev flux with B (q stays
+the same), so freeofcharge's results do not change (a test checks this) while the orbit widths
+go as 1/B. One run per field, each with its own work folder and results file, for example
+
+```bash
+for b in 2.5 5 10; do
+  OMP_NUM_THREADS=8 python benchmarks/ascot5/run_ascot5.py --ascot5 /path/to/ascot5/build \
+      --work /tmp/ascot5-field-$b --out /tmp/ascot5-field-$b.json --toroidal-field $b \
+      --slowing-down-markers 1000 --cpu-time 600
+done
+```
+
+If the orbit width causes the 18%, ASCOT5's fast-ion current with orbits rises towards
+freeofcharge's 69.5 kA as B grows. Give the markers enough CPU time (`--cpu-time`): at 10 T,
+120 s stopped about half of them before they thermalised.
 
 ## References
 
