@@ -146,3 +146,15 @@ def test_comparison_needs_the_same_shells(ours):
     other = dict(ours, rho_edges=list(np.linspace(0, 1, 5)))
     with pytest.raises(ValueError, match="different shells"):
         ascot5.compare(ours, other)
+
+
+def test_the_field_changes_only_the_orbit_widths():
+    # the field scan of the benchmark: freeofcharge's answer must not move
+    cases = [
+        ascot5.benchmark_case(markers=20, grid_points=65, toroidal_field=b)
+        for b in (2.5, 10.0)
+    ]
+    assert cases[1].parameters["toroidal_field"] == 10.0
+    weak, strong = (ascot5.run_freeofcharge(case) for case in cases)
+    for name in ("fast_ion_current", "driven_current", "fast_ions", "stored_energy"):
+        assert strong[name] == pytest.approx(weak[name], rel=1e-12)

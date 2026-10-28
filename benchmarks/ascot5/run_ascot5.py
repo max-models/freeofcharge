@@ -264,6 +264,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--cpu-time", type=float, default=120.0)
     parser.add_argument("--seed", type=int, default=3)
     parser.add_argument(
+        "--toroidal-field",
+        type=float,
+        default=2.5,
+        help="B on the axis [T]; scales the orbit widths as 1/B (the field scan)",
+    )
+    parser.add_argument(
         "--reuse", action="store_true", help="keep the BBNBI5 runs found in --work"
     )
     args = parser.parse_args(argv)
@@ -272,7 +278,9 @@ def main(argv: list[str] | None = None) -> None:
     bbnbi5 = str(args.ascot5.resolve() / "bbnbi5")
     ascot5_main = str(args.ascot5.resolve() / "ascot5_main")
 
-    case = ascot5.benchmark_case(markers=args.beamlets)
+    case = ascot5.benchmark_case(
+        markers=args.beamlets, toroidal_field=args.toroidal_field
+    )
     scan = []
     timing = {}
     for ne0 in case.densities:

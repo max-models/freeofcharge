@@ -227,6 +227,7 @@ def benchmark_case(
     shells: int = 20,
     grid_points: int = 129,
     seed: int = 1,
+    toroidal_field: float = 2.5,
 ) -> BenchmarkCase:
     """Return the benchmark case.
 
@@ -244,12 +245,14 @@ def benchmark_case(
         shells: Shells of ``rho`` of the profiles.
         grid_points: Points of the (R, Z) grid each way.
         seed: Seed of the beam markers.
+        toroidal_field: B on the axis [T]. The Solov'ev flux scales with it
+            (q stays the same), so only the orbit widths change, as 1/B.
     """
     parameters = {
         "major_radius": 1.65,
         "minor_radius": 0.5,
         "elongation": 1.6,
-        "toroidal_field": 2.5,
+        "toroidal_field": toroidal_field,
         "q_axis": 1.0,
         "wall_psi_n": 1.3,
         "ne0": 5.0e19,
