@@ -1,4 +1,6 @@
-"""The ASCOT5 benchmark: deposition, shine-through, heating and current.
+"""ASCOT5 benchmark.
+
+The ASCOT5 benchmark: deposition, shine-through, heating and current.
 
 The case of `freeofcharge.ascot5.benchmark_case`, an ASDEX Upgrade-sized
 Solov'ev equilibrium with a 2.5 MW beam of 60 keV deuterium, computed by

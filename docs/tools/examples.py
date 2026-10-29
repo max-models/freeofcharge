@@ -46,7 +46,7 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
     if not docstring:
         raise ValueError(f"{source}: a module docstring is required")
     title, _, description = docstring.partition("\n")
-    title = title.strip()
+    title = title.strip().rstrip(".")
     description = description.strip()
     summary = description.split("\n\n", 1)[0].replace("\n", " ") or title
     output = PUBLIC / slug

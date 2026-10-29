@@ -1,4 +1,6 @@
-"""A 1 MeV deuterium beam in an ITER-like plasma: shine-through, heating, current.
+"""ITER-like injection.
+
+A 1 MeV deuterium beam in an ITER-like plasma: shine-through, heating, current.
 
 One 16.5 MW beam of 1 MeV atoms, tangent to R = 5.3 m, enters a Solov'ev
 equilibrium of ITER's size (R0 = 6.2 m, outboard minor radius 1.8 m, elongation
