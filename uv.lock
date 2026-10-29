@@ -1250,9 +1250,9 @@ requires-dist = [
     { name = "nbclient", marker = "extra == 'docs'", specifier = ">=0.11" },
     { name = "nbformat", marker = "extra == 'docs'", specifier = ">=5.11.1" },
     { name = "numpy" },
-    { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=molecules-inference" },
+    { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=devel" },
     { name = "plasma-plots", marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=h2-highn" },
+    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
@@ -1262,7 +1262,7 @@ requires-dist = [
     { name = "scipy" },
     { name = "simgeometry", git = "https://github.com/max-models/simgeometry?branch=devel" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
-    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=opencr-rates" },
+    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=devel" },
     { name = "xarray" },
 ]
 provides-extras = ["dev", "docs", "chain", "cr", "test"]
@@ -2723,7 +2723,7 @@ wheels = [
 [[package]]
 name = "opencr"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/opencr?branch=molecules-inference#c726fbea4a0391eff09aceaa040f5ae72e88d5f1" }
+source = { git = "https://github.com/max-models/opencr?branch=devel#bb5431d486c228f57ecda0aabedbdbc208786df9" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
@@ -3043,7 +3043,7 @@ dependencies = [
 [[package]]
 name = "plasmacoll"
 version = "0.4.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=h2-highn#ae6322d59d81b1bcb6aa37d8137dcffef3ed103e" }
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#30f963789dbab02be4d02131441db44f98ff6b2e" }
 dependencies = [
     { name = "cunumpy" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -4413,7 +4413,7 @@ wheels = [
 [[package]]
 name = "wellbalanced"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/wellbalanced?branch=opencr-rates#e90e9f841d38c277a44688dbf61921a9adf8c81d" }
+source = { git = "https://github.com/max-models/wellbalanced?branch=devel#d1c67f625e0be7133066eba6c2b8083eaf68a602" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
