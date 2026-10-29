@@ -80,7 +80,7 @@ steady = foc.slow_down(deposition, plasma, surfaces)
 print(deposition.shine_through_fraction, steady.driven_current)
 ```
 
-The [tutorials](https://max-models.github.io/freeofcharge/tutorials/) go
+The [examples](https://max-models.github.io/freeofcharge/examples/) go
 from the equilibrium through the beam, its stopping and the slowing down
 to a design scan of the injector’s energy and aiming, checking each step
 against closed forms and conservation laws.

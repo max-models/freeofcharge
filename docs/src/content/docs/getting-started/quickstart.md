@@ -55,5 +55,5 @@ It runs in a few seconds on a laptop.
 datasets for plotting, for example with plasma-plots. More markers and a shorter `step`
 reduce the sampling noise of the profiles.
 
-The [tutorials](/freeofcharge/tutorials/) go through each step and what it checks; the
+The [examples](/freeofcharge/examples/) go through each step and what it checks; the
 [API reference](/freeofcharge/api/freeofcharge/) lists every function.
