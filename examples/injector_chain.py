@@ -1,4 +1,6 @@
-"""An injector from source to plasma: RF power and neutralizer gas against current drive.
+"""Injector chain.
+
+An injector from source to plasma: RF power and neutralizer gas against current drive.
 
 A negative-ion neutral-beam injector of ITER's size, one stage per max-models code. The
 deuterium RF source is a wellbalanced global model: more RF power gives a denser plasma
