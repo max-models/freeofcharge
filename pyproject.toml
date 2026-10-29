@@ -8,7 +8,6 @@ version = "0.1.0"
 description = "Neutral beams in tokamak plasmas: deposition, shine-through and slowing down."
 readme = "README.md"
 keywords = [ "plasma", "tokamak", "neutral beam injection", "beam stopping", "fast ions" ]
-license = { file = "LICENSE.txt" }
 authors = [ { name = "Max" } ]
 requires-python = ">=3.10"
 classifiers = [
