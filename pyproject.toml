@@ -50,7 +50,8 @@ optional-dependencies.chain = [
   "tree-d-3d @ git+https://github.com/max-models/tree-d-3d@devel",
   "wellbalanced>=0.1.0",
 ]
-optional-dependencies.test = [ "freeofcharge[chain]", "pytest", "pytest-cov" ]
+optional-dependencies.cr = [ "opencr" ]
+optional-dependencies.test = [ "freeofcharge[chain,cr]", "pytest", "pytest-cov" ]
 urls.Source = "https://github.com/max-models/freeofcharge"
 
 [tool.setuptools]
@@ -59,12 +60,13 @@ packages.find.where = [ "src" ]
 
 [tool.uv.sources]
 # one entry per max-models package in [project], spelled exactly like this in every repo:
+opencr = { git = "https://github.com/max-models/opencr", branch = "molecules-inference" }
 cunumpy = { git = "https://github.com/max-models/cunumpy", branch = "devel" }
 maybempi = { git = "https://github.com/max-models/maybempi", branch = "devel" }
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
-plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "devel" }
+plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "h2-highn" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
-wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "devel" }
+wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "opencr-rates" }
 
 [tool.ruff]
 target-version = "py310"

@@ -100,3 +100,22 @@ def test_suzuki_blend_makes_the_cross_section_continuous(te):
 def test_suzuki_blend_must_be_a_factor_between_one_and_two():
     with pytest.raises(ValueError, match="blend"):
         SuzukiStopping(blend=0.9)
+
+
+def test_electron_cr_stopping_is_the_electron_share_of_suzuki():
+    pytest.importorskip("opencr")
+    from freeofcharge.stopping import ElectronCRStopping, SuzukiStopping
+
+    electron = ElectronCRStopping(
+        temperatures=np.geomspace(100.0, 2.0e4, 8), densities=[1e19, 1e20], n_max=6
+    )
+    energy = np.array([3.0e4, 1.0e5, 5.0e5])
+    args = (5e19, 3e3, [5e19], [2], [1])
+    sigma_e = electron(energy, *args)
+    total = SuzukiStopping()(energy, *args)
+    # the electron share is a part of the total, falling with the beam's speed
+    assert np.all(sigma_e > 0.0) and np.all(sigma_e < total)
+    assert np.all(np.diff(sigma_e) < 0.0)
+    # at 3 keV electrons, S_CR is near 3e-14 m^3/s (Janev's ground-state rate)
+    rate = electron.table(electron.name, 3e3, 5e19)
+    assert 1e-14 < rate < 5e-14

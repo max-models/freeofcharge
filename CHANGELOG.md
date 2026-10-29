@@ -33,6 +33,8 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `ElectronCRStopping` (the `cr` extra): the electron-impact share of the beam stopping from
+  OpenCR's collisional-radiative ionization coefficient, a check of Suzuki's fit.
 - `freeofcharge.ascot5` and `benchmarks/ascot5`: the ASCOT5 benchmark. The equilibrium,
   plasma, wall and beam in a5py's input format (`B_2DS`, `plasma_1D`, `wall_2D`, one BBNBI5
   beamlet per marker), a benchmark case of ASDEX Upgrade's size with a 60 keV deuterium beam,
