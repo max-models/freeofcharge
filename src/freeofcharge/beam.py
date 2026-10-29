@@ -3,7 +3,8 @@
 A marker is a stream of atoms: a position and a velocity (Cartesian, ``z``
 vertical) and a weight in atoms per second, held in a
 :class:`plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
-the markers.
+the markers. :meth:`NeutralBeam.from_dataset` takes the markers a beamline
+model hands on, e.g. beamtracer's at the port.
 """
 
 from __future__ import annotations
@@ -183,4 +184,43 @@ class NeutralBeam:
         return cls(
             ParticleArrays(positions, speed * directions, xp.full(local, rate)),
             mass_number,
+        )
+
+    @classmethod
+    def from_dataset(
+        cls,
+        dataset,
+        *,
+        mass_number: int | None = None,
+        comm: MPI.Comm | None = None,
+    ) -> NeutralBeam:
+        """Return the neutral markers of a dataset, e.g. a beamline's at its port.
+
+        The dataset holds ``position`` and ``velocity`` over ``(component, marker)``
+        and ``weight`` [atoms/s] over ``marker``, as beamtracer writes them
+        (``beamtracer.beamline.Markers.to_dataset``); with a ``state``, only the
+        neutrals (``"0"``) are taken. ``mass_number`` defaults to the ``mass``
+        attribute in atomic masses. The markers are split between the ranks of
+        ``comm``.
+        """
+        keep = np.ones(dataset.sizes["marker"], dtype=bool)
+        if "state" in dataset:
+            keep &= np.asarray(dataset["state"].values).astype(str) == "0"
+        if mass_number is None:
+            if "mass" not in dataset.attrs:
+                raise ValueError("the dataset has no mass; give the mass_number")
+            mass_number = round(float(dataset.attrs["mass"]) / ATOMIC_MASS)
+        index = np.flatnonzero(keep)
+        if comm is not None:
+            index = index[comm.Get_rank() :: comm.Get_size()]
+        positions = dataset["position"].transpose("marker", "component").values[index]
+        velocities = dataset["velocity"].transpose("marker", "component").values[index]
+        weights = dataset["weight"].values[index]
+        return cls(
+            ParticleArrays(
+                xp.asarray(positions, dtype=float),
+                xp.asarray(velocities, dtype=float),
+                xp.asarray(weights, dtype=float),
+            ),
+            int(mass_number),
         )

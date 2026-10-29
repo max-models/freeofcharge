@@ -94,3 +94,49 @@ def test_plasma_rejects_charge_imbalance():
             np.ones(2),
             {"D": IonSpecies(2, 1, np.ones(2) * 2e19)},
         )
+
+
+def beamline_dataset(num=6):
+    """Markers in the layout of beamtracer's ``Markers.to_dataset``."""
+    import xarray as xr
+    from plasmacoll.constants import ATOMIC_MASS
+
+    rng = np.random.default_rng(0)
+    position = rng.normal(size=(3, num))
+    velocity = np.vstack([np.full(num, 1e7), rng.normal(0, 1e4, (2, num))])
+    return xr.Dataset(
+        {
+            "position": (("component", "marker"), position),
+            "velocity": (("component", "marker"), velocity),
+            "weight": ("marker", np.arange(1.0, num + 1) * 1e15),
+            "state": ("marker", ["0", "+", "0", "-", "0", "0"][:num]),
+        },
+        coords={"component": ["x", "y", "z"]},
+        attrs={"mass": 2.014 * ATOMIC_MASS, "states": ["-", "0", "+"]},
+    )
+
+
+def test_a_beam_from_a_beamline_dataset_keeps_the_neutrals():
+    data = beamline_dataset()
+    beam = NeutralBeam.from_dataset(data)
+    neutral = np.array([0, 2, 4, 5])
+    assert beam.mass_number == 2
+    assert beam.size == 4
+    assert np.allclose(
+        np.asarray(beam.markers.positions), data.position.values[:, neutral].T
+    )
+    assert np.allclose(
+        np.asarray(beam.markers.velocities), data.velocity.values[:, neutral].T
+    )
+    energy = 0.5 * beam.mass * np.sum(data.velocity.values[:, neutral] ** 2, axis=0)
+    weights = data.weight.values[neutral]
+    assert beam.power() == pytest.approx(np.sum(weights * energy))
+
+
+def test_a_beam_from_a_dataset_needs_its_mass():
+    data = beamline_dataset()
+    data.attrs.pop("mass")
+    with pytest.raises(ValueError, match="mass_number"):
+        NeutralBeam.from_dataset(data)
+    assert NeutralBeam.from_dataset(data, mass_number=1).mass_number == 1
+    assert NeutralBeam.from_dataset(data.drop_vars("state"), mass_number=2).size == 6
