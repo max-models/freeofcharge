@@ -22,7 +22,12 @@ from typing import Any, Protocol
 import cunumpy as xp
 import numpy as np
 
-__all__ = ["ConstantStopping", "StoppingModel", "SuzukiStopping"]
+__all__ = [
+    "ConstantStopping",
+    "ElectronCRStopping",
+    "StoppingModel",
+    "SuzukiStopping",
+]
 
 
 class StoppingModel(Protocol):
@@ -446,3 +451,64 @@ class SuzukiStopping:
                 blended = xp.exp((1.0 - w) * xp.log(sigma_low) + w * xp.log(sigma_high))
                 sigma = xp.where(window, blended, sigma)
         return sigma
+
+
+#: The atomic mass unit [kg] and the elementary charge [C].
+_AMU = 1.66053906660e-27
+_E = 1.602176634e-19
+
+
+class ElectronCRStopping:
+    """The electron-impact part of the stopping, from OpenCR's collisional-radiative model.
+
+    A fast atom is ionized by the plasma electrons, directly and through its
+    excited levels, at OpenCR's collisional-radiative ionization coefficient
+    ``S_CR(T_e, n_e)`` of ``hydrogen/atomic/basic`` (``opencr``, the ``cr``
+    extra). The electrons are much faster than the beam, so the cross section
+    per electron is ``sigma_e = S_CR / v_beam``. The excited levels here are
+    populated by electrons only: proton impact, which populates them in a
+    fusion plasma and dominates the stopping above about 30 keV/amu, needs
+    proton-impact data for H(n) that OpenCR does not have yet. So this is the
+    electron share and a check of Suzuki's fit (:class:`SuzukiStopping`, which
+    includes everything), not a replacement for it.
+
+    Args:
+        temperatures: The electron temperatures (eV) of the table.
+        densities: The electron densities (m^-3) of the table.
+        n_max: The levels of the atomic model.
+    """
+
+    def __init__(
+        self,
+        temperatures: Sequence[float] = tuple(np.geomspace(10.0, 2.0e4, 20)),
+        densities: Sequence[float] = tuple(np.geomspace(1e18, 1e21, 7)),
+        n_max: int = 10,
+    ) -> None:
+        """Tabulate ``S_CR`` with OpenCR."""
+        try:
+            import opencr
+            from opencr.tables import effective_rate_table
+        except ImportError as error:  # pragma: no cover - the cr extra is in CI
+            raise ImportError(
+                "OpenCR is needed: pip install 'freeofcharge[cr]'"
+            ) from error
+        # cross sections to 1 MeV: the Maxwellian average at keV temperatures
+        model = opencr.load_model(
+            "hydrogen/atomic/basic", n_max=n_max, max_energy=1.0e6
+        )
+        conditions = opencr.Conditions(1.0, 1e19, densities={"H(n=1)": 1.0, "H+": 1.0})
+        self.name = "effective_rate:H(n=1)>H+"
+        self.table = effective_rate_table(
+            model, conditions, [self.name], temperatures, densities
+        )
+
+    def __call__(
+        self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
+    ) -> Any:
+        """Return ``sigma_e = S_CR(T_e, n_e) / v_beam`` [m^2]."""
+        energy = np.asarray(energy_per_amu, dtype=float)
+        speed = np.sqrt(2.0 * energy * _E / _AMU)
+        rate = self.table(
+            self.name, np.asarray(te, dtype=float), np.asarray(ne, dtype=float)
+        )
+        return xp.asarray(rate / speed)
