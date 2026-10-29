@@ -64,7 +64,7 @@ opencr = { git = "https://github.com/max-models/opencr", branch = "molecules-inf
 cunumpy = { git = "https://github.com/max-models/cunumpy", branch = "devel" }
 maybempi = { git = "https://github.com/max-models/maybempi", branch = "devel" }
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
-plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "h2-highn" }
+plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "devel" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
 wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "opencr-rates" }
 

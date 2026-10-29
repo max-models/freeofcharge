@@ -1252,7 +1252,7 @@ requires-dist = [
     { name = "numpy" },
     { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=molecules-inference" },
     { name = "plasma-plots", marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=h2-highn" },
+    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
@@ -3043,7 +3043,7 @@ dependencies = [
 [[package]]
 name = "plasmacoll"
 version = "0.4.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=h2-highn#ae6322d59d81b1bcb6aa37d8137dcffef3ed103e" }
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#949d9ca4f1819dab5a87eaf4f70469cc3d4e4b80" }
 dependencies = [
     { name = "cunumpy" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
