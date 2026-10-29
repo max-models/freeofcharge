@@ -66,7 +66,7 @@ maybempi = { git = "https://github.com/max-models/maybempi", branch = "devel" }
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
 plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "h2-highn" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
-wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "devel" }
+wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "opencr-rates" }
 
 [tool.ruff]
 target-version = "py310"

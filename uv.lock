@@ -1193,6 +1193,9 @@ chain = [
     { name = "tree-d-3d" },
     { name = "wellbalanced" },
 ]
+cr = [
+    { name = "opencr" },
+]
 dev = [
     { name = "griffe" },
     { name = "ipykernel", version = "7.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -1202,6 +1205,7 @@ dev = [
     { name = "matplotlib", version = "3.11.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "nbclient" },
     { name = "nbformat" },
+    { name = "opencr" },
     { name = "plasma-plots" },
     { name = "pre-commit" },
     { name = "pyproject-fmt" },
@@ -1225,6 +1229,7 @@ docs = [
     { name = "wellbalanced" },
 ]
 test = [
+    { name = "opencr" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "tree-d-3d" },
@@ -1235,7 +1240,7 @@ test = [
 requires-dist = [
     { name = "cunumpy", git = "https://github.com/max-models/cunumpy?branch=devel" },
     { name = "freeofcharge", extras = ["chain"], marker = "extra == 'docs'" },
-    { name = "freeofcharge", extras = ["chain"], marker = "extra == 'test'" },
+    { name = "freeofcharge", extras = ["chain", "cr"], marker = "extra == 'test'" },
     { name = "freeofcharge", extras = ["docs", "test"], marker = "extra == 'dev'" },
     { name = "griffe", marker = "extra == 'docs'" },
     { name = "ipykernel", marker = "extra == 'docs'" },
@@ -1245,8 +1250,9 @@ requires-dist = [
     { name = "nbclient", marker = "extra == 'docs'", specifier = ">=0.11" },
     { name = "nbformat", marker = "extra == 'docs'", specifier = ">=5.11.1" },
     { name = "numpy" },
+    { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=molecules-inference" },
     { name = "plasma-plots", marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
+    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=h2-highn" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
@@ -1256,10 +1262,10 @@ requires-dist = [
     { name = "scipy" },
     { name = "simgeometry", git = "https://github.com/max-models/simgeometry?branch=devel" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
-    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=devel" },
+    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=opencr-rates" },
     { name = "xarray" },
 ]
-provides-extras = ["dev", "docs", "chain", "test"]
+provides-extras = ["dev", "docs", "chain", "cr", "test"]
 
 [[package]]
 name = "griffe"
@@ -2715,6 +2721,23 @@ wheels = [
 ]
 
 [[package]]
+name = "opencr"
+version = "0.1.0"
+source = { git = "https://github.com/max-models/opencr?branch=molecules-inference#c726fbea4a0391eff09aceaa040f5ae72e88d5f1" }
+dependencies = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "plasmacoll" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "scope-profiler" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+
+[[package]]
 name = "overrides"
 version = "7.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3019,8 +3042,8 @@ dependencies = [
 
 [[package]]
 name = "plasmacoll"
-version = "0.3.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=devel#8db4749fc5ca3d83aafa24bb8b8c8459e6d3ae69" }
+version = "0.4.0"
+source = { git = "https://github.com/max-models/plasmacoll?branch=h2-highn#ae6322d59d81b1bcb6aa37d8137dcffef3ed103e" }
 dependencies = [
     { name = "cunumpy" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -4390,7 +4413,7 @@ wheels = [
 [[package]]
 name = "wellbalanced"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/wellbalanced?branch=devel#28ee036cbfec4a8c19e9e28df0fd541a2423aa16" }
+source = { git = "https://github.com/max-models/wellbalanced?branch=opencr-rates#e90e9f841d38c277a44688dbf61921a9adf8c81d" }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
