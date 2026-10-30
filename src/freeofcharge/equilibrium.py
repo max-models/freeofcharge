@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import cunumpy as xp
 import numpy as np
@@ -164,27 +164,29 @@ class MagneticEquilibrium(Protocol):
     (``(..., 3)`` for the field).
     """
 
-    has_wall: bool
-    """Whether there is a first wall (otherwise every point is inside it)."""
+    @property
+    def has_wall(self) -> bool:
+        """Return whether there is a first wall (otherwise all points are inside)."""
+        ...
 
     @property
     def bounds(self) -> tuple[np.ndarray, np.ndarray]:
         """Return the lower and upper corners of a box holding the plasma [m]."""
         ...
 
-    def rho_at(self, points):
+    def rho_at(self, points) -> Any:
         """Return the radius ``rho``, 0 on the axis and 1 on the boundary."""
         ...
 
-    def field_at(self, points):
+    def field_at(self, points) -> Any:
         """Return ``B`` [T]."""
         ...
 
-    def inside_at(self, points):
+    def inside_at(self, points) -> Any:
         """Return whether the points are inside the last closed flux surface."""
         ...
 
-    def inside_wall_at(self, points):
+    def inside_wall_at(self, points) -> Any:
         """Return whether the points are inside the first wall."""
         ...
 
