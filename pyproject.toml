@@ -39,7 +39,7 @@ optional-dependencies.dev = [
 optional-dependencies.docs = [
   "freeofcharge[chain,gvec]",
   "griffe",
-  "plasma-plots>=0.2.3",
+  "plasma-plots[scene]>=0.2.3",
   "ipykernel",
   "matplotlib>=3.10.9",
   "nbclient>=0.11",
