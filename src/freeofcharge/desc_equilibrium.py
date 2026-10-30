@@ -21,9 +21,9 @@ __all__ = ["DESCEquilibrium"]
 
 def _require_desc():
     try:
-        import desc.examples
-        import desc.grid
-        import desc.io
+        import desc.examples  # pyright: ignore[reportMissingImports]
+        import desc.grid  # pyright: ignore[reportMissingImports]
+        import desc.io  # pyright: ignore[reportMissingImports]
     except ImportError as error:  # pragma: no cover - depends on the extra
         raise ImportError(
             "DESC equilibria need the optional extra: pip install freeofcharge[desc]"
