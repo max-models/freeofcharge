@@ -33,6 +33,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
 
+      - name: Install the GVEC build dependencies (GVEC has no Linux wheel)
+        run: sudo apt-get update && sudo apt-get install -y gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+
       - name: Install project
         run: uv sync --extra test
 
@@ -45,4 +48,35 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
           flags: python-${{ matrix.python-version }}
+          fail_ci_if_error: false
+
+  desc:
+    # DESC (and JAX) only here: its tests compile for minutes, and its pins stay out of
+    # the main jobs.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up uv and Python 3.13
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install the GVEC build dependencies (GVEC has no Linux wheel)
+        run: sudo apt-get update && sudo apt-get install -y gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+
+      - name: Install project
+        run: uv sync --extra test --extra desc
+
+      - name: Run the DESC tests with coverage
+        run: uv run pytest --cov --cov-report=xml --cov-report=term src/freeofcharge/tests/unit/test_desc_equilibrium.py
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: desc
           fail_ci_if_error: false

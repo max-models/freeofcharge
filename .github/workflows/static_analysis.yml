@@ -44,6 +44,9 @@ jobs:
           python-version: "3.12"
           enable-cache: true
 
+      - name: Install the GVEC build dependencies (GVEC has no Linux wheel)
+        run: sudo apt-get update && sudo apt-get install -y gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+
       - name: Install project
         run: uv sync --extra dev
 

@@ -70,6 +70,9 @@ jobs:
           uv pip install --refresh -e . wellbalanced pytest
 
       # The devel branches from [tool.uv.sources], at their latest commits.
+      - name: Install the GVEC build dependencies (GVEC has no Linux wheel)
+        run: sudo apt-get update && sudo apt-get install -y gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+
       - name: Install the devel branches
         if: matrix.flavour == 'devel'
         run: uv sync --extra test --upgrade

@@ -25,6 +25,7 @@ jobs:
     uses: max-models/starlight-theme/.github/workflows/docs.yml@v0
     with:
       node-version: "24"
+      apt-packages: gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
         getting-started/installation/index.html
@@ -32,6 +33,7 @@ jobs:
         examples/index.html
         examples/equilibrium-and-flux-surfaces/index.html
         examples/injector-design-scan/index.html
+        examples/stellarator-injection/index.html
         example-scripts/index.html
         example-scripts/iter-like-injection/index.html
         example-scripts/injector-chain/index.html
