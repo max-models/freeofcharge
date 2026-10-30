@@ -32,7 +32,7 @@ from plasmacoll import ParticleArrays, make_rng
 from plasmacoll.constants import ELEMENTARY_CHARGE
 
 from freeofcharge.beam import NeutralBeam
-from freeofcharge.equilibrium import Equilibrium, FluxSurfaces
+from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
 from freeofcharge.profiles import Plasma
 from freeofcharge.stopping import StoppingModel, SuzukiStopping
 
@@ -123,19 +123,19 @@ def allreduce(values, comm: MPI.Comm | None):
     return values
 
 
-def _path_length(beam: NeutralBeam, equilibrium: Equilibrium) -> float:
-    """Return a length every line needs to cross the whole equilibrium grid."""
+def _path_length(beam: NeutralBeam, equilibrium: MagneticEquilibrium) -> float:
+    """Return a length every line needs to cross the whole equilibrium box."""
     positions = xp.to_numpy(beam.markers.positions)
-    r_start = float(np.hypot(positions[:, 0], positions[:, 1]).max(initial=0.0))
-    z_start = float(np.abs(positions[:, 2]).max(initial=0.0))
-    lower, upper = equilibrium.grid.lower_bound, equilibrium.grid.upper_bound
-    radius = max(r_start, upper[0])
-    return 2.0 * radius + (upper[1] - lower[1]) + z_start
+    lower, upper = equilibrium.bounds
+    if positions.shape[0] > 0:
+        lower = np.minimum(lower, positions.min(axis=0))
+        upper = np.maximum(upper, positions.max(axis=0))
+    return float(np.linalg.norm(upper - lower))
 
 
 def deposit(
     beam: NeutralBeam,
-    equilibrium: Equilibrium,
+    equilibrium: MagneticEquilibrium,
     plasma: Plasma,
     stopping: StoppingModel | None = None,
     *,
@@ -190,24 +190,23 @@ def deposit(
         direction = directions[sl]
         weight = beam.markers.weights[sl]
         points = origin[:, None, :] + s_mid[None, :, None] * direction[:, None, :]
-        r = xp.hypot(points[..., 0], points[..., 1])
-        z = points[..., 2]
+        shape = points.shape[:2]
 
-        if equilibrium.wall is not None:
-            in_wall = equilibrium.inside_wall(r, z)
+        if equilibrium.has_wall:
+            in_wall = equilibrium.inside_wall_at(points)
             entered = xp.cumsum(in_wall, axis=1) > 0
             leaving = entered & ~in_wall
             alive = xp.cumsum(leaving, axis=1) == 0
             has_hit = xp.any(leaving, axis=1)
             hit_step = xp.argmax(leaving, axis=1)
         else:
-            alive = xp.ones(r.shape, dtype=bool)
-            has_hit = xp.zeros(r.shape[0], dtype=bool)
-            hit_step = xp.zeros(r.shape[0], dtype=int)
+            alive = xp.ones(shape, dtype=bool)
+            has_hit = xp.zeros(shape[0], dtype=bool)
+            hit_step = xp.zeros(shape[0], dtype=int)
 
-        in_plasma = equilibrium.inside(r, z) & alive
+        in_plasma = equilibrium.inside_at(points) & alive
         row, col = xp.nonzero(in_plasma)
-        rho = equilibrium.rho(r[row, col], z[row, col])
+        rho = equilibrium.rho_at(points[row, col])
         sigma = stopping(
             energy_per_amu[sl][row],
             plasma.electron_density(rho),
@@ -216,7 +215,7 @@ def deposit(
             plasma.ion_mass_numbers,
             plasma.ion_charges,
         )
-        dtau = xp.zeros(r.shape)
+        dtau = xp.zeros(shape)
         dtau[row, col] = plasma.electron_density(rho) * sigma * step
         tau = xp.cumsum(dtau, axis=1)
         tau_before = tau - dtau
@@ -244,7 +243,7 @@ def deposit(
             * ELEMENTARY_CHARGE
         )
 
-        if equilibrium.wall is not None:
+        if equilibrium.has_wall:
             hits = xp.nonzero(has_hit)[0]
             hit_parts.append(
                 (
@@ -289,10 +288,9 @@ def deposit(
 
     births = join(birth_parts)
     positions = births.positions
-    birth_r = xp.hypot(positions[:, 0], positions[:, 1])
-    birth_rho = equilibrium.rho(birth_r, positions[:, 2])
+    birth_rho = equilibrium.rho_at(positions)
     if births.weights.shape[0] > 0:
-        field = equilibrium.magnetic_field_cartesian(positions)
+        field = equilibrium.field_at(positions)
         speed = xp.sqrt(xp.sum(births.velocities**2, axis=1))
         b_norm = xp.sqrt(xp.sum(field**2, axis=1))
         birth_pitch = xp.sum(births.velocities * field, axis=1) / (speed * b_norm)
@@ -312,5 +310,5 @@ def deposit(
         injected_power=beam.power(comm),
         absorbed_power=float(totals[0]),
         shine_through_power=float(totals[1]),
-        wall_hits=None if equilibrium.wall is None else join(hit_parts),
+        wall_hits=join(hit_parts) if equilibrium.has_wall else None,
     )

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from freeofcharge import Equilibrium
+from freeofcharge import Equilibrium, FluxSurfaces, MagneticEquilibrium
 from freeofcharge.geqdsk import read
 
 R0, A, KAPPA, B0, Q0 = 3.0, 0.9, 1.6, 2.5, 1.2
@@ -53,9 +53,7 @@ def test_cartesian_field_is_the_rotated_cylindrical_one(solovev):
     phi = 0.7
     r, z = R0 + 0.3, 0.2
     b_r, b_z, b_phi = (float(b) for b in solovev.magnetic_field(r, z))
-    field = solovev.magnetic_field_cartesian(
-        np.array([[r * np.cos(phi), r * np.sin(phi), z]])
-    )[0]
+    field = solovev.field_at(np.array([[r * np.cos(phi), r * np.sin(phi), z]]))[0]
     expected = [
         b_r * np.cos(phi) - b_phi * np.sin(phi),
         b_r * np.sin(phi) + b_phi * np.cos(phi),
@@ -145,3 +143,36 @@ def test_a_polygon_that_is_not_star_shaped_falls_back():
         dtype=float,
     )
     assert _StarShapedPolygon.try_build(c_shape, (1.75, 1.0)) is None
+
+
+def test_equilibrium_is_a_magnetic_equilibrium(solovev):
+    assert isinstance(solovev, MagneticEquilibrium)
+    lower, upper = solovev.bounds
+    assert lower.shape == upper.shape == (3,)
+    assert np.all(lower < upper)
+
+
+def test_cartesian_methods_match_the_cylindrical_ones(solovev):
+    phi = np.linspace(0.0, 2.0 * np.pi, 7)
+    r = np.linspace(R0 - 0.8 * A, R0 + 1.3 * A, 7)
+    z = np.linspace(-0.4, 0.3, 7)
+    points = np.stack([r * np.cos(phi), r * np.sin(phi), z], axis=-1).reshape(7, 1, 3)
+    np.testing.assert_allclose(
+        np.ravel(solovev.rho_at(points)), solovev.rho(r, z), rtol=1e-12
+    )
+    assert np.ravel(solovev.inside_at(points)).tolist() == solovev.inside(r, z).tolist()
+    assert (
+        np.ravel(solovev.inside_wall_at(points)).tolist()
+        == solovev.inside_wall(r, z).tolist()
+    )
+    assert solovev.has_wall
+    assert solovev.field_at(points).shape == (7, 1, 3)
+
+
+def test_rotational_transform_is_one_over_q(solovev):
+    surfaces = solovev.flux_surfaces(np.linspace(0.0, 1.0, 5), resolution=50)
+    np.testing.assert_allclose(
+        surfaces.rotational_transform * surfaces.safety_factor, 1.0
+    )
+    bare = FluxSurfaces(np.linspace(0.0, 1.0, 3), np.zeros(2), np.zeros(2), np.zeros(2))
+    assert bare.rotational_transform is None

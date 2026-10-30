@@ -1,6 +1,12 @@
-r"""Axisymmetric equilibria: the poloidal flux on an (R, Z) grid.
+r"""Equilibria: the protocol the beam codes use, and the axisymmetric one.
 
-The field is
+:class:`MagneticEquilibrium` is what deposition and slowing down need from an
+equilibrium, at Cartesian points ``(..., 3)``: the radius ``rho``, the field,
+inside the plasma and the wall, a bounding box, and the shells between radii.
+:class:`Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
+are adapters in their own modules.
+
+The axisymmetric field is
 
 .. math::
 
@@ -19,6 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Protocol, runtime_checkable
 
 import cunumpy as xp
 import numpy as np
@@ -28,7 +35,7 @@ from simgeometry.objects.polygon import Polygon
 
 from freeofcharge import geqdsk
 
-__all__ = ["Equilibrium", "FluxSurfaces"]
+__all__ = ["Equilibrium", "FluxSurfaces", "MagneticEquilibrium"]
 
 
 class _StarShapedPolygon:
@@ -91,18 +98,26 @@ class FluxSurfaces:
     """Shell edges in ``rho``, increasing from 0 to 1."""
     """Volume of each shell [m^3]."""
     """Poloidal cross-section area of each shell [m^2]."""
-    """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre."""
-    """``|B|`` [T] at points around the surface at each shell centre, shape
-    ``(shells, points)``."""
-    """Weights of those points in the flux-surface average, ``dl_p / B_p``
-    normalised to a sum of one (``dl_p`` the poloidal arc length)."""
-    """``q = F / (2 pi) * oint dl_p / (R^2 B_p)`` at each shell centre."""
+    """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre
+    (averaged over the toroidal angle in 3D)."""
+    """``|B|`` [T] at points on the surface at each shell centre, shape
+    ``(shells, points)``: around it in 2D, on a ``(theta, zeta)`` grid in 3D."""
+    """Weights of those points in the flux-surface average, normalised to a sum
+    of one: ``dl_p / B_p`` in 2D (``dl_p`` the poloidal arc length), the
+    Jacobian in 3D."""
+    """``q = 1 / iota`` at each shell centre; in 2D ``F / (2 pi) * oint dl_p /
+    (R^2 B_p)``."""
     """``(R_max + R_min) / 2`` of the surface at each shell centre [m]."""
 
     @property
     def rho(self) -> np.ndarray:
         """Return the shell centres."""
         return 0.5 * (self.rho_edges[1:] + self.rho_edges[:-1])
+
+    @property
+    def rotational_transform(self) -> np.ndarray | None:
+        """Return ``iota = 1 / q`` at each shell centre."""
+        return None if self.safety_factor is None else 1.0 / self.safety_factor
 
     def surface_average(self, values) -> np.ndarray:
         """Return the flux-surface average of ``values`` given at the field points."""
@@ -139,6 +154,51 @@ class FluxSurfaces:
         edges = xp.asarray(self.rho_edges)
         index = xp.searchsorted(edges, xp.asarray(rho), side="right") - 1
         return xp.where((index >= 0) & (index < len(self.rho_edges) - 1), index, -1)
+
+
+@runtime_checkable
+class MagneticEquilibrium(Protocol):
+    """What the beam codes need from an equilibrium, at Cartesian ``points``.
+
+    ``points`` has shape ``(..., 3)`` [m]; the results have its leading shape
+    (``(..., 3)`` for the field).
+    """
+
+    @property
+    def has_wall(self) -> bool:
+        """Return whether there is a first wall (otherwise all points are inside)."""
+        ...
+
+    @property
+    def bounds(self) -> tuple[np.ndarray, np.ndarray]:
+        """Return the lower and upper corners of a box holding the plasma [m]."""
+        ...
+
+    def rho_at(self, points) -> Any:
+        """Return the radius ``rho``, 0 on the axis and 1 on the boundary."""
+        ...
+
+    def field_at(self, points) -> Any:
+        """Return ``B`` [T]."""
+        ...
+
+    def inside_at(self, points) -> Any:
+        """Return whether the points are inside the last closed flux surface."""
+        ...
+
+    def inside_wall_at(self, points) -> Any:
+        """Return whether the points are inside the first wall."""
+        ...
+
+    def flux_surfaces(self, rho_edges) -> FluxSurfaces:
+        """Return the shells between the radii ``rho_edges``."""
+        ...
+
+
+def _cylindrical(points):
+    """Return ``(R, Z)`` of Cartesian ``points`` ``(..., 3)``."""
+    points = xp.asarray(points, dtype=float)
+    return xp.hypot(points[..., 0], points[..., 1]), points[..., 2]
 
 
 class Equilibrium:
@@ -384,11 +444,42 @@ class Equilibrium:
         f = xp.interp(xp.clip(psi_n, 0.0, 1.0), self._f_psi_n, xp.asarray(self.f))
         return -dpsi_dz / r, dpsi_dr / r, f / r
 
-    def magnetic_field_cartesian(self, positions):
-        """Return ``B`` [T] at Cartesian ``positions`` ``(N, 3)``, shape ``(N, 3)``."""
-        positions = xp.asarray(positions, dtype=float)
-        x, y, zc = positions[:, 0], positions[:, 1], positions[:, 2]
-        r = xp.hypot(x, y)
+    # ------------------------------------------------------------------
+    # MagneticEquilibrium, at Cartesian points
+    # ------------------------------------------------------------------
+
+    @property
+    def has_wall(self) -> bool:
+        """Return whether there is a first wall."""
+        return self.wall is not None
+
+    @property
+    def bounds(self) -> tuple[np.ndarray, np.ndarray]:
+        """Return the box swept by the ``(R, Z)`` grid about the axis [m]."""
+        lower, upper = self.grid.lower_bound, self.grid.upper_bound
+        r_max = float(upper[0])
+        return (
+            np.array([-r_max, -r_max, float(lower[1])]),
+            np.array([r_max, r_max, float(upper[1])]),
+        )
+
+    def rho_at(self, points):
+        """Return ``rho`` at Cartesian ``points`` ``(..., 3)``."""
+        return self.rho(*_cylindrical(points))
+
+    def inside_at(self, points):
+        """Return whether Cartesian ``points`` are inside the last closed surface."""
+        return self.inside(*_cylindrical(points))
+
+    def inside_wall_at(self, points):
+        """Return whether Cartesian ``points`` are inside the first wall."""
+        return self.inside_wall(*_cylindrical(points))
+
+    def field_at(self, points):
+        """Return ``B`` [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``."""
+        points = xp.asarray(points, dtype=float)
+        x, y = points[..., 0], points[..., 1]
+        r, zc = _cylindrical(points)
         b_r, b_z, b_phi = self.magnetic_field(r, zc)
         cos_phi, sin_phi = x / r, y / r
         return xp.stack(

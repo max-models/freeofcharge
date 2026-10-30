@@ -1,8 +1,8 @@
-"""Neutral beams in tokamak plasmas: deposition, shine-through, slowing down."""
+"""Neutral beams in tokamak and stellarator plasmas: deposition, shine-through, slowing down."""
 
 from freeofcharge.beam import NeutralBeam, tangential_injection
 from freeofcharge.deposition import Deposition, deposit
-from freeofcharge.equilibrium import Equilibrium, FluxSurfaces
+from freeofcharge.equilibrium import Equilibrium, FluxSurfaces, MagneticEquilibrium
 from freeofcharge.profiles import IonSpecies, Plasma
 from freeofcharge.slowing_down import SlowingDown, slow_down
 from freeofcharge.stopping import ConstantStopping, StoppingModel, SuzukiStopping
@@ -15,6 +15,7 @@ __all__ = [
     "Equilibrium",
     "FluxSurfaces",
     "IonSpecies",
+    "MagneticEquilibrium",
     "NeutralBeam",
     "Plasma",
     "SlowingDown",
