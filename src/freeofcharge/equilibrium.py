@@ -114,6 +114,74 @@ class FluxSurfaces:
         """Return the shell centres."""
         return 0.5 * (self.rho_edges[1:] + self.rho_edges[:-1])
 
+    @classmethod
+    def from_flux_coordinates(
+        cls,
+        shape,
+        nfp: int,
+        rho_edges,
+        field_points: tuple[int, int] = (32, 32),
+        radial_points: int = 8,
+    ) -> FluxSurfaces:
+        """Return the shells of a 3D equilibrium in flux coordinates.
+
+        ``shape(rho, theta, zeta)`` returns, at flat arrays of flux coordinates,
+        ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, ``|B|``
+        and ``iota`` (``zeta`` the toroidal angle up to sign). Volumes and the
+        toroidally averaged cross-section areas come from Gauss-Legendre
+        quadrature in ``rho`` within each shell and the trapezoidal rule on a
+        ``field_points`` ``(theta, zeta)`` grid over one of the ``nfp`` field
+        periods; the field strength and the averaging weights (the Jacobian
+        ``R dA``) from that grid on the surface through each shell centre.
+        """
+        rho_edges = np.asarray(rho_edges, dtype=float)
+        n_theta, n_zeta = field_points
+        period = 2.0 * np.pi / nfp
+        theta, zeta = np.meshgrid(
+            np.linspace(0.0, 2.0 * np.pi, n_theta, endpoint=False),
+            np.linspace(0.0, period, n_zeta, endpoint=False),
+            indexing="ij",
+        )
+        theta, zeta = theta.ravel(), zeta.ravel()
+        cell = (2.0 * np.pi / n_theta) * (period / n_zeta)
+        nodes, weights = np.polynomial.legendre.leggauss(radial_points)
+        n_shells = len(rho_edges) - 1
+        volume, area = np.zeros(n_shells), np.zeros(n_shells)
+        for k in range(n_shells):
+            lo, hi = rho_edges[k], rho_edges[k + 1]
+            for node, weight in zip(nodes, weights, strict=True):
+                rho = np.full(theta.size, 0.5 * (lo + hi) + 0.5 * (hi - lo) * node)
+                r, r_r, r_t, z_r, z_t, *_ = shape(rho, theta, zeta)
+                jac_rz = np.abs(r_r * z_t - r_t * z_r)
+                factor = 0.5 * (hi - lo) * weight * cell
+                volume[k] += factor * np.sum(r * jac_rz) * nfp
+                area[k] += factor * np.sum(jac_rz) / period
+
+        centres = 0.5 * (rho_edges[1:] + rho_edges[:-1])
+        strength = np.empty((n_shells, theta.size))
+        surface_weight = np.empty_like(strength)
+        epsilon, major, iota = (np.empty(n_shells) for _ in range(3))
+        for k, centre in enumerate(centres):
+            rho = np.full(theta.size, centre)
+            r, r_r, r_t, z_r, z_t, strength[k], iotas = shape(rho, theta, zeta)
+            jacobian = np.abs(r * (r_r * z_t - r_t * z_r))
+            surface_weight[k] = jacobian / jacobian.sum()
+            slices = r.reshape(n_theta, n_zeta)
+            r_min, r_max = slices.min(axis=0), slices.max(axis=0)
+            epsilon[k] = np.mean((r_max - r_min) / (r_max + r_min))
+            major[k] = np.mean(0.5 * (r_max + r_min))
+            iota[k] = np.mean(iotas)
+        return cls(
+            rho_edges,
+            volume,
+            area,
+            epsilon,
+            field_strength=strength,
+            surface_weight=surface_weight,
+            safety_factor=1.0 / iota,
+            major_radius=major,
+        )
+
     @property
     def rotational_transform(self) -> np.ndarray | None:
         """Return ``iota = 1 / q`` at each shell centre."""

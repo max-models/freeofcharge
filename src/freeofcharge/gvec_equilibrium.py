@@ -233,69 +233,16 @@ class GVECEquilibrium:
         field = self._field(rho, theta, zeta)
         return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
 
-    def flux_surfaces(
-        self,
-        rho_edges,
-        field_points: tuple[int, int] = (32, 32),
-        radial_points: int = 8,
-    ) -> FluxSurfaces:
-        """Return the volumes, areas, shapes and fields of the shells.
-
-        Volumes and the toroidally averaged cross-section areas by
-        Gauss-Legendre quadrature in ``rho`` within each shell and the
-        trapezoidal rule on a ``field_points`` ``(theta, zeta)`` grid over one
-        field period; the field strength and the averaging weights (the
-        Jacobian) on that grid on the surface through each shell centre.
-        """
-        rho_edges = np.asarray(rho_edges, dtype=float)
-        n_theta, n_zeta = field_points
-        theta = np.linspace(0.0, 2.0 * np.pi, n_theta, endpoint=False)
-        zeta = np.linspace(0.0, 2.0 * np.pi / self.nfp, n_zeta, endpoint=False)
-        cell = (2.0 * np.pi / n_theta) * (2.0 * np.pi / self.nfp / n_zeta)
-        nodes, weights = np.polynomial.legendre.leggauss(radial_points)
-        n_shells = len(rho_edges) - 1
-        volume, area = np.zeros(n_shells), np.zeros(n_shells)
-        for k in range(n_shells):
-            lo, hi = rho_edges[k], rho_edges[k + 1]
-            for node, weight in zip(nodes, weights, strict=True):
-                rho = 0.5 * (lo + hi) + 0.5 * (hi - lo) * node
-                tt, zz = np.meshgrid(theta, zeta, indexing="ij")
-                rr = np.full(tt.size, rho)
-                _, x1_r, x1_t, _ = self._evaluate("X1", rr, tt.ravel(), zz.ravel())
-                x1 = self._evaluate("X1", rr, tt.ravel(), zz.ravel())[0]
-                _, x2_r, x2_t, _ = self._evaluate("X2", rr, tt.ravel(), zz.ravel())
-                jac_rz = np.abs(x1_r * x2_t - x1_t * x2_r)
-                factor = 0.5 * (hi - lo) * weight * cell
-                volume[k] += factor * np.sum(x1 * jac_rz) * self.nfp
-                # the cross section averaged over zeta
-                area[k] += factor * np.sum(jac_rz) / (2.0 * np.pi / self.nfp)
-
-        centres = 0.5 * (rho_edges[1:] + rho_edges[:-1])
-        strength = np.empty((n_shells, n_theta * n_zeta))
-        weight = np.empty_like(strength)
-        epsilon, major = np.empty(n_shells), np.empty(n_shells)
-        tt, zz = np.meshgrid(theta, zeta, indexing="ij")
-        tt, zz = tt.ravel(), zz.ravel()
-        for k, rho in enumerate(centres):
-            rr = np.full(tt.size, rho)
-            field = self._field(rr, tt, zz)
-            x1, x1_r, x1_t, _ = self._evaluate("X1", rr, tt, zz)
-            _, x2_r, x2_t, _ = self._evaluate("X2", rr, tt, zz)
-            jacobian = np.abs(x1 * (x1_r * x2_t - x1_t * x2_r))
-            strength[k] = np.linalg.norm(field, axis=-1)
-            weight[k] = jacobian / jacobian.sum()
-            r_slices = x1.reshape(n_theta, n_zeta)
-            r_min, r_max = r_slices.min(axis=0), r_slices.max(axis=0)
-            epsilon[k] = float(np.mean((r_max - r_min) / (r_max + r_min)))
-            major[k] = float(np.mean(0.5 * (r_max + r_min)))
-        iota = self.state.evaluate_profile("iota", np.maximum(centres, 1.0e-8))
-        return FluxSurfaces(
-            rho_edges,
-            volume,
-            area,
-            epsilon,
-            field_strength=strength,
-            surface_weight=weight,
-            safety_factor=1.0 / np.asarray(iota),
-            major_radius=major,
+    def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
+        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
+        return FluxSurfaces.from_flux_coordinates(
+            self._shape, self.nfp, rho_edges, **kwargs
         )
+
+    def _shape(self, rho, theta, zeta):
+        """Return ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, |B|, iota."""
+        x1, x1_r, x1_t, _ = self._evaluate("X1", rho, theta, zeta)
+        _, x2_r, x2_t, _ = self._evaluate("X2", rho, theta, zeta)
+        strength = np.linalg.norm(self._field(rho, theta, zeta), axis=-1)
+        iota = self.state.evaluate_profile("iota", np.maximum(rho, 1.0e-8))
+        return x1, x1_r, x1_t, x2_r, x2_t, strength, iota
