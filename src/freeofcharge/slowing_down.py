@@ -614,7 +614,7 @@ def slow_down(
     mass = deposition.mass_number * ATOMIC_MASS
     births = deposition.births
     # births within half a step outside the last closed surface see its values
-    rho = xp.minimum(deposition.birth_rho, 1.0)
+    rho = xp.minimum(xp.asarray(deposition.birth_rho), 1.0)
     ne = plasma.electron_density(rho)
     te = plasma.electron_temperature(rho)
     ti = plasma.ion_temperature(rho)
