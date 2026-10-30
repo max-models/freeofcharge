@@ -25,6 +25,7 @@ jobs:
     uses: max-models/starlight-theme/.github/workflows/docs.yml@v0
     with:
       node-version: "24"
+      apt-packages: gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
         getting-started/installation/index.html
