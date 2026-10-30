@@ -4775,7 +4775,7 @@ wheels = [
 [[package]]
 name = "plasma-plots"
 version = "0.2.5"
-source = { git = "https://github.com/max-models/plasma-plots?branch=devel#4c41a796533a2d5c5cc2de63e74c0f38aea575ad" }
+source = { git = "https://github.com/max-models/plasma-plots?branch=devel#6522a7f1cc50f3b66bcfdb5ffe1e302d660c1ec9" }
 dependencies = [
     { name = "ipywidgets" },
     { name = "matplotlib" },
