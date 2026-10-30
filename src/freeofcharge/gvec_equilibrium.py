@@ -26,7 +26,7 @@ from pathlib import Path
 
 import cunumpy as xp
 import numpy as np
-from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 
 from freeofcharge.equilibrium import FluxSurfaces
 
@@ -78,7 +78,7 @@ class GVECEquilibrium:
         r_grid = state.evaluate_base_list_rtz_all("X1", rtz)[0].reshape(rr.shape)
         z_grid = state.evaluate_base_list_rtz_all("X2", rtz)[0].reshape(rr.shape)
         self._trees = [
-            cKDTree(np.stack([r_grid[..., k].ravel(), z_grid[..., k].ravel()], -1))
+            KDTree(np.stack([r_grid[..., k].ravel(), z_grid[..., k].ravel()], -1))
             for k in range(n_zeta)
         ]
         # off the axis, where theta is undefined
