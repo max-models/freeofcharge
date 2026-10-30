@@ -34,11 +34,11 @@ docs-install:  ## Python docs extra and the npm packages
 	$(PYTHON) -m pip install -e ".[docs]"
 	cd docs && npm ci
 
-docs-notebooks:  ## execute the changed tutorials and convert all of them (FORCE=1 reruns all)
+docs-notebooks:  ## execute the changed notebooks and convert all of them (FORCE=1 reruns all)
 	$(NOTEBOOKS) execute $(if $(FORCE),--force,)
 	$(NOTEBOOKS) convert
 
-docs-examples:  ## run full Python examples and generate pages with their plots
+docs-examples:  ## run the example scripts and generate pages with their plots
 	$(PYTHON) docs/tools/examples.py
 
 docs-hero:  ## redraw the home page figure (docs/src/assets/hero.svg)
@@ -59,5 +59,5 @@ docs-preview:  ## serve docs/dist
 
 docs-clean:  ## remove generated pages, assets and build output
 	$(NOTEBOOKS) clean
-	rm -rf docs/src/content/docs/full-examples docs/public/full-examples
+	rm -rf docs/src/content/docs/example-scripts docs/public/example-scripts
 	rm -rf docs/dist docs/.astro

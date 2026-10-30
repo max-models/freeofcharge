@@ -1,18 +1,23 @@
 ---
 title: Building the docs
-description: How this documentation site is built from Markdown pages, Jupyter tutorials and docstrings.
+description: How this documentation site is built from Markdown pages, Jupyter notebooks and docstrings.
 ---
 
 The site in `docs/` is built with [Astro](https://astro.build/) and
 [Starlight](https://starlight.astro.build/). It has three kinds of pages:
 
 - **Hand-written pages** in `docs/src/content/docs/`, as Markdown or MDX.
-- **Tutorials**, converted from the Jupyter notebooks in `tutorials/` by `starlight-notebooks`.
-  Each notebook is executed and its outputs (text, images, tables) are written into an MDX page.
-- **Full examples**, built from Python scripts in `examples/` by `docs/tools/examples.py`.
-  Each page shows the module docstring, the complete source file, and its Matplotlib plots.
+- **Examples**, converted from the Jupyter notebooks in `tutorials/` by `starlight-notebooks`
+  (the `section` setting in `docs/package.json` publishes them under `examples/`). Each
+  notebook is executed and its outputs (text, images, tables) are written into an MDX page.
+- **Example scripts**, a "Scripts" group of the Examples, built from the Python scripts in
+  `examples/` by `docs/tools/examples.py`. Each page shows the module docstring, the complete
+  source file, and its Matplotlib plots.
 - **API reference**, generated from the docstrings by
   [starlight-pydocs](https://ewels.github.io/starlight-pydocs/), one page per module.
+
+Guides, when a project has them, are hand-written pages that explain the model or a concept;
+anything runnable belongs in the Examples.
 
 The configuration (`defineDocs` in `docs/astro.config.mjs`), the look, the header, the notebook
 tool and the build workflow come from the shared
@@ -40,9 +45,9 @@ make docs-clean       # remove generated pages and build output
 `make docs-notebooks` only reruns a notebook whose cells changed since the last run; pass
 `FORCE=1` to rerun all of them.
 
-## Writing tutorials
+## Writing example notebooks
 
-Put a Jupyter notebook in `tutorials/`. Tutorials are authored only as `.ipynb` files. Its first `# Heading` becomes the page title and the first
+Put a Jupyter notebook in `tutorials/`. Examples are authored only as `.ipynb` files. Its first `# Heading` becomes the page title and the first
 paragraph its description. Cell tags control the output:
 
 | Tag                | Effect                                   |
@@ -55,7 +60,7 @@ paragraph its description. Cell tags control the output:
 
 Math in `$...$` and `$$...$$` is rendered with KaTeX.
 
-## Writing full examples
+## Writing example scripts
 
 Put a Python script in `examples/` with a module docstring. Its first line becomes the page
 title and the rest becomes the description. Leave Matplotlib figures open at the end of the

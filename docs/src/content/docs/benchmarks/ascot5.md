@@ -8,7 +8,7 @@ plasma: BBNBI5 for the deposition and shine-through, `ascot5_main` (guiding cent
 Carlo Coulomb collisions) for the slowing down. `freeofcharge.ascot5` writes freeofcharge's
 equilibrium, plasma, wall and beam as a5py inputs, and `benchmarks/ascot5/run_ascot5.py` runs both
 ASCOT5 programs on them and stores the results in `benchmarks/ascot5/ascot5_results.json`. The
-example [ASCOT5 benchmark](/freeofcharge/full-examples/ascot5-benchmark/) runs freeofcharge on
+example [ASCOT5 benchmark](/freeofcharge/example-scripts/ascot5-benchmark/) runs freeofcharge on
 the same case and plots both.
 
 ## The case

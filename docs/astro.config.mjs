@@ -10,8 +10,7 @@ export default defineDocs({
 	pythonPackage: 'freeofcharge',
 	nav: [
 		{ label: 'Getting started', link: '/getting-started/installation/' },
-		{ label: 'Tutorials', link: '/tutorials/' },
-		{ label: 'Full examples', link: '/full-examples/' },
+		{ label: 'Examples', link: '/examples/' },
 		{ label: 'Development', link: '/development/docs/' },
 		{ label: 'API', link: '/api/freeofcharge/' },
 	],
@@ -24,12 +23,11 @@ export default defineDocs({
 			],
 		},
 		{
-			label: 'Tutorials',
-			items: [{ autogenerate: { directory: 'tutorials' } }],
-		},
-		{
-			label: 'Full examples',
-			items: [{ autogenerate: { directory: 'full-examples' } }],
+			label: 'Examples',
+			items: [
+				{ autogenerate: { directory: 'examples' } },
+				{ label: 'Scripts', items: [{ autogenerate: { directory: 'example-scripts' } }] },
+			],
 		},
 		{
 			label: 'Benchmarks',

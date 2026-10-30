@@ -1,4 +1,4 @@
-"""Build Full examples pages from Python scripts and their Matplotlib figures."""
+"""Build the example script pages from Python scripts and their Matplotlib figures."""
 
 from __future__ import annotations
 
@@ -21,8 +21,9 @@ from notebooks import sanitize_markdown  # noqa: E402
 
 ROOT = DOCS.parent
 SOURCES = ROOT / "examples"
-CONTENT = DOCS / "src" / "content" / "docs" / "full-examples"
-PUBLIC = DOCS / "public" / "full-examples"
+# the "Scripts" group of the Examples section, next to the notebook pages in examples/
+CONTENT = DOCS / "src" / "content" / "docs" / "example-scripts"
+PUBLIC = DOCS / "public" / "example-scripts"
 
 
 def source_fence(code: str) -> str:
@@ -64,7 +65,7 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
         filename = f"plot-{index}.png"
         plt.figure(number).savefig(output / filename, dpi=150, bbox_inches="tight")
         plots.append(
-            f"![Plot {index} from {title}](/freeofcharge/full-examples/{slug}/{filename})"
+            f"![Plot {index} from {title}](/freeofcharge/example-scripts/{slug}/{filename})"
         )
     plt.close("all")
     page = [
@@ -92,7 +93,7 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
 
 
 def main() -> None:
-    """Regenerate all Full examples pages and assets."""
+    """Regenerate all example script pages and assets."""
     shutil.rmtree(CONTENT, ignore_errors=True)
     shutil.rmtree(PUBLIC, ignore_errors=True)
     examples = sorted(SOURCES.glob("*.py"))
@@ -100,13 +101,13 @@ def main() -> None:
     for order, source in enumerate(examples, start=1):
         title, summary = build_example(source, order)
         slug = re.sub(r"[^a-z0-9]+", "-", source.stem.lower()).strip("-")
-        listing.append(f"- [{title}](/freeofcharge/full-examples/{slug}/): {summary}")
+        listing.append(f"- [{title}](/freeofcharge/example-scripts/{slug}/): {summary}")
         print(f"[examples] {source} -> {CONTENT / slug}.mdx")
     CONTENT.mkdir(parents=True, exist_ok=True)
     (CONTENT / "index.md").write_text(
-        "---\ntitle: Full examples\ndescription: Complete Python scripts and their plots.\n"
+        "---\ntitle: Scripts\ndescription: Complete Python scripts and their plots.\n"
         "sidebar:\n  order: 0\n---\n\n"
-        "Complete Python examples are listed below. Each page shows the script and its plots.\n\n"
+        "Complete Python scripts are listed below. Each page shows the script and its plots.\n\n"
         + "\n".join(listing)
         + "\n"
     )
