@@ -233,12 +233,6 @@ class GVECEquilibrium:
         field = self._field(rho, theta, zeta)
         return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
 
-    def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
-        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
-        return FluxSurfaces.from_flux_coordinates(
-            self._shape, self.nfp, rho_edges, **kwargs
-        )
-
     def _shape(self, rho, theta, zeta):
         """Return ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, |B|, iota."""
         x1, x1_r, x1_t, _ = self._evaluate("X1", rho, theta, zeta)
@@ -246,3 +240,9 @@ class GVECEquilibrium:
         strength = np.linalg.norm(self._field(rho, theta, zeta), axis=-1)
         iota = self.state.evaluate_profile("iota", np.maximum(rho, 1.0e-8))
         return x1, x1_r, x1_t, x2_r, x2_t, strength, iota
+
+    def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
+        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
+        return FluxSurfaces.from_flux_coordinates(
+            self._shape, self.nfp, rho_edges, **kwargs
+        )

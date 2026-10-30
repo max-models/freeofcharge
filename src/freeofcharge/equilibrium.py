@@ -146,31 +146,35 @@ class FluxSurfaces:
         cell = (2.0 * np.pi / n_theta) * (period / n_zeta)
         nodes, weights = np.polynomial.legendre.leggauss(radial_points)
         n_shells = len(rho_edges) - 1
-        volume, area = np.zeros(n_shells), np.zeros(n_shells)
-        for k in range(n_shells):
-            lo, hi = rho_edges[k], rho_edges[k + 1]
-            for node, weight in zip(nodes, weights, strict=True):
-                rho = np.full(theta.size, 0.5 * (lo + hi) + 0.5 * (hi - lo) * node)
-                r, r_r, r_t, z_r, z_t, *_ = shape(rho, theta, zeta)
-                jac_rz = np.abs(r_r * z_t - r_t * z_r)
-                factor = 0.5 * (hi - lo) * weight * cell
-                volume[k] += factor * np.sum(r * jac_rz) * nfp
-                area[k] += factor * np.sum(jac_rz) / period
+        n_points = theta.size
+        # all quadrature surfaces in one call, then the shell centres in another
+        lo, hi = rho_edges[:-1, None], rho_edges[1:, None]
+        radii = (0.5 * (lo + hi) + 0.5 * (hi - lo) * nodes).ravel()
+        rho = np.repeat(radii, n_points)
+        r, r_r, r_t, z_r, z_t, *_ = shape(
+            rho, np.tile(theta, radii.size), np.tile(zeta, radii.size)
+        )
+        jac_rz = np.abs(r_r * z_t - r_t * z_r).reshape(n_shells, len(nodes), n_points)
+        factor = 0.5 * (hi - lo) * weights * cell
+        volume = np.sum(factor * np.sum(r.reshape(jac_rz.shape) * jac_rz, -1), -1) * nfp
+        area = np.sum(factor * np.sum(jac_rz, -1), -1) / period
 
         centres = 0.5 * (rho_edges[1:] + rho_edges[:-1])
-        strength = np.empty((n_shells, theta.size))
-        surface_weight = np.empty_like(strength)
-        epsilon, major, iota = (np.empty(n_shells) for _ in range(3))
-        for k, centre in enumerate(centres):
-            rho = np.full(theta.size, centre)
-            r, r_r, r_t, z_r, z_t, strength[k], iotas = shape(rho, theta, zeta)
-            jacobian = np.abs(r * (r_r * z_t - r_t * z_r))
-            surface_weight[k] = jacobian / jacobian.sum()
-            slices = r.reshape(n_theta, n_zeta)
-            r_min, r_max = slices.min(axis=0), slices.max(axis=0)
-            epsilon[k] = np.mean((r_max - r_min) / (r_max + r_min))
-            major[k] = np.mean(0.5 * (r_max + r_min))
-            iota[k] = np.mean(iotas)
+        r, r_r, r_t, z_r, z_t, strength, iotas = (
+            np.asarray(q).reshape(n_shells, n_points)
+            for q in shape(
+                np.repeat(centres, n_points),
+                np.tile(theta, n_shells),
+                np.tile(zeta, n_shells),
+            )
+        )
+        jacobian = np.abs(r * (r_r * z_t - r_t * z_r))
+        surface_weight = jacobian / jacobian.sum(axis=1, keepdims=True)
+        slices = r.reshape(n_shells, n_theta, n_zeta)
+        r_min, r_max = slices.min(axis=1), slices.max(axis=1)
+        epsilon = np.mean((r_max - r_min) / (r_max + r_min), axis=1)
+        major = np.mean(0.5 * (r_max + r_min), axis=1)
+        iota = np.mean(iotas, axis=1)
         return cls(
             rho_edges,
             volume,
