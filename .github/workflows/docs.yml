@@ -32,6 +32,7 @@ jobs:
         examples/index.html
         examples/equilibrium-and-flux-surfaces/index.html
         examples/injector-design-scan/index.html
+        examples/stellarator-injection/index.html
         example-scripts/index.html
         example-scripts/iter-like-injection/index.html
         example-scripts/injector-chain/index.html

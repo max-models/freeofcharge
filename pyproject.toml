@@ -37,7 +37,7 @@ optional-dependencies.dev = [
   "freeofcharge[docs,test]",
 ]
 optional-dependencies.docs = [
-  "freeofcharge[chain]",
+  "freeofcharge[chain,gvec]",
   "griffe",
   "plasma-plots>=0.2.3",
   "ipykernel",
