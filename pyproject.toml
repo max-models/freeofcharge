@@ -50,7 +50,8 @@ optional-dependencies.chain = [
   "wellbalanced>=0.1.0",
 ]
 optional-dependencies.cr = [ "opencr" ]
-optional-dependencies.test = [ "freeofcharge[chain,cr]", "pytest", "pytest-cov" ]
+optional-dependencies.gvec = [ "gvec>=1.5" ]
+optional-dependencies.test = [ "freeofcharge[chain,cr,gvec]", "pytest", "pytest-cov" ]
 urls.Source = "https://github.com/max-models/freeofcharge"
 
 [tool.setuptools]
