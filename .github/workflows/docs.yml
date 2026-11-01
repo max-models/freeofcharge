@@ -27,6 +27,16 @@ jobs:
       node-version: "24"
       xvfb: true
       apt-packages: gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+      # The W7-X notebook takes DESC's example (the desc extra) and evaluates it through
+      # PolarFEEC.jl: its Python wrapper (python/ of PolarFEEC.jl, not on PyPI) from a shallow
+      # clone. Julia is installed and PolarFEEC.jl compiled by that notebook's first cell
+      # (juliacall), so only its job pays; its metadata docs_timeout allows for it, which needs
+      # the theme's notebook-timeout branch until that is released.
+      extras: docs desc
+      theme-ref: notebook-timeout
+      pre-notebooks: |
+        git clone --depth 1 https://gitlab.mpcdf.mpg.de/rwr/polarfeec.jl.git ../polarfeec.jl
+        uv pip install -e ../polarfeec.jl/python
       pre-build: uv run python docs/tools/examples.py
       smoke-paths: |
         getting-started/installation/index.html
@@ -35,6 +45,7 @@ jobs:
         examples/equilibrium-and-flux-surfaces/index.html
         examples/injector-design-scan/index.html
         examples/stellarator-injection/index.html
+        examples/w7x-polarfeec/index.html
         example-scripts/index.html
         example-scripts/iter-like-injection/index.html
         example-scripts/injector-chain/index.html
