@@ -33,6 +33,10 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `PolarFEECEquilibrium` (`freeofcharge.polarfeec_equilibrium`): GVEC and DESC equilibria
+  through PolarFEEC.jl and its Python wrapper `polarfeec` (installed from a PolarFEEC.jl
+  checkout, not yet an extra), which inverts the maps robustly across the axis; `rho_at`,
+  `field_at` and the flux surfaces agree with the GVEC adapter on its test equilibrium.
 - `ElectronCRStopping` (the `cr` extra): the electron-impact share of the beam stopping from
   OpenCR's collisional-radiative ionization coefficient, a check of Suzuki's fit.
 - `freeofcharge.ascot5` and `benchmarks/ascot5`: the ASCOT5 benchmark. The equilibrium,
