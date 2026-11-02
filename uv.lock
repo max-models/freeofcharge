@@ -3416,7 +3416,7 @@ wheels = [
 [[package]]
 name = "methodcard"
 version = "0.1.0"
-source = { git = "https://github.com/max-models/methodcard?branch=devel#119bd9701526e85c872e760c79d48ea98b42a94a" }
+source = { git = "https://github.com/max-models/methodcard?branch=devel#54f22a9bca2f214c6097987bab07a4bb16bd096f" }
 dependencies = [
     { name = "griffe" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
