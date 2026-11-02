@@ -2,8 +2,8 @@
 
 A marker is a stream of atoms: a position and a velocity (Cartesian, ``z``
 vertical) and a weight in atoms per second, held in a
-:class:`plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
-the markers. :meth:`NeutralBeam.from_dataset` takes the markers a beamline
+`plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
+the markers. `NeutralBeam.from_dataset` takes the markers a beamline
 model hands on, e.g. beamtracer's at the port.
 """
 

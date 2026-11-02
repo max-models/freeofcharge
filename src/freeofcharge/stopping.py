@@ -315,8 +315,8 @@ _E_MAX_KEV = 10000.0
     },
     assumptions=(
         "10 keV/amu to 10 MeV/amu",
-        "plasmas of H, D or T with He, B, C, N, O or Fe in the Z_eff ranges of the fit",
-        "the low- and high-energy fits blended in log E within a factor blend of 100 keV/amu",
+        r"plasmas of H, D or T with He, B, C, N, O or Fe in the $Z_\mathrm{eff}$ ranges of the fit",
+        r"the low- and high-energy fits blended in $\log E$ within a factor `blend` of 100 keV/amu",
     ),
     references=("Suzuki et al., Plasma Phys. Control. Fusion 40, 2097 (1998), eq. 28",),
 )
@@ -483,7 +483,7 @@ class ElectronCRStopping:
     populated by electrons only: proton impact, which populates them in a
     fusion plasma and dominates the stopping above about 30 keV/amu, needs
     proton-impact data for H(n) that OpenCR does not have yet. So this is the
-    electron share and a check of Suzuki's fit (:class:`SuzukiStopping`, which
+    electron share and a check of Suzuki's fit (`SuzukiStopping`, which
     includes everything), not a replacement for it.
 
     Args:

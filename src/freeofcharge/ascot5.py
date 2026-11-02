@@ -11,9 +11,9 @@ return keyword arguments of a5py's ``Ascot.data.create_input`` for the inputs
 NumPy arrays, so neither a5py nor h5py is needed here. The script
 ``benchmarks/ascot5/run_ascot5.py`` writes them with a5py, runs BBNBI5 and
 ASCOT5 and stores what they give, per shell of ``rho``, in a JSON file of the
-format of :func:`run_freeofcharge`; :func:`compare` sets the two side by side.
+format of `run_freeofcharge`; `compare` sets the two side by side.
 
-The case (:func:`benchmark_case`) is a Solov'ev equilibrium of ASDEX Upgrade's
+The case (`benchmark_case`) is a Solov'ev equilibrium of ASDEX Upgrade's
 size with one 60 keV deuterium beam, so that ASCOT5 slows the ions down in
 minutes on a laptop.
 """
@@ -60,7 +60,7 @@ def bfield_2ds(equilibrium: Equilibrium, *, psi_axis_margin: float = 1.0e-6) -> 
     """Return the ``B_2DS`` input: ``psi`` and ``B_phi`` on the equilibrium grid.
 
     ASCOT5 computes ``B_R`` and ``B_Z`` from ``psi`` with the signs of
-    :mod:`freeofcharge.equilibrium`, so ``br`` and ``bz`` are zero. It stops a
+    `freeofcharge.equilibrium`, so ``br`` and ``bz`` are zero. It stops a
     marker where its splines of ``psi`` dip below ``psi0``, so ``psi0`` is
     moved past the axis value by ``psi_axis_margin`` of the flux difference;
     ``rho^2`` shifts by as much.
@@ -394,7 +394,7 @@ def save_results(path: str | Path, results: dict) -> None:
 
 
 def load_results(path: str | Path) -> dict:
-    """Read a results dictionary written by :func:`save_results`."""
+    """Read a results dictionary written by `save_results`."""
     return json.loads(Path(path).read_text())
 
 

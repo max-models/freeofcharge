@@ -32,7 +32,7 @@ def _require_desc():
 
 
 class DESCEquilibrium:
-    """A DESC equilibrium as a :class:`~freeofcharge.MagneticEquilibrium`.
+    """A DESC equilibrium as a `freeofcharge.MagneticEquilibrium`.
 
     Args:
         equilibrium: A ``desc.equilibrium.Equilibrium``.
@@ -182,7 +182,7 @@ class DESCEquilibrium:
         return (*(data[name] for name in names), np.interp(rho, radii, iota))
 
     def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
-        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
+        """Return the shells, see `FluxSurfaces.from_flux_coordinates`."""
         return FluxSurfaces.from_flux_coordinates(
             self._shape, self.nfp, rho_edges, **kwargs
         )

@@ -2,25 +2,25 @@
 
 Each stage is a small function on plain numbers, so an injector design can be scanned
 end to end (see ``examples/injector_chain.py``); the plasma side is freeofcharge's own
-:func:`~freeofcharge.deposit` and :func:`~freeofcharge.slow_down`. The stages use the
+`freeofcharge.deposit` and `freeofcharge.slow_down`. The stages use the
 other max-models codes, imported only when called (``pip install 'freeofcharge[chain]'``):
 
-1. :func:`deuterium_source`: the plasma of a deuterium RF source from a
-   :class:`wellbalanced.GlobalModel`, and the negative-ion current density it supplies,
+1. `deuterium_source`: the plasma of a deuterium RF source from a
+   `wellbalanced.GlobalModel`, and the negative-ion current density it supplies,
    taken as a share ``extraction_ratio`` of the positive-ion Bohm flux to the plasma grid.
    The negative-ion surface production on caesiated walls is not modelled: that share is
    an input.
-2. :func:`slit_divergence`: the rms divergence of a slit beamlet, and the share the
+2. `slit_divergence`: the rms divergence of a slit beamlet, and the share the
    extraction electrode lets through, against its normalized perveance ``j / j_CL``,
    from tree-d-3d's boundary-integral electrodes and meshless space charge (a gun-code
    fixed point, after tree-d-3d's ``examples/pierce_gun.py``). The plasma meniscus is
    replaced by a fixed planar emitter between focusing plasma-electrode wings, so the
    V-curve comes from the electrode focusing against the space charge, not from a
    moving meniscus.
-3. :func:`neutral_fraction`: the neutral share of a negative-ion beam after a gas
-   neutralizer of line density ``pi``, from :func:`plasmacoll.charge_state_fractions`,
-   checked by :func:`neutral_fraction_closed_form`.
-4. :func:`duct_transmission`: the share of a Gaussian beam that passes a square duct.
+3. `neutral_fraction`: the neutral share of a negative-ion beam after a gas
+   neutralizer of line density ``pi``, from `plasmacoll.charge_state_fractions`,
+   checked by `neutral_fraction_closed_form`.
+4. `duct_transmission`: the share of a Gaussian beam that passes a square duct.
 """
 
 from __future__ import annotations
@@ -98,7 +98,7 @@ def deuterium_source(
 ) -> Source:
     """The steady plasma of a deuterium RF source, and its negative-ion current density.
 
-    A :class:`wellbalanced.GlobalModel` of D2 at ``pressure`` [Pa] in a chamber of
+    A `wellbalanced.GlobalModel` of D2 at ``pressure`` [Pa] in a chamber of
     ``volume`` [m^3] and ``wall_area`` [m^2] absorbs ``absorbed_fraction`` of
     ``rf_power``. Its reactions (ionization and dissociation of D2, elastic collisions)
     use Arrhenius rates of plausible size, wellbalanced's illustrative deuterium set,
@@ -334,15 +334,15 @@ def slit_divergence(
         "rate_equations": r"\frac{dF_i}{d\pi} = \sum_{j \ne i} \left(\sigma_{ji} F_j - \sigma_{ij} F_i\right), \qquad F_- (0) = 1",
     },
     assumptions=(
-        "thin target: the fractions depend on the line density pi only",
+        r"thin target: the fractions depend on the line density $\pi$ only",
         "all of the beam negative at the entrance",
     ),
 )
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
     """The neutral share of a D- beam after a gas target of ``line_density`` [m^-2].
 
-    From :func:`plasmacoll.charge_state_fractions` with ``cross_sections``
-    (:data:`GAS_NEUTRALIZER` by default), all of the beam negative at the entrance.
+    From `plasmacoll.charge_state_fractions` with ``cross_sections``
+    (`GAS_NEUTRALIZER` by default), all of the beam negative at the entrance.
     """
     from plasmacoll import ChargeStateTransitions, charge_state_fractions
 
@@ -359,7 +359,7 @@ def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
 
 
 def _closed_form_rules() -> dict:
-    """The SymPy rule of :func:`neutral_fraction_closed_form` (for the tests)."""
+    """The SymPy rule of `neutral_fraction_closed_form` (for the tests)."""
     import sympy
 
     s1, s2, s3, pi = sympy.symbols("s1 s2 s3 line_density", positive=True)
@@ -388,7 +388,7 @@ def _closed_form_rules() -> dict:
         "neutral": r"F_0 = \frac{\sigma_{-0}}{\sigma_{-0} + \sigma_{-+} - \sigma_{0+}} \left(e^{-\sigma_{0+} \pi} - e^{-(\sigma_{-0} + \sigma_{-+}) \pi}\right)",
     },
     assumptions=(
-        "no electron capture (+ -> 0, 0 -> -)",
+        r"no electron capture ($+ \to 0$, $0 \to -$)",
         "all of the beam negative at the entrance",
     ),
     symbolic=_closed_form_rules,

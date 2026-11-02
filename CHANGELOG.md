@@ -13,6 +13,13 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `neutral_fraction_closed_form`: their equations, assumptions and references, checked by
   `test_method_cards.py` (SymPy rules for the closed forms, the observed order of
   `slowing_down_moments` and `pitch_modes`). Adds the `methodcard` dependency.
+- The docs show the cards: a "Numerics" page and a section on each method's API page
+  (`methodcard: true`).
+
+### Fixed
+
+- The math in the docstrings renders on the API pages: `$$` blocks instead of reST
+  `.. math::` (shown as code), and code spans instead of `:func:` roles.
 
 ### Changed
 

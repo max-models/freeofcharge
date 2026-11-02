@@ -35,7 +35,7 @@ def _require_polarfeec():
 
 
 class PolarFEECEquilibrium:
-    """A PolarFEEC.jl equilibrium as a :class:`~freeofcharge.MagneticEquilibrium`.
+    """A PolarFEEC.jl equilibrium as a `freeofcharge.MagneticEquilibrium`.
 
     Points outside the last closed surface, and points PolarFEEC.jl could not
     invert, have ``rho = inf`` and the field ``NaN``.
@@ -81,7 +81,7 @@ class PolarFEECEquilibrium:
         """Return the equilibrium of a GVEC run directory or a DESC HDF5 file.
 
         ``representation`` and ``regularity`` go to ``polarfeec.Equilibrium``, the
-        rest to :class:`PolarFEECEquilibrium`.
+        rest to `PolarFEECEquilibrium`.
         """
         polarfeec = _require_polarfeec()
         options = {
@@ -171,7 +171,7 @@ class PolarFEECEquilibrium:
         return r[0], r_r, r_t, z_r, z_t, strength, iota
 
     def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
-        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
+        """Return the shells, see `FluxSurfaces.from_flux_coordinates`."""
         return FluxSurfaces.from_flux_coordinates(
             self._shape, self.nfp, rho_edges, **kwargs
         )

@@ -25,7 +25,7 @@ _NUMBER = re.compile(r"[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[eEdD][+-]?\d+)?")
 
 @dataclass
 class GEqdsk:
-    """The parts of a G-EQDSK file that :class:`~freeofcharge.Equilibrium` uses."""
+    """The parts of a G-EQDSK file that `freeofcharge.Equilibrium` uses."""
 
     r: np.ndarray
     z: np.ndarray

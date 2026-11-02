@@ -21,7 +21,7 @@ class IonSpecies:
     density: np.ndarray
     """Atomic mass number (1 to 3 for hydrogen isotopes)."""
     """Charge number."""
-    """Density on :attr:`Plasma.rho` [m^-3]."""
+    """Density on `Plasma.rho` [m^-3]."""
 
     @property
     def mass(self) -> float:

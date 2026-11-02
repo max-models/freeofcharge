@@ -1,22 +1,22 @@
 r"""Equilibria: the protocol the beam codes use, and the axisymmetric one.
 
-:class:`MagneticEquilibrium` is what deposition and slowing down need from an
+`MagneticEquilibrium` is what deposition and slowing down need from an
 equilibrium, at Cartesian points ``(..., 3)``: the radius ``rho``, the field,
 inside the plasma and the wall, a bounding box, and the shells between radii.
-:class:`Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
+`Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
 are adapters in their own modules.
 
 The axisymmetric field is
 
-.. math::
-
-    B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad
-    B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad
-    B_\phi = \frac{F(\psi)}{R},
+$$
+B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad
+B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad
+B_\phi = \frac{F(\psi)}{R},
+$$
 
 with ``psi`` the poloidal flux per radian [Wb/rad] and ``(R, phi, Z)``
 right-handed. G-EQDSK files from different codes differ in these signs (the
-COCOS convention); :func:`Equilibrium.from_geqdsk` takes the file as it is.
+COCOS convention); `Equilibrium.from_geqdsk` takes the file as it is.
 Radii are ``rho = sqrt(psi_n)``, ``psi_n = (psi - psi_axis) / (psi_boundary -
 psi_axis)``.
 """
@@ -201,10 +201,10 @@ class FluxSurfaces:
     def trapped_fraction(self) -> np.ndarray:
         r"""Return the trapped-particle fraction of each surface centre.
 
-        .. math::
-
-            f_t = 1 - \frac{3}{4} \langle B^2 \rangle \int_0^{1/B_\max}
-                  \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}
+        $$
+        f_t = 1 - \frac{3}{4} \langle B^2 \rangle \int_0^{1/B_\max}
+              \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}
+        $$
 
         (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995), by Gauss-Legendre
         quadrature in ``lambda``.

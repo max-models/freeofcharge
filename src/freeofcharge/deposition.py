@@ -143,7 +143,7 @@ def _path_length(beam: NeutralBeam, equilibrium: MagneticEquilibrium) -> float:
     assumptions=(
         "straight lines from the markers",
         "midpoints outside the last closed flux surface do not attenuate",
-        "charge exchange counts as stopped (part of sigma_s)",
+        r"charge exchange counts as stopped (part of $\sigma_s$)",
         "the shine-through meets the wall to within one step",
     ),
     components=(SuzukiStopping,),
@@ -168,7 +168,7 @@ def deposit(
         beam: This rank's markers.
         equilibrium: Flux, boundary and (optional) wall.
         plasma: Profiles.
-        stopping: Stopping model; :class:`SuzukiStopping` if None.
+        stopping: Stopping model; `SuzukiStopping` if None.
         step: Step ``ds`` along the lines [m].
         rho_edges: Shells of the profiles; 50 equal ones if None.
         births_per_marker: Births sampled per marker (0 for profiles only).
