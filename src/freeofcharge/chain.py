@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
+from methodcard import Rule, method
 from scipy.special import erf
 
 if TYPE_CHECKING:
@@ -328,6 +329,15 @@ def slit_divergence(
     return np.array([r[0] for r in results]), np.array([r[1] for r in results])
 
 
+@method(
+    equations={
+        "rate_equations": r"\frac{dF_i}{d\pi} = \sum_{j \ne i} \left(\sigma_{ji} F_j - \sigma_{ij} F_i\right), \qquad F_- (0) = 1",
+    },
+    assumptions=(
+        "thin target: the fractions depend on the line density pi only",
+        "all of the beam negative at the entrance",
+    ),
+)
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
     """The neutral share of a D- beam after a gas target of ``line_density`` [m^-2].
 
@@ -348,6 +358,41 @@ def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
     return result
 
 
+def _closed_form_rules() -> dict:
+    """The SymPy rule of :func:`neutral_fraction_closed_form` (for the tests)."""
+    import sympy
+
+    s1, s2, s3, pi = sympy.symbols("s1 s2 s3 line_density", positive=True)
+    rule = s1 / (s1 + s2 - s3) * (sympy.exp(-s3 * pi) - sympy.exp(-(s1 + s2) * pi))
+    return {
+        "neutral": Rule(
+            rule,
+            implementation=lambda s1, s2, s3, line_density: (
+                neutral_fraction_closed_form(
+                    line_density, {("-", "0"): s1, ("-", "+"): s2, ("0", "+"): s3}
+                )
+            ),
+            ranges={
+                "s1": (1.0e-20, 2.0e-20),
+                "s2": (1.0e-22, 1.0e-21),
+                "s3": (2.0e-21, 5.0e-21),
+                "line_density": (1.0e19, 1.0e21),
+            },
+        )
+    }
+
+
+@method(
+    equations={
+        "negative": r"F_- = e^{-(\sigma_{-0} + \sigma_{-+}) \pi}",
+        "neutral": r"F_0 = \frac{\sigma_{-0}}{\sigma_{-0} + \sigma_{-+} - \sigma_{0+}} \left(e^{-\sigma_{0+} \pi} - e^{-(\sigma_{-0} + \sigma_{-+}) \pi}\right)",
+    },
+    assumptions=(
+        "no electron capture (+ -> 0, 0 -> -)",
+        "all of the beam negative at the entrance",
+    ),
+    symbolic=_closed_form_rules,
+)
 def neutral_fraction_closed_form(line_density, cross_sections=None) -> np.ndarray:
     """The neutral share in closed form, with no electron capture (``+ -> 0``, ``0 -> -``).
 

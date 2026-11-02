@@ -5,6 +5,15 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Method cards (methodcard) on the numerical methods: `deposit`, `SuzukiStopping`,
+  `slow_down`, `slowing_down_time`, `critical_velocity`, `coulomb_logarithm`,
+  `pitch_at_speed`, `slowing_down_moments`, `pitch_modes`, `neutral_fraction` and
+  `neutral_fraction_closed_form`: their equations, assumptions and references, checked by
+  `test_method_cards.py` (SymPy rules for the closed forms, the observed order of
+  `slowing_down_moments` and `pitch_modes`). Adds the `methodcard` dependency.
+
 ### Changed
 
 - `slow_down`: each species has its own Coulomb logarithm (`coulomb_logarithms`, as ASCOT5

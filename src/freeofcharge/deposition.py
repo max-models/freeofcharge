@@ -28,6 +28,7 @@ import cunumpy as xp
 import numpy as np
 import xarray as xr
 from maybempi import MPI
+from methodcard import method
 from plasmacoll import ParticleArrays, make_rng
 from plasmacoll.constants import ELEMENTARY_CHARGE
 
@@ -133,6 +134,20 @@ def _path_length(beam: NeutralBeam, equilibrium: MagneticEquilibrium) -> float:
     return float(np.linalg.norm(upper - lower))
 
 
+@method(
+    equations={
+        "attenuation": r"\frac{dI}{ds} = -n_e \sigma_s I",
+        "optical_depth": r"\tau_k = \sum_{l \le k} n_e(s_l) \sigma_s(s_l)\, \Delta s, \qquad s_l = \left(l + \tfrac{1}{2}\right) \Delta s",
+        "births": r"\dot N_k = w \left(e^{-\tau_{k-1}} - e^{-\tau_k}\right)",
+    },
+    assumptions=(
+        "straight lines from the markers",
+        "midpoints outside the last closed flux surface do not attenuate",
+        "charge exchange counts as stopped (part of sigma_s)",
+        "the shine-through meets the wall to within one step",
+    ),
+    components=(SuzukiStopping,),
+)
 def deposit(
     beam: NeutralBeam,
     equilibrium: MagneticEquilibrium,

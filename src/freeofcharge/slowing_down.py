@@ -75,6 +75,7 @@ import cunumpy as xp
 import numpy as np
 import xarray as xr
 from maybempi import MPI
+from methodcard import ConvergenceProblem, Rule, method
 from plasmacoll.constants import ATOMIC_MASS, ELECTRON_MASS, ELEMENTARY_CHARGE
 from scipy import constants
 
@@ -117,6 +118,25 @@ _NODES = 0.5 * (_NODES + 1.0)
 _WEIGHTS = 0.5 * _WEIGHTS
 
 
+def _coulomb_logarithm_rules() -> dict:
+    """The SymPy rule of :func:`coulomb_logarithm` (for the tests)."""
+    import sympy
+
+    ne, te = sympy.symbols("ne te", positive=True)
+    rule = 24 - sympy.log(sympy.sqrt(ne * sympy.Float("1e-6")) / te)
+    return {
+        "electrons": Rule(rule, ranges={"ne": (1.0e18, 1.0e21), "te": (10.0, 1.0e4)})
+    }
+
+
+@method(
+    equations={
+        "electrons": r"\ln\Lambda_e = 24 - \ln\frac{\sqrt{n_e\,[\mathrm{cm^{-3}}]}}{T_e\,[\mathrm{eV}]}"
+    },
+    assumptions=("T_e > 10 eV",),
+    references=("NRL Plasma Formulary",),
+    symbolic=_coulomb_logarithm_rules,
+)
 def coulomb_logarithm(ne, te):
     """Return the electron Coulomb logarithm (NRL formulary, ``T_e > 10 eV``).
 
@@ -185,6 +205,39 @@ def coulomb_logarithms(
     return electrons, ions
 
 
+def _slowing_down_time_rules() -> dict:
+    """The SymPy rule of :func:`slowing_down_time` (for the tests)."""
+    import sympy
+
+    m, z, ne, te, ln = sympy.symbols(
+        "mass charge_number ne te ln_lambda", positive=True
+    )
+    e, me, eps0 = (sympy.Float(c) for c in (_E, _ME, _EPS0))
+    rule = (
+        3
+        * (2 * sympy.pi) ** sympy.Rational(3, 2)
+        * eps0**2
+        * m
+        * (te * e) ** sympy.Rational(3, 2)
+    ) / (ne * z**2 * e**4 * sympy.sqrt(me) * ln)
+    ranges = {
+        "mass": (1.6e-27, 5.1e-27),
+        "charge_number": (1.0, 2.0),
+        "ne": (1.0e19, 1.0e20),
+        "te": (1.0e2, 1.0e4),
+        "ln_lambda": (10.0, 20.0),
+    }
+    return {"spitzer": Rule(rule, ranges=ranges, rtol=1e-9)}
+
+
+@method(
+    equations={
+        "spitzer": r"\tau_s = \frac{3 (2\pi)^{3/2} \varepsilon_0^2 m_b T_e^{3/2}}{n_e Z_b^2 e^4 m_e^{1/2} \ln\Lambda_e}",
+    },
+    assumptions=("v_Ti << v << v_Te",),
+    references=("Stix, Plasma Phys. 14, 367 (1972)",),
+    symbolic=_slowing_down_time_rules,
+)
 def slowing_down_time(mass, charge_number, ne, te, ln_lambda=None):
     """Return the Spitzer slowing-down time on the electrons [s].
 
@@ -216,6 +269,13 @@ def _z_over_mass(ne, ion_densities, ion_masses, ion_charges):
     ) / xp.asarray(ne)
 
 
+@method(
+    equations={
+        "critical": r"v_c^3 = \frac{3\sqrt{\pi}}{4} m_e v_{Te}^3 \sum_j \frac{n_j Z_j^2}{n_e m_j}, \qquad v_{Te} = \sqrt{2 T_e / m_e}",
+    },
+    assumptions=("equal Coulomb logarithms of electrons and ions",),
+    references=("Stix, Plasma Phys. 14, 367 (1972)",),
+)
 def critical_velocity(ne, te, ion_densities, ion_masses, ion_charges):
     """Return the critical velocity ``v_c`` [m/s] for equal Coulomb logarithms.
 
@@ -265,6 +325,25 @@ def ion_heating_fraction(energy_ratio):
     return _log_integral(xp.sqrt(x)) / x
 
 
+def _pitch_at_speed_rules() -> dict:
+    """The SymPy rule of :func:`pitch_at_speed` (for the tests)."""
+    import sympy
+
+    u, u0, xi0, beta = sympy.symbols(
+        "speed_ratio birth_speed_ratio birth_pitch beta", positive=True
+    )
+    rule = xi0 * (u**3 * (u0**3 + 1) / (u0**3 * (u**3 + 1))) ** (beta / 3)
+    return {"mean_pitch": rule}
+
+
+@method(
+    equations={
+        "mean_pitch": r"\langle\xi\rangle(v) = \xi_0 \left[\frac{v^3 (v_0^3 + v_c^3)}{v_0^3 (v^3 + v_c^3)}\right]^{\beta/3}",
+    },
+    assumptions=("constant Coulomb logarithms", "uniform field (no trapping)"),
+    references=("Gaffey, J. Plasma Phys. 16, 149 (1976)",),
+    symbolic=_pitch_at_speed_rules,
+)
 def pitch_at_speed(speed_ratio, birth_speed_ratio, birth_pitch, beta):
     """Return the mean pitch at ``v / v_c`` of ions born at ``v_0 / v_c``."""
     u3 = xp.asarray(speed_ratio, dtype=float) ** 3
@@ -352,6 +431,34 @@ def collision_coefficients(
     return electron_drag, ion_drag, deflection
 
 
+def _moments_problem() -> ConvergenceProblem:
+    """The slowing-down time with constant drags, against its closed form."""
+    a_e, a_i, v0, v1 = 1.0, 2.0, 3.0, 0.5
+    exact = np.log((a_e * v0**3 + a_i) / (a_e * v1**3 + a_i)) / (3.0 * a_e)
+    span = np.log(v0 / v1)
+
+    def error(log_step: float) -> float:
+        points = round(span / log_step) + 1
+        speed = np.exp(np.linspace(np.log(v0), np.log(v1), points))[None, :]
+        time = slowing_down_moments(speed, a_e, a_i, 0.0, np.zeros((1, 1)))[0]
+        return float(abs(time[0] - exact))
+
+    return ConvergenceProblem(error, steps=[span / 16, span / 32, span / 64])
+
+
+@method(
+    equations={
+        "time": r"t = \int_{v_1}^{v_0} \frac{dv}{a_e v + a_i / v^2} = \int_{\ln v_1}^{\ln v_0} \frac{v\, d\ln v}{a_e v + a_i / v^2}",
+        "simpson": r"\int_a^b f\,dx \approx \frac{h}{3}\left(f_0 + 4 f_1 + 2 f_2 + \dots + 4 f_{G-2} + f_{G-1}\right)",
+        "scattering": r"\int \nu_D\,dt \approx \frac{h}{2} \sum_k \left(\nu_{D,k} \dot t_k + \nu_{D,k+1} \dot t_{k+1}\right)",
+    },
+    order=4,
+    assumptions=(
+        "speeds equally spaced in ln v, an odd number of them",
+        "the order is that of the time; the cumulative scattering is second order",
+    ),
+    problem=_moments_problem,
+)
 def slowing_down_moments(speed, electron_drag, ion_drag, deflection, rates):
     r"""Return the time integrals over slowing-down trajectories sampled in speed.
 
@@ -568,6 +675,29 @@ class SlowingDown:
         )
 
 
+@method(
+    equations={
+        "drag": r"\frac{dv}{dt} = -\frac{v^3 + v_c^3}{\tau_s v^2}",
+        "scattering": r"\frac{d\langle\xi\rangle}{dt} = -\nu_D \langle\xi\rangle, \qquad \nu_D = \frac{\beta v_c^3}{\tau_s v^3}",
+        "current": r"j = j_f \left(1 - \frac{Z_b}{Z_\mathrm{eff}} (1 - G)\right)",
+    },
+    assumptions=(
+        "v_Ti << v << v_Te",
+        "zero orbit width: slowing down on the birth surface",
+        "no losses and no charge exchange",
+    ),
+    references=(
+        "Stix, Plasma Phys. 14, 367 (1972)",
+        "Gaffey, J. Plasma Phys. 16, 149 (1976)",
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002)",
+    ),
+    components=(
+        slowing_down_time,
+        critical_velocity,
+        slowing_down_moments,
+        pitch_modes,
+    ),
+)
 def slow_down(
     deposition: Deposition,
     plasma: Plasma,

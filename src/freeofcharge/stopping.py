@@ -21,6 +21,7 @@ from typing import Any, Protocol
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 
 __all__ = [
     "ConstantStopping",
@@ -306,6 +307,19 @@ _E_SPLIT_KEV = 100.0
 _E_MAX_KEV = 10000.0
 
 
+@method(
+    equations={
+        "hydrogen": r"\sigma_H = \frac{A_1}{E} \left(1 + A_2 \ln E + A_3 \ln^2 E\right) \left(1 + \left(1 - e^{-A_4 N}\right)^{A_5} \left(A_6 + A_7 \ln E + A_8 \ln^2 E\right)\right) \left(1 + A_9 U + A_{10} U^2\right)",
+        "impurities": r"\sigma_s = \sigma_H \left(1 + \frac{\sum_Z Z (Z - 1) n_Z S_Z(E, N, U)}{\sum_Z Z (Z - 1) n_Z} (Z_\mathrm{eff} - 1)\right)",
+        "variables": r"\sigma\ [10^{-16}\,\mathrm{cm^2}], \quad E\ [\mathrm{keV/amu}], \quad N = n_e / 10^{19}\,\mathrm{m^{-3}}, \quad U = \ln(T_e / \mathrm{keV})",
+    },
+    assumptions=(
+        "10 keV/amu to 10 MeV/amu",
+        "plasmas of H, D or T with He, B, C, N, O or Fe in the Z_eff ranges of the fit",
+        "the low- and high-energy fits blended in log E within a factor blend of 100 keV/amu",
+    ),
+    references=("Suzuki et al., Plasma Phys. Control. Fusion 40, 2097 (1998), eq. 28",),
+)
 @dataclass(frozen=True)
 class SuzukiStopping:
     """Suzuki's fit of the stopping cross section of H, D, T beams.

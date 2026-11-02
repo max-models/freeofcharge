@@ -53,6 +53,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
+from methodcard import ConvergenceProblem, method
 from scipy.linalg import eigh_tridiagonal
 
 if TYPE_CHECKING:
@@ -174,6 +175,44 @@ def _shell_modes(b, line_weight, n_modes: int, nodes: int):
     return lam, 2.0 * eigenvalues, modes, projections
 
 
+def _pitch_modes_problem() -> ConvergenceProblem:
+    """The first decay rate in a uniform field, where it is exactly 1."""
+    from freeofcharge.equilibrium import FluxSurfaces
+
+    points = 8
+    surfaces = FluxSurfaces(
+        np.array([0.0, 1.0]),
+        np.ones(1),
+        np.ones(1),
+        np.ones(1),
+        field_strength=np.ones((1, points)),
+        surface_weight=np.full((1, points), 1.0 / points),
+    )
+
+    def error(spacing: float) -> float:
+        modes = pitch_modes(surfaces, modes=1, nodes=round(1.0 / spacing))
+        return float(abs(modes.rates[0, 0] - 1.0))
+
+    return ConvergenceProblem(error, steps=[1 / 50, 1 / 100, 1 / 200, 1 / 400])
+
+
+@method(
+    equations={
+        "operator": r"\langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)} \frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda) \frac{\partial f}{\partial\lambda}\right)",
+        "averages": r"\overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}}, \qquad \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}",
+        "modes": r"E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0) \left(F_k, \overline{T}^{-1}\right) e^{-\kappa_k \int \nu_D\,dt}",
+    },
+    order=1,
+    assumptions=(
+        "zero orbit width",
+        "odd modes, zero in the trapped region",
+        "finite volumes in lambda; the order is in the node spacing",
+    ),
+    references=(
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002), ch. 11",
+    ),
+    problem=_pitch_modes_problem,
+)
 def pitch_modes(
     surfaces: FluxSurfaces, *, modes: int = 8, nodes: int = 200
 ) -> PitchModes:
