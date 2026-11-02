@@ -1,22 +1,22 @@
 r"""Equilibria: the protocol the beam codes use, and the axisymmetric one.
 
-:class:`MagneticEquilibrium` is what deposition and slowing down need from an
+`MagneticEquilibrium` is what deposition and slowing down need from an
 equilibrium, at Cartesian points ``(..., 3)``: the radius ``rho``, the field,
 inside the plasma and the wall, a bounding box, and the shells between radii.
-:class:`Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
+`Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
 are adapters in their own modules.
 
 The axisymmetric field is
 
-.. math::
-
-    B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad
-    B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad
-    B_\phi = \frac{F(\psi)}{R},
+$$
+B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad
+B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad
+B_\phi = \frac{F(\psi)}{R},
+$$
 
 with ``psi`` the poloidal flux per radian [Wb/rad] and ``(R, phi, Z)``
 right-handed. G-EQDSK files from different codes differ in these signs (the
-COCOS convention); :func:`Equilibrium.from_geqdsk` takes the file as it is.
+COCOS convention); `Equilibrium.from_geqdsk` takes the file as it is.
 Radii are ``rho = sqrt(psi_n)``, ``psi_n = (psi - psi_axis) / (psi_boundary -
 psi_axis)``.
 """
@@ -29,6 +29,7 @@ from typing import Any, Protocol, runtime_checkable
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 from scipy.interpolate import RectBivariateSpline
 from simgeometry.grid import Grid
 from simgeometry.objects.polygon import Polygon
@@ -115,6 +116,18 @@ class FluxSurfaces:
         return 0.5 * (self.rho_edges[1:] + self.rho_edges[:-1])
 
     @classmethod
+    @method(
+        equations={
+            "volume_element": r"dV = R\,dR\,dZ\,d\phi = R\,|R_\rho Z_\theta - R_\theta Z_\rho|\,d\rho\,d\theta\,d\zeta",
+            "volume": r"V_k = N_\mathrm{fp}\int_{\rho_k}^{\rho_{k+1}}\!\!\int_0^{2\pi}\!\!\int_0^{2\pi/N_\mathrm{fp}} R\,|R_\rho Z_\theta - R_\theta Z_\rho|\, d\zeta\, d\theta\, d\rho",
+            "area": r"A_k = \frac{N_\mathrm{fp}}{2\pi}\int\!\!\int\!\!\int |R_\rho Z_\theta - R_\theta Z_\rho|\, d\zeta\, d\theta\, d\rho",
+        },
+        assumptions=(
+            r"$\zeta = \pm\phi$: poloidal sections at fixed $\zeta$ in a cylindrical $(R, Z)$ plane",
+            r"Gauss-Legendre in $\rho$ per shell, the periodic trapezoidal rule in $(\theta, \zeta)$ over one field period",
+            r"averaging weights the Jacobian $R\,|R_\rho Z_\theta - R_\theta Z_\rho|$ on the centre surface; $q = 1/\langle\iota\rangle$",
+        ),
+    )
     def from_flux_coordinates(
         cls,
         shape,
@@ -198,13 +211,25 @@ class FluxSurfaces:
         return np.sum(self.surface_weight * values, axis=-1)
 
     @property
+    @method(
+        equations={
+            "trapped": r"f_t = 1 - \frac{3}{4}\langle B^2\rangle \int_0^{1/B_\mathrm{max}} \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}",
+            "quadrature": r"\lambda B_{\max} = 1 - s^2, \quad d\lambda = 2s\,ds, \quad s \in [0, 1]",
+        },
+        assumptions=(
+            r"64-point Gauss-Legendre in $s$, which resolves the square-root end point",
+        ),
+        references=(
+            "[Lin-Liu and Miller, Phys. Plasmas 2, 1666 (1995)](https://doi.org/10.1063/1.871315)",
+        ),
+    )
     def trapped_fraction(self) -> np.ndarray:
         r"""Return the trapped-particle fraction of each surface centre.
 
-        .. math::
-
-            f_t = 1 - \frac{3}{4} \langle B^2 \rangle \int_0^{1/B_\max}
-                  \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}
+        $$
+        f_t = 1 - \frac{3}{4} \langle B^2 \rangle \int_0^{1/B_{\max}}
+              \frac{\lambda\, d\lambda}{\langle\sqrt{1 - \lambda B}\rangle}
+        $$
 
         (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995), by Gauss-Legendre
         quadrature in ``lambda``.
@@ -348,6 +373,18 @@ class Equilibrium:
     # ------------------------------------------------------------------
 
     @classmethod
+    @method(
+        equations={
+            "flux": r"\psi = c \left( R^2 Z^2 + \frac{\kappa^2}{4} (R^2 - R_0^2)^2 \right), \qquad c = \frac{B_0}{2 R_0^2 \kappa q_0}",
+            "profiles": r"F = B_0 R_0, \qquad \mu_0 p' = -2c(1 + \kappa^2)",
+            "inboard": r"R_\mathrm{in} = \sqrt{2R_0^2 - (R_0 + a)^2}",
+        },
+        assumptions=(
+            r"magnetic axis at $(R_0, 0)$ with $\psi_\mathrm{axis} = 0$",
+            r"the shape (triangular, wider inboard than $R_0 - a$) is fixed by $a/R_0$; $R_\mathrm{in}$ must be real",
+            r"boundary and wall traced as $\psi_n = 1$ and $\psi_n =$ `wall_psi_n`",
+        ),
+    )
     def solovev(
         cls,
         major_radius: float,
@@ -482,6 +519,12 @@ class Equilibrium:
         """Return ``psi_n`` at ``(r, z)``."""
         return (self.psi(r, z) - self.psi_axis) / (self.psi_boundary - self.psi_axis)
 
+    @method(
+        equations={
+            "radius": r"\rho = \sqrt{\psi_n}, \qquad \psi_n = \frac{\psi - \psi_\mathrm{axis}}{\psi_\mathrm{boundary} - \psi_\mathrm{axis}}",
+        },
+        assumptions=(r"negative $\psi_n$ clipped to 0",),
+    )
     def rho(self, r, z):
         """Return ``rho = sqrt(psi_n)`` at ``(r, z)``."""
         return xp.sqrt(xp.maximum(self.psi_normalized(r, z), 0.0))
@@ -508,6 +551,16 @@ class Equilibrium:
             r.shape
         )
 
+    @method(
+        equations={
+            "field": r"B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad B_\phi = \frac{F(\psi)}{R}",
+        },
+        assumptions=(
+            r"axisymmetric; $\psi(R, Z)$ the poloidal flux per radian [Wb/rad], $F = R B_\phi$",
+            r"$(R, \phi, Z)$ right-handed; the COCOS signs are those of the G-EQDSK file",
+            r"$F$ linear in $\psi_n$ clipped to $[0, 1]$, so outside the last closed surface it keeps its boundary value",
+        ),
+    )
     def magnetic_field(self, r, z):
         """Return ``(B_R, B_Z, B_phi)`` at ``(r, z)`` [T]."""
         psi, dpsi_dr, dpsi_dz = self._evaluate(r, z)
@@ -607,6 +660,18 @@ class Equilibrium:
             xp.stack([r0 + distance * cos_t, z0 + distance * sin_t], axis=1)
         )
 
+    @method(
+        equations={
+            "average": r"\langle A\rangle = \frac{\oint A\, dl_p/B_p}{\oint dl_p/B_p}",
+            "safety_factor": r"q = \frac{1}{2\pi}\oint \frac{F}{R^2 B_p}\, dl_p = \frac{1}{2\pi}\sum_i \frac{|B_{\phi,i}|\, \Delta l_i}{R_i B_{p,i}}",
+            "shells": r"V = \sum 2\pi R\,\Delta R\,\Delta Z, \qquad A = \sum \Delta R\,\Delta Z, \qquad \epsilon = \frac{R_{\max} - R_{\min}}{R_{\max} + R_{\min}}",
+        },
+        assumptions=(
+            r"surfaces star-shaped about the magnetic axis, found by bisection along rays",
+            r"volumes and areas over the cell centres of a `resolution`² grid inside the boundary",
+            r"the arc length of a point is half the distance between its neighbours",
+        ),
+    )
     def flux_surfaces(
         self, rho_edges, resolution: int = 400, field_points: int = 256
     ) -> FluxSurfaces:

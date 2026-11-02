@@ -3,21 +3,22 @@ r"""3D equilibria from GVEC (github.com/gvec-group/gvec), the optional extra ``g
 GVEC maps flux coordinates ``(rho, theta, zeta)`` to ``(X1, X2)`` with its
 ``hmap``; only ``which_hmap = 1`` is supported, ``(X1, X2) = (R, Z)`` and
 
-.. math::
-
-    \mathbf{x} = (R \cos\zeta, -R \sin\zeta, Z),
+$$
+\mathbf{x} = (R \cos\zeta, -R \sin\zeta, Z),
+$$
 
 so a Cartesian point fixes ``zeta`` and the inverse map is a 2D Newton
 iteration for ``(R, Z)`` in ``(u, v) = (rho cos theta, rho sin theta)``, which
 stays regular on the axis. The start is the nearest node of a grid cached per
 toroidal slice. The field is
 
-.. math::
+$$
+\mathbf{B} = \frac{\chi' - \Phi' \partial_\zeta\lambda}{\sqrt{g}}
+             \mathbf{e}_\theta
+           + \frac{\Phi' (1 + \partial_\theta\lambda)}{\sqrt{g}}
+             \mathbf{e}_\zeta .
+$$
 
-    \mathbf{B} = \frac{\chi' - \Phi' \partial_\zeta\lambda}{\sqrt{g}}
-                 \mathbf{e}_\theta
-               + \frac{\Phi' (1 + \partial_\theta\lambda)}{\sqrt{g}}
-                 \mathbf{e}_\zeta .
 """
 
 from __future__ import annotations
@@ -26,6 +27,7 @@ from pathlib import Path
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 from scipy.spatial import KDTree
 
 from freeofcharge.equilibrium import FluxSurfaces
@@ -43,8 +45,20 @@ def _require_gvec():
     return gvec
 
 
+@method(
+    equations={
+        "map": r"\mathbf{x} = (R\cos\zeta, -R\sin\zeta, Z), \qquad \zeta = -\operatorname{atan2}(y, x) \bmod 2\pi",
+        "field": r"\mathbf{B} = \frac{\chi' - \Phi'\partial_\zeta\lambda}{\sqrt g}\,\mathbf{e}_\theta + \frac{\Phi'(1 + \partial_\theta\lambda)}{\sqrt g}\,\mathbf{e}_\zeta, \qquad \sqrt g = \mathbf{e}_\rho\cdot(\mathbf{e}_\theta\times\mathbf{e}_\zeta)",
+    },
+    assumptions=(
+        r"only `which_hmap = 1`, $(X_1, X_2) = (R, Z)$",
+        r"$\Phi'$, $\chi'$ taken at $\max(\rho, 10^{-8})$",
+        r"inverse map by a damped 2D Newton iteration in $(\rho\cos\theta, \rho\sin\theta)$; no first wall",
+    ),
+    references=("[GVEC](https://github.com/gvec-group/gvec)",),
+)
 class GVECEquilibrium:
-    """A GVEC equilibrium as a :class:`~freeofcharge.MagneticEquilibrium`.
+    """A GVEC equilibrium as a `freeofcharge.MagneticEquilibrium`.
 
     Args:
         state: A ``gvec.State``.
@@ -242,7 +256,7 @@ class GVECEquilibrium:
         return x1, x1_r, x1_t, x2_r, x2_t, strength, iota
 
     def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
-        """Return the shells, see :meth:`FluxSurfaces.from_flux_coordinates`."""
+        """Return the shells, see `FluxSurfaces.from_flux_coordinates`."""
         return FluxSurfaces.from_flux_coordinates(
             self._shape, self.nfp, rho_edges, **kwargs
         )

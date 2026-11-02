@@ -8,6 +8,8 @@ export default defineDocs({
 	title: 'freeofcharge',
 	description: 'Neutral beams in tokamak plasmas: deposition, shine-through, slowing down and current drive.',
 	pythonPackage: 'freeofcharge',
+	// the method cards of the numerical methods: a Numerics section on their API pages and /numerics/
+	methodcard: true,
 	nav: [
 		{ label: 'Getting started', link: '/getting-started/installation/' },
 		{ label: 'Examples', link: '/examples/' },

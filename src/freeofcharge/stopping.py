@@ -21,6 +21,7 @@ from typing import Any, Protocol
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 
 __all__ = [
     "ConstantStopping",
@@ -307,6 +308,26 @@ _E_MAX_KEV = 10000.0
 
 
 @dataclass(frozen=True)
+@method(
+    equations={
+        "hydrogen": r"\sigma_H = \frac{A_1\, 10^{-16}}{E}\,(1 + A_2 \ln E + A_3 \ln^2 E) \left[1 + (1 - e^{-A_4 N})^{A_5}\,(A_6 + A_7 \ln E + A_8 \ln^2 E)\right] (1 + A_9 U + A_{10} U^2)",
+        "impurity": r"S_Z = \sum_{i,j,k} B_{ijk}\, (\ln E)^i (\ln N)^j U^k, \quad i \in \{0,1,2\},\ j, k \in \{0,1\}",
+        "total": r"\sigma_s = 10^{-4}\,\sigma_H \left[1 + (Z_\mathrm{eff} - 1)\, \frac{\sum_Z Z(Z - 1)\, n_Z\, S_Z}{\sum_Z Z(Z - 1)\, n_Z}\right], \qquad Z_\mathrm{eff} = \frac{\sum_j n_j Z_j^2}{\sum_j n_j Z_j}",
+        "blend": r"\ln\sigma_s = (1 - w)\ln\sigma_\mathrm{low} + w \ln\sigma_\mathrm{high}, \quad w = \frac{\ln E - \ln(E_s/b)}{\ln(E_s b) - \ln(E_s/b)}, \quad E_s/b < E < E_s b",
+        "variables": r"E\ [\mathrm{keV/amu}], \quad N = n_e / 10^{19}\,\mathrm{m^{-3}}, \quad U = \ln(T_e / \mathrm{keV}), \quad \sigma_H\ [\mathrm{cm^2}], \quad \sigma_s\ [\mathrm{m^2}]",
+    },
+    assumptions=(
+        r"$E$ in $[9, 10^4)$ keV/amu (the paper's table starts at 10, ASCOT5's at 9)",
+        r"H, D or T plasmas with He, B, C, N, O or Fe in the $Z_\mathrm{eff}$ ranges of the table rows (open intervals)",
+        r"several hydrogen isotopes averaged with their densities; $A$ rows from table 3a below and 2a above 100 keV/amu",
+        r"the magnetic-field column and the Li and Be rows left out, as in ASCOT5; $\ln N$ uses $\max(N, 10^{-30})$",
+        r"blended within a factor $b$ = `blend` of $E_s = 100$ keV/amu, where the published fits do not meet",
+    ),
+    references=(
+        "[Suzuki et al., Plasma Phys. Control. Fusion 40, 2097 (1998)](https://doi.org/10.1088/0741-3335/40/12/009), eq. 28",
+        "[ASCOT5](https://github.com/ascot4fusion/ascot5) `src/suzuki.c`; STELLOPT `suzuki_sigma.f90`",
+    ),
+)
 class SuzukiStopping:
     """Suzuki's fit of the stopping cross section of H, D, T beams.
 
@@ -458,6 +479,17 @@ _AMU = 1.66053906660e-27
 _E = 1.602176634e-19
 
 
+@method(
+    equations={
+        "electron": r"\sigma_e = \frac{S_\mathrm{CR}(T_e, n_e)}{v_\mathrm{beam}}",
+    },
+    assumptions=(
+        r"electron impact only; the excited levels populated by electrons (no proton-impact data for H(n) in OpenCR)",
+        r"electrons much faster than the beam; $S_\mathrm{CR}$ tabulated on a $(T_e, n_e)$ grid",
+        r"a check of the electron part of Suzuki's fit, not a replacement",
+    ),
+    references=("OpenCR `hydrogen/atomic/basic`, `effective_rate:H(n=1)>H+`",),
+)
 class ElectronCRStopping:
     """The electron-impact part of the stopping, from OpenCR's collisional-radiative model.
 
@@ -469,7 +501,7 @@ class ElectronCRStopping:
     populated by electrons only: proton impact, which populates them in a
     fusion plasma and dominates the stopping above about 30 keV/amu, needs
     proton-impact data for H(n) that OpenCR does not have yet. So this is the
-    electron share and a check of Suzuki's fit (:class:`SuzukiStopping`, which
+    electron share and a check of Suzuki's fit (`SuzukiStopping`, which
     includes everything), not a replacement for it.
 
     Args:

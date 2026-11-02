@@ -2,8 +2,8 @@
 
 A marker is a stream of atoms: a position and a velocity (Cartesian, ``z``
 vertical) and a weight in atoms per second, held in a
-:class:`plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
-the markers. :meth:`NeutralBeam.from_dataset` takes the markers a beamline
+`plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
+the markers. `NeutralBeam.from_dataset` takes the markers a beamline
 model hands on, e.g. beamtracer's at the port.
 """
 
@@ -15,12 +15,21 @@ from dataclasses import dataclass
 import cunumpy as xp
 import numpy as np
 from maybempi import MPI
+from methodcard import method
 from plasmacoll import ParticleArrays, make_rng
 from plasmacoll.constants import ATOMIC_MASS, ELEMENTARY_CHARGE
 
 __all__ = ["NeutralBeam", "tangential_injection"]
 
 
+@method(
+    equations={
+        "start": r"\mathbf{x}_\mathrm{start} = \mathbf{x}_\mathrm{tan} - \sqrt{R_\mathrm{start}^2 - R_\mathrm{tan}^2}\;\hat d",
+    },
+    assumptions=(
+        r"a horizontal axis tangent to $R = R_\mathrm{tan}$, starting at $R = R_\mathrm{start} > R_\mathrm{tan}$",
+    ),
+)
 def tangential_injection(
     tangency_radius: float,
     start_radius: float,
@@ -100,6 +109,17 @@ class NeutralBeam:
         )
 
     @classmethod
+    @method(
+        equations={
+            "positions": r"\mathbf{x} = \mathbf{x}_0 + w_h N_1 \hat h + w_v N_2 \hat v",
+            "directions": r"\hat d \propto \hat a + \tan\theta_h \hat h + \tan\theta_v \hat v, \qquad \hat h = \hat a\times\hat z, \quad \hat v = \hat h\times\hat a",
+            "weight": r"w = \frac{P}{E e N}",
+        },
+        assumptions=(
+            r"mono-energetic; $N_{1,2}$ standard normal, $\theta_{h,v}$ Gaussian with the core or (for `halo_fraction`) the halo divergence",
+            r"the weights sum to the power $P$ over all ranks",
+        ),
+    )
     def gaussian(
         cls,
         origin,

@@ -5,6 +5,25 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Method cards (methodcard) on the equations of the model: the equilibrium (field, $\rho$,
+  Solov'ev, flux surfaces and $q$, trapped fraction, 3D shells, GVEC), the profiles, the beam
+  markers, the stopping (Suzuki with the blend, electron CR), the deposition and its birth
+  sampling, the slowing down (Coulomb logarithms, drags, closed forms, moments, ion heating,
+  $L_{31}$, collisionality, Start-Cordey, the shielded current), the orbit-averaged pitch
+  (transit pitch, finite volumes in $\lambda$, amplitudes) and the injector chain, with
+  their assumptions and references. `test_method_cards.py` checks them: SymPy rules for nine
+  closed forms, the observed order of `slowing_down_moments` and `pitch_modes`, and the cards
+  of the docs against those of the code. Adds the `methodcard` dependency.
+- The docs show the cards: a "Numerics" page and a section on each method's API page
+  (`methodcard: true`).
+
+### Fixed
+
+- The math in the docstrings renders on the API pages: `$$` blocks instead of reST
+  `.. math::` (shown as code), and code spans instead of `:func:` roles.
+
 ### Changed
 
 - `slow_down`: each species has its own Coulomb logarithm (`coulomb_logarithms`, as ASCOT5

@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 from plasmacoll.constants import ATOMIC_MASS
 
 __all__ = ["IonSpecies", "Plasma"]
@@ -21,7 +22,7 @@ class IonSpecies:
     density: np.ndarray
     """Atomic mass number (1 to 3 for hydrogen isotopes)."""
     """Charge number."""
-    """Density on :attr:`Plasma.rho` [m^-3]."""
+    """Density on `Plasma.rho` [m^-3]."""
 
     @property
     def mass(self) -> float:
@@ -69,6 +70,16 @@ class Plasma:
                 )
 
     @classmethod
+    @method(
+        equations={
+            "profile": r"x(\rho) = x_0 \left[ (1 - f)(1 - \rho^2)^\alpha + f \right]",
+        },
+        assumptions=(
+            r"each ion density a fixed share of $n_e$",
+            r"linear between the grid points, zero density outside $\rho = 1$ (temperatures keep the edge value)",
+            r"quasi-neutral to 1% at every grid point",
+        ),
+    )
     def parabolic(
         cls,
         ne0: float,
@@ -150,6 +161,12 @@ class Plasma:
         """Return the charge number of each ion species, in order."""
         return [ion.charge for ion in self.ions.values()]
 
+    @method(
+        equations={
+            "zeff": r"Z_\mathrm{eff} = \frac{\sum_j n_j Z_j^2}{n_e}",
+        },
+        assumptions=(r"profiles interpolated without the cut at $\rho = 1$",),
+    )
     def zeff(self, rho):
         """Return ``Z_eff = sum n_j Z_j^2 / n_e`` at ``rho`` (1 outside)."""
         z2 = sum(

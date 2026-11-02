@@ -22,6 +22,7 @@ classifiers = [
 dependencies = [
   "cunumpy",
   "maybempi>=0.1",
+  "methodcard",
   "numpy",
   "plasmacoll>=0.2.0",
   "scipy",
@@ -52,7 +53,7 @@ optional-dependencies.chain = [
 optional-dependencies.cr = [ "opencr" ]
 optional-dependencies.desc = [ "desc-opt>=0.17" ]
 optional-dependencies.gvec = [ "gvec>=1.5" ]
-optional-dependencies.test = [ "freeofcharge[chain,cr,gvec]", "pytest", "pytest-cov" ]
+optional-dependencies.test = [ "freeofcharge[chain,cr,gvec]", "methodcard[symbolic]", "pytest", "pytest-cov" ]
 urls.Source = "https://github.com/max-models/freeofcharge"
 
 [tool.setuptools]
@@ -64,6 +65,7 @@ packages.find.where = [ "src" ]
 opencr = { git = "https://github.com/max-models/opencr", branch = "devel" }
 cunumpy = { git = "https://github.com/max-models/cunumpy", branch = "devel" }
 maybempi = { git = "https://github.com/max-models/maybempi", branch = "devel" }
+methodcard = { git = "https://github.com/max-models/methodcard", branch = "devel" }
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
 plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "devel" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
@@ -91,6 +93,7 @@ typeCheckingMode = "standard"
 ini_options.pythonpath = [ "src" ]
 ini_options.testpaths = [ "src" ]
 ini_options.addopts = "-ra"
+ini_options.markers = [ "convergence: an order-of-accuracy test of a method card" ]
 
 [tool.coverage]
 run.omit = [ "*/tests/*" ]

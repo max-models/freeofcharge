@@ -7,11 +7,11 @@ B_min``, changes. Ions with ``lambda > lambda_c = B_min / B_max`` are trapped:
 over a bounce their parallel velocity averages to zero. A passing ion moves
 along B at the transit average
 
-.. math::
-
-    \langle\xi\rangle_t = \frac{\oint dl}{\oint dl / |\xi|}
-                        = \frac{1}{\overline{T}(\lambda)}, \qquad
-    \overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}},
+$$
+\langle\xi\rangle_t = \frac{\oint dl}{\oint dl / |\xi|}
+                    = \frac{1}{\overline{T}(\lambda)}, \qquad
+\overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}},
+$$
 
 the bar being the average over the length of a field line, ``\overline{A} =
 \langle A B\rangle / \langle B\rangle``. That is the parallel velocity its
@@ -22,12 +22,12 @@ Pitch-angle scattering, the Lorentz operator ``nu_D / 2 d/dxi (1 - xi^2)
 d/dxi``, averaged over the orbit, becomes (Helander and Sigmar, *Collisional
 Transport in Magnetized Plasmas*, 2002, ch. 11)
 
-.. math::
-
-    \langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)}
-    \frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda)
-    \frac{\partial f}{\partial\lambda}\right), \qquad
-    \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}.
+$$
+\langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)}
+\frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda)
+\frac{\partial f}{\partial\lambda}\right), \qquad
+\overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}.
+$$
 
 Its odd eigenfunctions ``sigma F_k(lambda)``, zero in the trapped region,
 decay as ``exp(-kappa_k int nu_D dt)``; in a uniform field they are the odd
@@ -35,12 +35,12 @@ Legendre polynomials with ``kappa = l (l + 1) / 2`` (1, 6, 15, ...), and the
 first gives Gaffey's decay of the mean pitch. The expected transit-averaged
 pitch of an ion born at ``(lambda_0, sigma_0)`` is then
 
-.. math::
+$$
+E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0)
+    \left(F_k, \overline{T}^{-1}\right) e^{-\kappa_k \int \nu_D dt},
+$$
 
-    E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0)
-        \left(F_k, \overline{T}^{-1}\right) e^{-\kappa_k \int \nu_D dt},
-
-with the inner product weighted by ``T``. :func:`pitch_modes` solves the
+with the inner product weighted by ``T``. `pitch_modes` solves the
 eigenproblem on each shell by finite volumes in ``lambda``; the slowing down
 uses the modes in place of Gaffey's single exponential (RABBIT, Weiland et al.,
 Nucl. Fusion 58, 082032, 2018, averages over guiding-centre orbits instead,
@@ -53,6 +53,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
+from methodcard import ConvergenceProblem, method
 from scipy.linalg import eigh_tridiagonal
 
 if TYPE_CHECKING:
@@ -73,6 +74,16 @@ def _line_averages(b, line_weight, lam):
     return t, q
 
 
+@method(
+    equations={
+        "transit": r"\langle\xi\rangle_t = \frac{\oint dl}{\oint dl / |\xi|} = \frac{1}{\overline{T}(\lambda)}, \qquad \overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}}, \qquad \overline{A} = \frac{\langle A B\rangle}{\langle B\rangle}",
+        "invariant": r"\lambda = (1 - \xi^2) \frac{B_\mathrm{min}}{B}, \qquad \xi = \sigma\sqrt{1 - \lambda b}, \qquad b = \frac{B}{B_\mathrm{min}}",
+    },
+    assumptions=(
+        r"zero orbit width: energy and magnetic moment kept along the orbit",
+        r"trapped for $\lambda > \lambda_c = B_\mathrm{min} / B_\mathrm{max}$: no current",
+    ),
+)
 def transit_pitch(b, line_weight, lam):
     """Return the transit-averaged ``|xi|`` of passing ions, zero for trapped ones.
 
@@ -101,7 +112,7 @@ class PitchModes:
     line_weight: np.ndarray
     """Nodes in ``lambda`` from 0 to ``lambda_c``, shape ``(shells, nodes)``."""
     """Decay rates ``kappa_k`` in units of ``nu_D``, shape ``(shells, modes)``;
-    the last is the rate given to the remainder (see :meth:`amplitudes`)."""
+    the last is the rate given to the remainder (see `amplitudes`)."""
     """``F_k`` on the nodes, normalised with the weight ``T``, zero at
     ``lambda_c``; shape ``(shells, modes - 1, nodes)``."""
     """``(F_k, 1 / T)``, shape ``(shells, modes - 1)``."""
@@ -109,6 +120,16 @@ class PitchModes:
     """``B / B_min`` along the field line of each shell."""
     """Shares of the field-line length of those points."""
 
+    @method(
+        equations={
+            "birth": r"b = \max\!\left(\frac{|B|}{B_{\min}}, 1\right), \qquad \lambda_0 = \max\!\left(0, \frac{1 - \xi_0^2}{b}\right)",
+            "amplitudes": r"a_k = \sigma_0 F_k(\lambda_0)\,\big(F_k, \overline T^{-1}\big), \qquad a_\mathrm{rest} = \sigma_0 \langle\xi\rangle_t(\lambda_0) - \sum_k a_k",
+        },
+        assumptions=(
+            r"$F_k(\lambda_0)$ by linear interpolation, zero beyond $\lambda_c$",
+            r"the remainder decays with the first rate left out, an upper bound on how long it lasts",
+        ),
+    )
     def amplitudes(self, shell, pitch, field_strength):
         """Return the amplitude of each mode for births, shape ``(births, modes)``.
 
@@ -174,13 +195,55 @@ def _shell_modes(b, line_weight, n_modes: int, nodes: int):
     return lam, 2.0 * eigenvalues, modes, projections
 
 
+def _pitch_modes_problem() -> ConvergenceProblem:
+    """The first decay rate in a uniform field, where it is exactly 1."""
+    from freeofcharge.equilibrium import FluxSurfaces
+
+    points = 8
+    surfaces = FluxSurfaces(
+        np.array([0.0, 1.0]),
+        np.ones(1),
+        np.ones(1),
+        np.ones(1),
+        field_strength=np.ones((1, points)),
+        surface_weight=np.full((1, points), 1.0 / points),
+    )
+
+    def error(spacing: float) -> float:
+        modes = pitch_modes(surfaces, modes=1, nodes=round(1.0 / spacing))
+        return float(abs(modes.rates[0, 0] - 1.0))
+
+    return ConvergenceProblem(error, steps=[1 / 50, 1 / 100, 1 / 200, 1 / 400])
+
+
+@method(
+    equations={
+        "operator": r"\langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)} \frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda) \frac{\partial f}{\partial\lambda}\right), \qquad \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}",
+        "modes": r"E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0) \big(F_k, \overline{T}^{-1}\big) e^{-\kappa_k \int \nu_D\,dt}",
+        "nodes": r"\lambda_i = \lambda_c\,[1 - (1 - x_i)^2], \quad x_i = \frac{i}{n-1}, \qquad f_{n-1} = 0",
+        "stiffness": r"K_{i+1/2} = \frac{c_{i+1/2}\,\overline Q(c_{i+1/2})}{\lambda_{i+1} - \lambda_i}, \qquad M_i = \int_{c_{i-1/2}}^{c_{i+1/2}} \overline T\, d\lambda",
+        "eigenproblem": r"K f = \mu M f, \qquad \kappa_k = 2\mu_k, \qquad F_k = M^{-1/2} v_k",
+    },
+    order=1,
+    assumptions=(
+        r"zero orbit width; odd modes, zero in the trapped region (Dirichlet at $\lambda_c$)",
+        r"no flux through $\lambda = 0$; $M_i$ by 4-point Gauss-Legendre per control volume",
+        r"in a uniform field the $F_k$ are the odd Legendre polynomials, $\kappa = 1, 6, 15, \dots$",
+        r"the order is in the node spacing in $\lambda$",
+    ),
+    references=(
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002), ch. 11",
+        "[Weiland et al., Nucl. Fusion 58, 082032 (2018)](https://doi.org/10.1088/1741-4326/aabf0f)",
+    ),
+    problem=_pitch_modes_problem,
+)
 def pitch_modes(
     surfaces: FluxSurfaces, *, modes: int = 8, nodes: int = 200
 ) -> PitchModes:
     """Return the odd eigenmodes of the bounce-averaged Lorentz operator per shell.
 
     Args:
-        surfaces: Shells with their field points (:meth:`Equilibrium.flux_surfaces`).
+        surfaces: Shells with their field points (`Equilibrium.flux_surfaces`).
         modes: Modes kept; one more rate is computed for the remainder.
         nodes: Finite-volume nodes in ``lambda``.
     """

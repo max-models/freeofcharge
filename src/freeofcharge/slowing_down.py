@@ -3,24 +3,24 @@ r"""Classical slowing down of fast ions (Stix), local to their flux surface.
 A fast ion of speed ``v`` with ``v_Ti << v << v_Te`` loses energy to the
 electrons and to the ions at the rate
 
-.. math::
-
-    \frac{dv}{dt} = -\frac{v^3 + v_c^3}{\tau_s v^2},
+$$
+\frac{dv}{dt} = -\frac{v^3 + v_c^3}{\tau_s v^2},
+$$
 
 with the Spitzer slowing-down time on the electrons
 
-.. math::
-
-    \tau_s = \frac{3 (2\pi)^{3/2} \varepsilon_0^2 m_b T_e^{3/2}}
-                  {n_e Z_b^2 e^4 m_e^{1/2} \ln\Lambda_e}
+$$
+\tau_s = \frac{3 (2\pi)^{3/2} \varepsilon_0^2 m_b T_e^{3/2}}
+              {n_e Z_b^2 e^4 m_e^{1/2} \ln\Lambda_e}
+$$
 
 and the critical velocity, where the electron and ion drags are equal,
 
-.. math::
-
-    v_c^3 = \frac{3\sqrt{\pi}}{4} m_e v_{Te}^3
-            \sum_j \frac{n_j Z_j^2}{n_e m_j}
-            \frac{\ln\Lambda_j}{\ln\Lambda_e}, \qquad v_{Te} = \sqrt{2 T_e / m_e}
+$$
+v_c^3 = \frac{3\sqrt{\pi}}{4} m_e v_{Te}^3
+        \sum_j \frac{n_j Z_j^2}{n_e m_j}
+        \frac{\ln\Lambda_j}{\ln\Lambda_e}, \qquad v_{Te} = \sqrt{2 T_e / m_e}
+$$
 
 (Stix, Plasma Phys. 14, 367, 1972). Its pitch ``xi = v_par / v`` relaxes by
 pitch-angle scattering on the ions, ``d<xi>/dt = -nu_D <xi>``, with the
@@ -29,18 +29,18 @@ deflection rate of a fast particle on cold targets ``nu_D = sum_j Gamma_j / v^3`
 and Sigmar, *Collisional Transport in Magnetized Plasmas*, 2002), while the
 ions' energy drag is ``sum_j (m_b / m_j) Gamma_j / v^2``. Their ratio,
 
-.. math::
-
-    \beta = \frac{\sum_j n_j Z_j^2 \ln\Lambda_j}
-                 {\sum_j n_j Z_j^2 \ln\Lambda_j\, m_b / m_j},
+$$
+\beta = \frac{\sum_j n_j Z_j^2 \ln\Lambda_j}
+             {\sum_j n_j Z_j^2 \ln\Lambda_j\, m_b / m_j},
+$$
 
 equal to ``Z_eff / [Z]`` for equal logarithms, gives ``nu_D = beta v_c^3 /
 (tau_s v^3)`` and, dividing by ``dv/dt``,
 
-.. math::
-
-    \langle\xi\rangle(v) = \xi_0 \left[\frac{v^3 (v_0^3 + v_c^3)}
-                                         {v_0^3 (v^3 + v_c^3)}\right]^{\beta/3},
+$$
+\langle\xi\rangle(v) = \xi_0 \left[\frac{v^3 (v_0^3 + v_c^3)}
+                                     {v_0^3 (v^3 + v_c^3)}\right]^{\beta/3},
+$$
 
 the first Legendre term of the form of Gaffey (J. Plasma Phys. 16, 149, 1976),
 the ``l``-th term decaying with the exponent ``l (l + 1) beta / 6`` from the
@@ -49,10 +49,10 @@ here and checked against the equations of motion and a Monte Carlo of the
 scattering (tests), not symbol by symbol against Gaffey's paper. These closed
 forms hold for constant Coulomb logarithms.
 
-Each species has its own Coulomb logarithm (:func:`coulomb_logarithms`, as
+Each species has its own Coulomb logarithm (`coulomb_logarithms`, as
 ASCOT5 evaluates it); the ion ones grow with the speed of the fast ion, so
-:func:`slow_down` integrates the slowing down numerically
-(:func:`slowing_down_moments`), with the drags and the deflection rate at
+`slow_down` integrates the slowing down numerically
+(`slowing_down_moments`), with the drags and the deflection rate at
 each speed.
 
 The ions slow down on the flux surface where they are born (no orbit width,
@@ -60,7 +60,7 @@ no losses, no charge exchange) until their energy falls to
 ``max(thermal_factor T_i, minimum_energy)``, where they join the thermal ions
 with what is left (zero by default: to rest). Their current is that of their
 orbits: trapped ions carry none, and pitch-angle scattering is averaged over
-the orbit (:mod:`freeofcharge.trapping`). The beam-driven current is the
+the orbit (`freeofcharge.trapping`). The beam-driven current is the
 fast-ion current shielded by the electrons, ``j = j_f (1 - Z_b / Z_eff (1 -
 G))``, with the trapped-electron correction ``G``.
 """
@@ -75,6 +75,7 @@ import cunumpy as xp
 import numpy as np
 import xarray as xr
 from maybempi import MPI
+from methodcard import ConvergenceProblem, Rule, method
 from plasmacoll.constants import ATOMIC_MASS, ELECTRON_MASS, ELEMENTARY_CHARGE
 from scipy import constants
 
@@ -117,6 +118,27 @@ _NODES = 0.5 * (_NODES + 1.0)
 _WEIGHTS = 0.5 * _WEIGHTS
 
 
+def _coulomb_logarithm_rules() -> dict:
+    """The SymPy rule of `coulomb_logarithm` (for the tests)."""
+    import sympy
+
+    ne, te = sympy.symbols("ne te", positive=True)
+    rule = 24 - sympy.log(sympy.sqrt(ne * sympy.Float("1e-6")) / te)
+    return {
+        "electrons": Rule(rule, ranges={"ne": (1.0e18, 1.0e21), "te": (10.0, 1.0e4)})
+    }
+
+
+@method(
+    equations={
+        "electrons": r"\ln\Lambda_e = 24 - \ln\frac{\sqrt{n_e\,[\mathrm{cm^{-3}}]}}{T_e\,[\mathrm{eV}]}",
+    },
+    assumptions=(r"$T_e > 10$ eV",),
+    references=(
+        "[NRL Plasma Formulary](https://www.nrl.navy.mil/ppd/content/nrl-plasma-formulary)",
+    ),
+    symbolic=_coulomb_logarithm_rules,
+)
 def coulomb_logarithm(ne, te):
     """Return the electron Coulomb logarithm (NRL formulary, ``T_e > 10 eV``).
 
@@ -128,17 +150,30 @@ def coulomb_logarithm(ne, te):
     return 24.0 - xp.log(xp.sqrt(ne_cm3) / xp.asarray(te, dtype=float))
 
 
+@method(
+    equations={
+        "logarithm": r"\ln\Lambda_b = \ln\frac{\lambda_D}{\max(b_\mathrm{cl}, b_\mathrm{qm})}, \quad b_\mathrm{cl} = \frac{|Z_b Z| e^2}{4\pi\varepsilon_0 m_r \bar u^2}, \quad b_\mathrm{qm} = \frac{\hbar}{2 m_r \bar u}, \quad \bar u^2 = v^2 + \frac{2T}{m}",
+        "debye": r"\lambda_D^{-2} = \frac{e^2}{\varepsilon_0}\left(\frac{n_e}{T_e} + \sum_j \frac{n_j Z_j^2}{T_i}\right)",
+    },
+    assumptions=(
+        r"$m_r$ the reduced mass; $T$, $m$ those of the target",
+        r"the ion logarithms grow with the fast ion's speed; the electron one is about NRL's",
+    ),
+    references=(
+        "[Hirvijoki et al., Comput. Phys. Commun. 185, 1310 (2014)](https://www.sciencedirect.com/science/article/abs/pii/S0010465514000277); ASCOT5 `mccc_coefs_clog`",
+    ),
+)
 def coulomb_logarithms(
     speed, mass, charge_number, ne, te, ion_densities, ion_masses, ion_charges, ti
 ):
     r"""Return the Coulomb logarithms of a fast ion on the electrons and each ion.
 
-    .. math::
-
-        \ln\Lambda_{b} = \ln\frac{\lambda_D}{\max(b_\mathrm{cl}, b_\mathrm{qm})},
-        \quad b_\mathrm{cl} = \frac{|Z_b Z| e^2}{4\pi\varepsilon_0 m_r \bar u^2},
-        \quad b_\mathrm{qm} = \frac{\hbar}{2 m_r \bar u},
-        \quad \bar u^2 = v^2 + \frac{2T}{m},
+    $$
+    \ln\Lambda_{b} = \ln\frac{\lambda_D}{\max(b_\mathrm{cl}, b_\mathrm{qm})},
+    \quad b_\mathrm{cl} = \frac{|Z_b Z| e^2}{4\pi\varepsilon_0 m_r \bar u^2},
+    \quad b_\mathrm{qm} = \frac{\hbar}{2 m_r \bar u},
+    \quad \bar u^2 = v^2 + \frac{2T}{m},
+    $$
 
     with the Debye length of electrons and ions together and the reduced mass
     ``m_r`` (Hirvijoki et al., Comput. Phys. Commun. 185, 1310, 2014; ASCOT5's
@@ -185,6 +220,41 @@ def coulomb_logarithms(
     return electrons, ions
 
 
+def _slowing_down_time_rules() -> dict:
+    """The SymPy rule of `slowing_down_time` (for the tests)."""
+    import sympy
+
+    m, z, ne, te, ln = sympy.symbols(
+        "mass charge_number ne te ln_lambda", positive=True
+    )
+    e, me, eps0 = (sympy.Float(c) for c in (_E, _ME, _EPS0))
+    rule = (
+        3
+        * (2 * sympy.pi) ** sympy.Rational(3, 2)
+        * eps0**2
+        * m
+        * (te * e) ** sympy.Rational(3, 2)
+    ) / (ne * z**2 * e**4 * sympy.sqrt(me) * ln)
+    ranges = {
+        "mass": (1.6e-27, 5.1e-27),
+        "charge_number": (1.0, 2.0),
+        "ne": (1.0e19, 1.0e20),
+        "te": (1.0e2, 1.0e4),
+        "ln_lambda": (10.0, 20.0),
+    }
+    return {"spitzer": Rule(rule, ranges=ranges, rtol=1e-9)}
+
+
+@method(
+    equations={
+        "spitzer": r"\tau_s = \frac{3 (2\pi)^{3/2} \varepsilon_0^2 m_b T_e^{3/2}}{n_e Z_b^2 e^4 m_e^{1/2} \ln\Lambda_e}",
+    },
+    assumptions=(r"$v_{Ti} \ll v \ll v_{Te}$",),
+    references=(
+        "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
+    ),
+    symbolic=_slowing_down_time_rules,
+)
 def slowing_down_time(mass, charge_number, ne, te, ln_lambda=None):
     """Return the Spitzer slowing-down time on the electrons [s].
 
@@ -193,7 +263,7 @@ def slowing_down_time(mass, charge_number, ne, te, ln_lambda=None):
         charge_number: Fast-ion charge number.
         ne: Electron density [m^-3].
         te: Electron temperature [eV].
-        ln_lambda: Coulomb logarithm; from :func:`coulomb_logarithm` if None.
+        ln_lambda: Coulomb logarithm; from `coulomb_logarithm` if None.
     """
     if ln_lambda is None:
         ln_lambda = coulomb_logarithm(ne, te)
@@ -216,6 +286,17 @@ def _z_over_mass(ne, ion_densities, ion_masses, ion_charges):
     ) / xp.asarray(ne)
 
 
+@method(
+    equations={
+        "critical": r"v_c^3 = \frac{3\sqrt{\pi}}{4}\, m_e v_{Te}^3 \sum_j \frac{n_j Z_j^2}{n_e m_j}, \qquad v_{Te} = \sqrt{2 T_e / m_e}",
+    },
+    assumptions=(
+        r"equal Coulomb logarithms (in general each term has the factor $\ln\Lambda_j / \ln\Lambda_e$)",
+    ),
+    references=(
+        "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
+    ),
+)
 def critical_velocity(ne, te, ion_densities, ion_masses, ion_charges):
     """Return the critical velocity ``v_c`` [m/s] for equal Coulomb logarithms.
 
@@ -231,6 +312,14 @@ def critical_velocity(ne, te, ion_densities, ion_masses, ion_charges):
     return (0.75 * xp.sqrt(xp.pi) * _ME * v_te**3 * z_over_m) ** (1.0 / 3.0)
 
 
+@method(
+    equations={
+        "beta": r"\beta = \frac{Z_\mathrm{eff}}{[Z]}, \qquad [Z] = \sum_j \frac{n_j Z_j^2 m_b}{n_e m_j}",
+    },
+    assumptions=(
+        r"equal Coulomb logarithms; $\beta = 1$ for a beam in a plasma of its own isotope",
+    ),
+)
 def pitch_angle_exponent(mass, ne, ion_densities, ion_masses, ion_charges):
     """Return ``beta = Z_eff / [Z]``, the pitch-angle scattering of the ions.
 
@@ -256,6 +345,13 @@ def _log_integral(w):
     return antiderivative + 2.0 / sqrt3 * xp.pi / 6.0
 
 
+@method(
+    equations={
+        "fraction": r"G_i(x) = \frac{1}{x}\int_0^x \frac{dy}{1 + y^{3/2}}, \qquad x = \frac{E_0}{E_c}",
+        "closed_form": r"\int_0^w \frac{2u\,du}{1 + u^3} = -\frac{2}{3}\ln(1 + w) + \frac{1}{3}\ln(w^2 - w + 1) + \frac{2}{\sqrt 3}\arctan\frac{2w - 1}{\sqrt 3} + \frac{\pi}{3\sqrt 3}, \qquad u = \sqrt y",
+    },
+    assumptions=(r"constant Coulomb logarithms",),
+)
 def ion_heating_fraction(energy_ratio):
     """Return the share of a fast ion's energy that goes to the ions.
 
@@ -265,6 +361,33 @@ def ion_heating_fraction(energy_ratio):
     return _log_integral(xp.sqrt(x)) / x
 
 
+def _pitch_at_speed_rules() -> dict:
+    """The SymPy rule of `pitch_at_speed` (for the tests)."""
+    import sympy
+
+    u, u0, xi0, beta = sympy.symbols(
+        "speed_ratio birth_speed_ratio birth_pitch beta", positive=True
+    )
+    rule = xi0 * (u**3 * (u0**3 + 1) / (u0**3 * (u**3 + 1))) ** (beta / 3)
+    return {"mean_pitch": rule}
+
+
+@method(
+    equations={
+        "mean_pitch": r"\langle\xi\rangle(v) = \xi_0 \left[\frac{v^3 (v_0^3 + v_c^3)}{v_0^3 (v^3 + v_c^3)}\right]^{\beta/3}",
+        "from": r"\frac{d\ln\langle\xi\rangle}{d\ln v} = \frac{\beta v_c^3}{v^3 + v_c^3}, \qquad \nu_D = \frac{\beta v_c^3}{\tau_s v^3}",
+        "legendre": r"\text{the } l\text{-th Legendre term decays with } \frac{l(l+1)\beta}{6}",
+    },
+    assumptions=(
+        r"constant Coulomb logarithms",
+        r"uniform field (no trapping): the `orbit_average=False` path",
+    ),
+    references=(
+        "[Gaffey, J. Plasma Phys. 16, 149 (1976)](https://doi.org/10.1017/S0022377800020134)",
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002), ch. 11",
+    ),
+    symbolic=_pitch_at_speed_rules,
+)
 def pitch_at_speed(speed_ratio, birth_speed_ratio, birth_pitch, beta):
     """Return the mean pitch at ``v / v_c`` of ions born at ``v_0 / v_c``."""
     u3 = xp.asarray(speed_ratio, dtype=float) ** 3
@@ -272,6 +395,19 @@ def pitch_at_speed(speed_ratio, birth_speed_ratio, birth_pitch, beta):
     return birth_pitch * (u3 * (u03 + 1.0) / (u03 * (u3 + 1.0))) ** (beta / 3.0)
 
 
+@method(
+    equations={
+        "time": r"t = \frac{\tau_s}{3}\ln(1 + x^3), \qquad x = \frac{v_0}{v_c}",
+        "kinetic": r"\int v^2 dt = \tau_s v_c^2 \left[\frac{x^2}{2} - \int_0^x \frac{u\,du}{1 + u^3}\right]",
+        "trajectory": r"dt = \frac{\tau_s v^2\, dv}{v^3 + v_c^3}",
+    },
+    assumptions=(
+        r"constant $v_c$, $\tau_s$ and $\beta$; the parallel integral by 64-point Gauss-Legendre in $v/v_c$",
+    ),
+    references=(
+        "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
+    ),
+)
 def slowing_down_integrals(birth_speed, birth_pitch, v_c, tau_s, beta):
     """Return the time integrals of one fast ion from birth to rest, closed forms.
 
@@ -303,6 +439,19 @@ def slowing_down_integrals(birth_speed, birth_pitch, v_c, tau_s, beta):
     return time, kinetic, parallel
 
 
+@method(
+    equations={
+        "drag": r"\frac{dv}{dt} = -a_e v - \frac{a_i}{v^2}, \qquad a_e = \frac{1}{\tau_s}, \qquad a_i = \sum_j \frac{m_b}{m_j}\,\Gamma_j",
+        "gamma": r"\Gamma_j = \frac{n_j Z_j^2 Z_b^2 e^4 \ln\Lambda_j}{4\pi \varepsilon_0^2 m_b^2}, \qquad \nu_D = \frac{\sum_j \Gamma_j}{v^3}",
+    },
+    assumptions=(
+        r"each species with its own Coulomb logarithm; with one logarithm $a_i \tau_s = v_c^3$",
+    ),
+    references=(
+        "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002)",
+    ),
+)
 def collision_coefficients(
     speed,
     mass,
@@ -320,7 +469,7 @@ def collision_coefficients(
     ``dv/dt = -electron_drag v - ion_drag / v^2`` and ``nu_D = deflection /
     v^3``: ``electron_drag = 1 / tau_s`` [1/s], ``ion_drag = sum_j (m_b / m_j)
     Gamma_j`` and ``deflection = sum_j Gamma_j`` [m^3/s^3], each with its own
-    Coulomb logarithm (:func:`coulomb_logarithms`), or all with ``ln_lambda``
+    Coulomb logarithm (`coulomb_logarithms`), or all with ``ln_lambda``
     if given. With equal logarithms ``ion_drag tau_s = v_c^3``.
     """
     if ln_lambda is None:
@@ -352,12 +501,42 @@ def collision_coefficients(
     return electron_drag, ion_drag, deflection
 
 
+def _moments_problem() -> ConvergenceProblem:
+    """The slowing-down time with constant drags, against its closed form."""
+    a_e, a_i, v0, v1 = 1.0, 2.0, 3.0, 0.5
+    exact = np.log((a_e * v0**3 + a_i) / (a_e * v1**3 + a_i)) / (3.0 * a_e)
+    span = np.log(v0 / v1)
+
+    def error(log_step: float) -> float:
+        points = round(span / log_step) + 1
+        speed = np.exp(np.linspace(np.log(v0), np.log(v1), points))[None, :]
+        time = slowing_down_moments(speed, a_e, a_i, 0.0, np.zeros((1, 1)))[0]
+        return float(abs(time[0] - exact))
+
+    return ConvergenceProblem(error, steps=[span / 16, span / 32, span / 64])
+
+
+@method(
+    equations={
+        "trajectory": r"dt = \frac{dv}{a_e v + a_i / v^2}, \qquad \frac{dt}{d\ln v} = \frac{v}{a_e v + a_i/v^2}",
+        "moments": r"t, \quad \int v^2\,dt, \quad \int \frac{a_i}{v}\,dt, \quad \int v\, e^{-\kappa_k \int \nu_D\,dt'}\,dt",
+        "simpson": r"\int_a^b f\,dx \approx \frac{h}{3}\left(f_0 + 4 f_1 + 2 f_2 + \dots + 4 f_{G-2} + f_{G-1}\right)",
+        "scattering": r"\int \nu_D\,dt \approx \frac{h}{2} \sum_k \left(\nu_{D,k} \dot t_k + \nu_{D,k+1} \dot t_{k+1}\right)",
+    },
+    order=4,
+    assumptions=(
+        r"speeds equally spaced in $\ln v$, an odd number of them",
+        r"the order is that of the time; the cumulative scattering is second order",
+        r"the energy to the electrons is the rest of $E_0 - E_\mathrm{end}$, so the balance is exact",
+    ),
+    problem=_moments_problem,
+)
 def slowing_down_moments(speed, electron_drag, ion_drag, deflection, rates):
     r"""Return the time integrals over slowing-down trajectories sampled in speed.
 
     Each row of ``speed`` runs from the birth speed down to the end speed,
     equally spaced in ``ln v`` (an odd number of points); ``electron_drag``,
-    ``ion_drag`` and ``deflection`` (see :func:`collision_coefficients`) are
+    ``ion_drag`` and ``deflection`` (see `collision_coefficients`) are
     given on it. Simpson's rule in ``ln v`` integrates ``dt = dv / (a_e v +
     a_i / v^2)``, the trapezoidal rule the cumulative ``int nu_D dt``.
 
@@ -406,18 +585,41 @@ def slowing_down_moments(speed, electron_drag, ion_drag, deflection, rates):
     return time, kinetic, ion_loss, parallel
 
 
+def _start_cordey_rules() -> dict:
+    """The SymPy rule of :func:`start_cordey_fit` (for the tests)."""
+    import sympy
+
+    z, eps = sympy.symbols("zeff epsilon", positive=True)
+    rule = (sympy.Rational(155, 100) + sympy.Rational(85, 100) / z) * sympy.sqrt(eps)
+    rule -= (sympy.Rational(20, 100) + sympy.Rational(155, 100) / z) * eps
+    return {
+        "correction": Rule(rule, ranges={"zeff": (1.0, 3.0), "epsilon": (0.01, 0.4)})
+    }
+
+
 # ----------------------------------------------------------------------
 # Trapped-electron correction of the shielding
 # ----------------------------------------------------------------------
 
 
+@method(
+    equations={
+        "correction": r"G = \left(1.55 + \frac{0.85}{Z}\right)\sqrt\epsilon - \left(0.20 + \frac{1.55}{Z}\right)\epsilon",
+    },
+    assumptions=(r"collisionless; circular surfaces at large aspect ratio",),
+    references=(
+        "[Mikkelsen and Singer, Nucl. Technol./Fusion 4, 237 (1983)](https://doi.org/10.13182/FST83-A22816)",
+        "Start and Cordey, Phys. Fluids 23, 1477 (1980)",
+    ),
+    symbolic=lambda: _start_cordey_rules(),
+)
 def start_cordey_fit(zeff, epsilon):
     """Return ``G = (1.55 + 0.85/Z) sqrt(eps) - (0.20 + 1.55/Z) eps``.
 
     Mikkelsen and Singer's fit (Nucl. Technol./Fusion 4, 237, 1983) to the
     collisionless values of Start and Cordey (Phys. Fluids 23, 1477, 1980) for
     circular surfaces at large aspect ratio. Within 6% of
-    :func:`l31_coefficient` without collisions and ``f_t = 1.46 sqrt(eps) -
+    `l31_coefficient` without collisions and ``f_t = 1.46 sqrt(eps) -
     0.46 eps^(3/2)`` up to ``eps = 0.3`` (Honda et al., Nucl. Fusion 52,
     023021, 2012, compare the models).
     """
@@ -426,6 +628,34 @@ def start_cordey_fit(zeff, epsilon):
     return (1.55 + 0.85 / z) * xp.sqrt(eps) - (0.20 + 1.55 / z) * eps
 
 
+def _l31_rules() -> dict:
+    """The SymPy rule of :func:`l31_coefficient` (for the tests)."""
+    import sympy
+
+    z, ft, nu = sympy.symbols("zeff trapped_fraction collisionality", positive=True)
+    x = ft / (1 + (1 - ft / 10) * sympy.sqrt(nu) + (1 - ft) * nu / (2 * z))
+    z1 = z + 1
+    rule = (1 + sympy.Rational(14, 10) / z1) * x - sympy.Rational(19, 10) / z1 * x**2
+    rule += sympy.Rational(3, 10) / z1 * x**3 + sympy.Rational(2, 10) / z1 * x**4
+    ranges = {
+        "zeff": (1.0, 3.0),
+        "trapped_fraction": (0.05, 0.7),
+        "collisionality": (1.0e-3, 10.0),
+    }
+    return {"l31": Rule(rule, ranges=ranges)}
+
+
+@method(
+    equations={
+        "l31": r"L_{31} = \left(1 + \frac{1.4}{Z+1}\right) X - \frac{1.9}{Z+1} X^2 + \frac{0.3}{Z+1} X^3 + \frac{0.2}{Z+1} X^4",
+        "x": r"X = \frac{f_t}{1 + (1 - 0.1 f_t)\sqrt{\nu_e^*} + 0.5 (1 - f_t)\, \nu_e^* / Z}",
+    },
+    assumptions=(r"$Z = Z_\mathrm{eff}$; no collisions when `collisionality` is None",),
+    references=(
+        "[Sauter, Angioni and Lin-Liu, Phys. Plasmas 6, 2834 (1999)](https://doi.org/10.1063/1.873240), eqs. 14 and 18",
+    ),
+    symbolic=lambda: _l31_rules(),
+)
 def l31_coefficient(zeff, trapped_fraction, collisionality=None):
     """Return Sauter's bootstrap coefficient ``L31``, equal to ``G``.
 
@@ -445,6 +675,44 @@ def l31_coefficient(zeff, trapped_fraction, collisionality=None):
     return (1.0 + 1.4 / z1) * x - 1.9 / z1 * x**2 + 0.3 / z1 * x**3 + 0.2 / z1 * x**4
 
 
+def _collisionality_rules() -> dict:
+    """The SymPy rule of :func:`electron_collisionality` (for the tests)."""
+    import sympy
+
+    ne, te, z, q, r, eps = sympy.symbols(
+        "ne te zeff safety_factor major_radius epsilon", positive=True
+    )
+    ln_e = sympy.Float("31.3") - sympy.log(sympy.sqrt(ne) / te)
+    rule = (
+        sympy.Float("6.921e-18")
+        * q
+        * r
+        * ne
+        * z
+        * ln_e
+        / (te**2 * eps ** sympy.Rational(3, 2))
+    )
+    ranges = {
+        "ne": (1.0e19, 1.0e20),
+        "te": (1.0e2, 1.0e4),
+        "zeff": (1.0, 3.0),
+        "safety_factor": (1.0, 5.0),
+        "major_radius": (1.0, 6.0),
+        "epsilon": (0.05, 0.4),
+    }
+    return {"collisionality": Rule(rule, ranges=ranges, rtol=1e-9)}
+
+
+@method(
+    equations={
+        "collisionality": r"\nu_e^* = 6.921\times10^{-18}\, \frac{q R n_e Z \ln\Lambda_e}{T_e^2 \epsilon^{3/2}}, \qquad \ln\Lambda_e = 31.3 - \ln\frac{\sqrt{n_e}}{T_e}",
+    },
+    assumptions=(r"SI units, $T_e$ in eV",),
+    references=(
+        "[Sauter, Angioni and Lin-Liu, Phys. Plasmas 6, 2834 (1999)](https://doi.org/10.1063/1.873240), eqs. 14 and 18",
+    ),
+    symbolic=lambda: _collisionality_rules(),
+)
 def electron_collisionality(ne, te, zeff, safety_factor, major_radius, epsilon):
     """Return Sauter's ``nu_e* = 6.921e-18 q R n_e Z ln(Lambda_e) / (T_e^2 eps^1.5)``.
 
@@ -465,8 +733,20 @@ def electron_collisionality(ne, te, zeff, safety_factor, major_radius, epsilon):
     )
 
 
+@method(
+    equations={
+        "correction": r"G = L_{31}(Z_\mathrm{eff}, f_t, \nu_e^*)",
+    },
+    assumptions=(r"$f_t$, $q$, $R$, $\epsilon$ of the shell's centre surface",),
+    references=(
+        "[Lin-Liu and Hinton, Phys. Plasmas 4, 4179 (1997)](https://doi.org/10.1063/1.872543)",
+        "[Honda et al., Nucl. Fusion 52, 023021 (2012)](https://doi.org/10.1088/0029-5515/52/2/023021)",
+        "[Sauter, Angioni and Lin-Liu, Phys. Plasmas 6, 2834 (1999)](https://doi.org/10.1063/1.873240), eqs. 14 and 18",
+    ),
+    components=(l31_coefficient, electron_collisionality),
+)
 def sauter_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
-    """Return ``G`` of each shell: :func:`l31_coefficient` with collisions.
+    """Return ``G`` of each shell: `l31_coefficient` with collisions.
 
     The trapped fraction, safety factor and major radius of the surfaces, the
     plasma at the shell centres.
@@ -487,7 +767,7 @@ def sauter_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
 
 
 def start_cordey_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
-    """Return ``G`` of each shell from :func:`start_cordey_fit` (no collisions)."""
+    """Return ``G`` of each shell from `start_cordey_fit` (no collisions)."""
     zeff = xp.to_numpy(plasma.zeff(surfaces.rho))
     return np.asarray(start_cordey_fit(zeff, surfaces.inverse_aspect_ratio))
 
@@ -568,6 +848,33 @@ class SlowingDown:
         )
 
 
+@method(
+    equations={
+        "drag": r"\frac{dv}{dt} = -\frac{v^3 + v_c^3}{\tau_s v^2}",
+        "scattering": r"\frac{d\langle\xi\rangle}{dt} = -\nu_D \langle\xi\rangle",
+        "moments": r"n_f = \frac{\sum_b w_b t_b}{V}, \quad p_f = \frac{2}{3}\frac{\sum_b w_b \tfrac{m_b}{2}\int v^2 dt}{V}, \quad j_f = \frac{e \sum_b w_b \int v\langle\xi\rangle dt}{V}",
+        "end_energy": r"E_\mathrm{end} = \min\!\left(\max(\text{thermal\_factor}\cdot T_i,\ \text{minimum\_energy}),\ E_0\right)",
+        "speed_grid": r"v_i = v_0\, r^{i/(G-1)}, \qquad r = \max\!\left(\sqrt{E_\mathrm{end}/E_0},\ 10^{-4}\right)",
+        "current": r"j = j_f \left(1 - \frac{Z_b}{Z_\mathrm{eff}}(1 - G)\right), \qquad I = \sum_k j_k A_k",
+    },
+    assumptions=(
+        r"$v_{Ti} \ll v \ll v_{Te}$ (not checked)",
+        r"zero orbit width: slowing down on the birth surface; no losses, no charge exchange, no energy diffusion",
+        r"$Z_b = 1$; $p_f$ an isotropic estimate; births with $\rho > 1$ take the plasma at $\rho = 1$",
+    ),
+    references=(
+        "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
+        "[Gaffey, J. Plasma Phys. 16, 149 (1976)](https://doi.org/10.1017/S0022377800020134)",
+        "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002), ch. 11",
+    ),
+    components=(
+        slowing_down_time,
+        critical_velocity,
+        collision_coefficients,
+        slowing_down_moments,
+        pitch_modes,
+    ),
+)
 def slow_down(
     deposition: Deposition,
     plasma: Plasma,
@@ -595,9 +902,9 @@ def slow_down(
         plasma: Profiles.
         surfaces: Volumes, areas and fields of the shells.
         ln_lambda: One Coulomb logarithm for all species (a number or one
-            per birth); each its own (:func:`coulomb_logarithms`) if None.
+            per birth); each its own (`coulomb_logarithms`) if None.
         orbit_average: Carry the current of the orbits, trapped ions none and
-            scattering averaged over the orbit (:mod:`freeofcharge.trapping`);
+            scattering averaged over the orbit (`freeofcharge.trapping`);
             if False, the local pitch with Gaffey's decay, as if the field were
             uniform.
         thermal_factor: The ions are thermal below ``thermal_factor T_i`` ...
