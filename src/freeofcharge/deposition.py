@@ -136,15 +136,18 @@ def _path_length(beam: NeutralBeam, equilibrium: MagneticEquilibrium) -> float:
 
 @method(
     equations={
-        "attenuation": r"\frac{dI}{ds} = -n_e \sigma_s I",
-        "optical_depth": r"\tau_k = \sum_{l \le k} n_e(s_l) \sigma_s(s_l)\, \Delta s, \qquad s_l = \left(l + \tfrac{1}{2}\right) \Delta s",
-        "births": r"\dot N_k = w \left(e^{-\tau_{k-1}} - e^{-\tau_k}\right)",
+        "attenuation": r"\frac{dI}{ds} = -n_e\,\sigma_s\, I \quad\Rightarrow\quad I = w\, e^{-\tau}, \qquad \tau(s) = \int_0^s n_e \sigma_s\, ds'",
+        "optical_depth": r"\tau_k = \sum_{i \le k} n_e(s_i) \sigma_s(s_i)\, \Delta s, \qquad s_i = \left(i + \tfrac{1}{2}\right) \Delta s",
+        "births": r"\dot N_k = w \left( e^{-\tau_{k-1}} - e^{-\tau_k} \right)",
+        "powers": r"P_\mathrm{abs} = w \left(1 - e^{-\tau_\mathrm{total}}\right) E, \qquad P_\mathrm{shine} = w\, e^{-\tau_\mathrm{total}} E",
+        "sampling": r"\tau^* = -\ln\!\left(1 - u\,(1 - e^{-\tau_\mathrm{total}})\right), \qquad w_\mathrm{birth} = \frac{w (1 - e^{-\tau_\mathrm{total}})}{n_b}",
+        "pitch": r"\xi = \frac{\mathbf{v}\cdot\mathbf{B}}{v B}",
     },
     assumptions=(
-        "straight lines from the markers",
-        "midpoints outside the last closed flux surface do not attenuate",
+        r"straight lines from the markers; midpoints outside the last closed surface do not attenuate",
         r"charge exchange counts as stopped (part of $\sigma_s$)",
-        "the shine-through meets the wall to within one step",
+        r"the wall crossing and the boundary are resolved to one step; a birth may lie half a step outside",
+        r"$u$ uniform; the birth point by linear interpolation of $\tau$ within its step",
     ),
     components=(SuzukiStopping,),
 )

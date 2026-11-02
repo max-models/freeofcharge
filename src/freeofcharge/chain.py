@@ -50,6 +50,34 @@ DEUTERIUM_MASS = 2.014 * ATOMIC_MASS
 GAS_NEUTRALIZER = {("-", "0"): 1.2e-20, ("-", "+"): 5.0e-22, ("0", "+"): 3.7e-21}
 
 
+def _child_langmuir_rules() -> dict:
+    """The SymPy rule of :func:`child_langmuir` (for the tests)."""
+    import sympy
+
+    v, d, m = sympy.symbols("voltage gap mass", positive=True)
+    eps0, e = sympy.Float(EPSILON_0), sympy.Float(ELEMENTARY_CHARGE)
+    rule = (
+        sympy.Rational(4, 9)
+        * eps0
+        * sympy.sqrt(2 * e / m)
+        * v ** sympy.Rational(3, 2)
+        / d**2
+    )
+    ranges = {
+        "voltage": (1.0e3, 1.0e4),
+        "gap": (1.0e-3, 1.0e-2),
+        "mass": (1.6e-27, 5.1e-27),
+    }
+    return {"current": Rule(rule, ranges=ranges, rtol=1e-9)}
+
+
+@method(
+    equations={
+        "current": r"j_\mathrm{CL} = \frac{4\varepsilon_0}{9}\sqrt{\frac{2e}{m}}\, \frac{V^{3/2}}{d^2}",
+    },
+    assumptions=(r"planar diode, singly charged ions; the deuteron mass by default",),
+    symbolic=lambda: _child_langmuir_rules(),
+)
 def child_langmuir(voltage: float, gap: float, mass: float = DEUTERIUM_MASS) -> float:
     """The planar space-charge-limited current density (A/m^2) of singly charged ions."""
     return (
@@ -84,6 +112,17 @@ class Source:
     state: GlobalState
 
 
+@method(
+    equations={
+        "rates": r"k = a\,e^{-c/T_e}",
+        "current": r"j_- = \text{extraction\_ratio}\cdot e\, h\, n_{D_2^+} u_B, \qquad u_B = \sqrt{\frac{e T_e}{m_{D_2^+}}}",
+    },
+    assumptions=(
+        r"a wellbalanced global model of e, D$_2$, D, D$_2^+$ at fixed D$_2$ density $p/(e T_g)$",
+        r"illustrative Arrhenius rates, not data: ionisation ($a = 2\cdot10^{-14}$ m³/s, $c = 15.4$ eV), dissociation ($10^{-14}$, 8.8 eV), elastic ($3\cdot10^{-14}$ m³/s)",
+        r"the negative-ion surface production is an input share (`extraction_ratio`)",
+    ),
+)
 def deuterium_source(
     rf_power: float,
     *,
@@ -296,6 +335,18 @@ class _SlitGun:
         return float(np.sqrt(np.mean(angles[through] ** 2))), float(through.mean())
 
 
+@method(
+    equations={
+        "divergence": r"\theta_\mathrm{rms} = \sqrt{\left\langle (v_y / v_x)^2 \right\rangle} \quad \text{one gap past the extraction electrode}",
+        "injection": r"v_0 = \sqrt{2\phi}, \qquad j = \text{perveance}\cdot j_\mathrm{CL}",
+    },
+    assumptions=(
+        r"code units $\varepsilon_0 = |q|/m = d = V = 1$; tree-d-3d's boundary-integral electrodes and meshless space charge",
+        r"a fixed point of rays, line charges and electrodes, under-relaxed with $\omega = 0.5$; kick-drift-kick steps",
+        r"converges up to a perveance of about 0.5 at the default resolution",
+    ),
+    components=(child_langmuir,),
+)
 def slit_divergence(
     perveances,
     *,
@@ -331,11 +382,14 @@ def slit_divergence(
 
 @method(
     equations={
-        "rate_equations": r"\frac{dF_i}{d\pi} = \sum_{j \ne i} \left(\sigma_{ji} F_j - \sigma_{ij} F_i\right), \qquad F_- (0) = 1",
+        "rate_equations": r"\frac{dF_i}{d\pi} = \sum_{j \ne i} \left(\sigma_{ji} F_j - \sigma_{ij} F_i\right), \qquad F_-(0) = 1",
     },
     assumptions=(
         r"thin target: the fractions depend on the line density $\pi$ only",
-        "all of the beam negative at the entrance",
+        r"all of the beam negative at the entrance; placeholder cross sections (`GAS_NEUTRALIZER`)",
+    ),
+    references=(
+        "[Hemsworth et al., Nucl. Fusion 49, 045006 (2009)](https://iopscience.iop.org/0029-5515/49/4/045006)",
     ),
 )
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
@@ -384,12 +438,12 @@ def _closed_form_rules() -> dict:
 
 @method(
     equations={
-        "negative": r"F_- = e^{-(\sigma_{-0} + \sigma_{-+}) \pi}",
-        "neutral": r"F_0 = \frac{\sigma_{-0}}{\sigma_{-0} + \sigma_{-+} - \sigma_{0+}} \left(e^{-\sigma_{0+} \pi} - e^{-(\sigma_{-0} + \sigma_{-+}) \pi}\right)",
+        "negative": r"F_- = e^{-(s_1 + s_2) \pi}",
+        "neutral": r"F_0 = \frac{s_1}{s_1 + s_2 - s_3} \left(e^{-s_3 \pi} - e^{-(s_1 + s_2) \pi}\right)",
     },
     assumptions=(
         r"no electron capture ($+ \to 0$, $0 \to -$)",
-        "all of the beam negative at the entrance",
+        r"$s_1$ single and $s_2$ double stripping, $s_3$ re-ionisation; $\pi$ the line density",
     ),
     symbolic=_closed_form_rules,
 )
@@ -406,6 +460,34 @@ def neutral_fraction_closed_form(line_density, cross_sections=None) -> np.ndarra
     return s1 / (s1 + s2 - s3) * (np.exp(-s3 * pi) - np.exp(-(s1 + s2) * pi))
 
 
+def _duct_rules() -> dict:
+    """The SymPy rule of :func:`duct_transmission` (for the tests)."""
+    import sympy
+
+    w, theta, length, a = sympy.symbols(
+        "width divergence length half_aperture", positive=True
+    )
+    sigma = sympy.sqrt(w**2 + (length * theta) ** 2)
+    rule = sympy.erf(a / (sympy.sqrt(2) * sigma)) ** 2
+    ranges = {
+        "width": (0.01, 0.1),
+        "divergence": (1.0e-3, 1.0e-2),
+        "length": (1.0, 20.0),
+        "half_aperture": (0.05, 0.3),
+    }
+    return {"transmission": Rule(rule, ranges=ranges)}
+
+
+@method(
+    equations={
+        "width": r"\sigma(L) = \sqrt{w^2 + (L\,\theta)^2}",
+        "transmission": r"T = \mathrm{erf}\!\left(\frac{a}{\sqrt 2\, \sigma(L)}\right)^2",
+    },
+    assumptions=(
+        r"a round Gaussian beam through a square aperture: the product of two independent one-dimensional shares",
+    ),
+    symbolic=lambda: _duct_rules(),
+)
 def duct_transmission(
     width: float, divergence: float, length: float, half_aperture: float
 ) -> float:

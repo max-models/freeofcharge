@@ -27,6 +27,7 @@ from pathlib import Path
 
 import cunumpy as xp
 import numpy as np
+from methodcard import method
 from scipy.spatial import KDTree
 
 from freeofcharge.equilibrium import FluxSurfaces
@@ -44,6 +45,18 @@ def _require_gvec():
     return gvec
 
 
+@method(
+    equations={
+        "map": r"\mathbf{x} = (R\cos\zeta, -R\sin\zeta, Z), \qquad \zeta = -\operatorname{atan2}(y, x) \bmod 2\pi",
+        "field": r"\mathbf{B} = \frac{\chi' - \Phi'\partial_\zeta\lambda}{\sqrt g}\,\mathbf{e}_\theta + \frac{\Phi'(1 + \partial_\theta\lambda)}{\sqrt g}\,\mathbf{e}_\zeta, \qquad \sqrt g = \mathbf{e}_\rho\cdot(\mathbf{e}_\theta\times\mathbf{e}_\zeta)",
+    },
+    assumptions=(
+        r"only `which_hmap = 1`, $(X_1, X_2) = (R, Z)$",
+        r"$\Phi'$, $\chi'$ taken at $\max(\rho, 10^{-8})$",
+        r"inverse map by a damped 2D Newton iteration in $(\rho\cos\theta, \rho\sin\theta)$; no first wall",
+    ),
+    references=("[GVEC](https://github.com/gvec-group/gvec)",),
+)
 class GVECEquilibrium:
     """A GVEC equilibrium as a `freeofcharge.MagneticEquilibrium`.
 

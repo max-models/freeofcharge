@@ -74,6 +74,16 @@ def _line_averages(b, line_weight, lam):
     return t, q
 
 
+@method(
+    equations={
+        "transit": r"\langle\xi\rangle_t = \frac{\oint dl}{\oint dl / |\xi|} = \frac{1}{\overline{T}(\lambda)}, \qquad \overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}}, \qquad \overline{A} = \frac{\langle A B\rangle}{\langle B\rangle}",
+        "invariant": r"\lambda = (1 - \xi^2) \frac{B_\mathrm{min}}{B}, \qquad \xi = \sigma\sqrt{1 - \lambda b}, \qquad b = \frac{B}{B_\mathrm{min}}",
+    },
+    assumptions=(
+        r"zero orbit width: energy and magnetic moment kept along the orbit",
+        r"trapped for $\lambda > \lambda_c = B_\mathrm{min} / B_\mathrm{max}$: no current",
+    ),
+)
 def transit_pitch(b, line_weight, lam):
     """Return the transit-averaged ``|xi|`` of passing ions, zero for trapped ones.
 
@@ -110,6 +120,16 @@ class PitchModes:
     """``B / B_min`` along the field line of each shell."""
     """Shares of the field-line length of those points."""
 
+    @method(
+        equations={
+            "birth": r"b = \max\!\left(\frac{|B|}{B_{\min}}, 1\right), \qquad \lambda_0 = \max\!\left(0, \frac{1 - \xi_0^2}{b}\right)",
+            "amplitudes": r"a_k = \sigma_0 F_k(\lambda_0)\,\big(F_k, \overline T^{-1}\big), \qquad a_\mathrm{rest} = \sigma_0 \langle\xi\rangle_t(\lambda_0) - \sum_k a_k",
+        },
+        assumptions=(
+            r"$F_k(\lambda_0)$ by linear interpolation, zero beyond $\lambda_c$",
+            r"the remainder decays with the first rate left out, an upper bound on how long it lasts",
+        ),
+    )
     def amplitudes(self, shell, pitch, field_strength):
         """Return the amplitude of each mode for births, shape ``(births, modes)``.
 
@@ -198,18 +218,22 @@ def _pitch_modes_problem() -> ConvergenceProblem:
 
 @method(
     equations={
-        "operator": r"\langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)} \frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda) \frac{\partial f}{\partial\lambda}\right)",
-        "averages": r"\overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}}, \qquad \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}",
-        "modes": r"E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0) \left(F_k, \overline{T}^{-1}\right) e^{-\kappa_k \int \nu_D\,dt}",
+        "operator": r"\langle L f\rangle_b = \frac{2 \nu_D}{\overline{T}(\lambda)} \frac{\partial}{\partial\lambda}\left(\lambda\,\overline{Q}(\lambda) \frac{\partial f}{\partial\lambda}\right), \qquad \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}",
+        "modes": r"E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0) \big(F_k, \overline{T}^{-1}\big) e^{-\kappa_k \int \nu_D\,dt}",
+        "nodes": r"\lambda_i = \lambda_c\,[1 - (1 - x_i)^2], \quad x_i = \frac{i}{n-1}, \qquad f_{n-1} = 0",
+        "stiffness": r"K_{i+1/2} = \frac{c_{i+1/2}\,\overline Q(c_{i+1/2})}{\lambda_{i+1} - \lambda_i}, \qquad M_i = \int_{c_{i-1/2}}^{c_{i+1/2}} \overline T\, d\lambda",
+        "eigenproblem": r"K f = \mu M f, \qquad \kappa_k = 2\mu_k, \qquad F_k = M^{-1/2} v_k",
     },
     order=1,
     assumptions=(
-        "zero orbit width",
-        "odd modes, zero in the trapped region",
-        r"finite volumes in $\lambda$; the order is in the node spacing",
+        r"zero orbit width; odd modes, zero in the trapped region (Dirichlet at $\lambda_c$)",
+        r"no flux through $\lambda = 0$; $M_i$ by 4-point Gauss-Legendre per control volume",
+        r"in a uniform field the $F_k$ are the odd Legendre polynomials, $\kappa = 1, 6, 15, \dots$",
+        r"the order is in the node spacing in $\lambda$",
     ),
     references=(
         "Helander and Sigmar, Collisional Transport in Magnetized Plasmas (2002), ch. 11",
+        "[Weiland et al., Nucl. Fusion 58, 082032 (2018)](https://doi.org/10.1088/1741-4326/aabf0f)",
     ),
     problem=_pitch_modes_problem,
 )
