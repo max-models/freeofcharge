@@ -10,9 +10,6 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - A Numerics section in the docs (header and sidebar): an overview of the model's equations
   (`docs/src/content/docs/numerics/index.mdx`, with the main cards) and one page per module
   in the order of the pipeline (starlight-theme's `methodcard: { pages: true }`).
-
-### Added
-
 - Method cards (methodcard) on the equations of the model: the equilibrium (field, $\rho$,
   Solov'ev, flux surfaces and $q$, trapped fraction, 3D shells, GVEC), the profiles, the beam
   markers, the stopping (Suzuki with the blend, electron CR), the deposition and its birth
