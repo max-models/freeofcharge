@@ -9,10 +9,27 @@ export default defineDocs({
 	description: 'Neutral beams in tokamak plasmas: deposition, shine-through, slowing down and current drive.',
 	pythonPackage: 'freeofcharge',
 	// the method cards of the numerical methods: a Numerics section on their API pages and /numerics/
-	methodcard: true,
+	// the method cards: a Numerics section with the overview (numerics/index.mdx) and one page per
+	// module, in the order of the model, and a Numerics section on each method's API page
+	methodcard: {
+		pages: true,
+		index: false,
+		labels: {
+			'freeofcharge.equilibrium': 'Equilibrium',
+			'freeofcharge.gvec_equilibrium': 'GVEC equilibria',
+			'freeofcharge.profiles': 'Plasma profiles',
+			'freeofcharge.beam': 'Beam markers',
+			'freeofcharge.stopping': 'Beam stopping',
+			'freeofcharge.deposition': 'Deposition',
+			'freeofcharge.slowing_down': 'Slowing down',
+			'freeofcharge.trapping': 'Orbit-averaged pitch',
+			'freeofcharge.chain': 'Injector chain',
+		},
+	},
 	nav: [
 		{ label: 'Getting started', link: '/getting-started/installation/' },
 		{ label: 'Examples', link: '/examples/' },
+		{ label: 'Numerics', link: '/numerics/' },
 		{ label: 'Development', link: '/development/docs/' },
 		{ label: 'API', link: '/api/freeofcharge/' },
 	],

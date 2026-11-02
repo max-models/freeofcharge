@@ -852,8 +852,8 @@ class SlowingDown:
     equations={
         "drag": r"\frac{dv}{dt} = -\frac{v^3 + v_c^3}{\tau_s v^2}",
         "scattering": r"\frac{d\langle\xi\rangle}{dt} = -\nu_D \langle\xi\rangle",
-        "moments": r"n_f = \frac{\sum_b w_b t_b}{V}, \quad p_f = \frac{2}{3}\frac{\sum_b w_b \tfrac{m_b}{2}\int v^2 dt}{V}, \quad j_f = \frac{e \sum_b w_b \int v\langle\xi\rangle dt}{V}",
-        "end_energy": r"E_\mathrm{end} = \min\!\left(\max(\text{thermal\_factor}\cdot T_i,\ \text{minimum\_energy}),\ E_0\right)",
+        "moments": r"\begin{aligned} n_f &= \frac{\sum_b w_b t_b}{V}, \qquad p_f = \frac{2}{3}\frac{\sum_b w_b \tfrac{m_b}{2}\int v^2 dt}{V}, \\ j_f &= \frac{e \sum_b w_b \int v\langle\xi\rangle dt}{V} \end{aligned}",
+        "end_energy": r"E_\mathrm{end} = \min\!\left(\max(f_\mathrm{th}\, T_i,\ E_\mathrm{min}),\ E_0\right), \qquad f_\mathrm{th} = \texttt{thermal\_factor}, \quad E_\mathrm{min} = \texttt{minimum\_energy}",
         "speed_grid": r"v_i = v_0\, r^{i/(G-1)}, \qquad r = \max\!\left(\sqrt{E_\mathrm{end}/E_0},\ 10^{-4}\right)",
         "current": r"j = j_f \left(1 - \frac{Z_b}{Z_\mathrm{eff}}(1 - G)\right), \qquad I = \sum_k j_k A_k",
     },
