@@ -24,6 +24,9 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- The GVEC tests skip, with the reason, when GVEC's compiled library dies on the CPU of the
+  machine (an illegal instruction from a build for a newer CPU), instead of crashing pytest.
+
 - The math in the docstrings renders on the API pages: `$$` blocks instead of reST
   `.. math::` (shown as code), and code spans instead of `:func:` roles.
 
