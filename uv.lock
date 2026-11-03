@@ -4940,8 +4940,8 @@ scene = [
 
 [[package]]
 name = "plasmacoll"
-version = "0.4.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=devel#c9e03b3bb3f85c93ccb6233eb566dccb46167ad8" }
+version = "0.5.0"
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#5bb8606089002fe172e8334bf2e7b7a250aa46e9" }
 dependencies = [
     { name = "cunumpy" },
     { name = "methodcard" },

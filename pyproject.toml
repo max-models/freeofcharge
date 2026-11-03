@@ -24,7 +24,7 @@ dependencies = [
   "maybempi>=0.1",
   "methodcard",
   "numpy",
-  "plasmacoll>=0.2.0",
+  "plasmacoll>=0.5.0",
   "scipy",
   "simgeometry>=0.1.0",
   "xarray",
