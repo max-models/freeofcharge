@@ -22,6 +22,7 @@ from typing import Any, Protocol
 import cunumpy as xp
 import numpy as np
 from methodcard import method
+from plasmacoll.units import convert_units, to_unit, unit_field
 
 __all__ = [
     "ConstantStopping",
@@ -51,8 +52,12 @@ class StoppingModel(Protocol):
 class ConstantStopping:
     """A constant stopping cross section, for tests and estimates."""
 
-    sigma: float
-    """The cross section [m^2]."""
+    sigma: float = unit_field("m^2")
+    """The cross section [m^2], or a quantity such as ``"1e-20 m^2"``."""
+
+    def __post_init__(self) -> None:
+        """Convert a cross section given as a quantity to m^2."""
+        convert_units(self)
 
     def __call__(
         self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
@@ -505,8 +510,9 @@ class ElectronCRStopping:
     includes everything), not a replacement for it.
 
     Args:
-        temperatures: The electron temperatures (eV) of the table.
-        densities: The electron densities (m^-3) of the table.
+        temperatures: The electron temperatures (eV, or quantities in eV or K)
+            of the table.
+        densities: The electron densities (m^-3, or quantities) of the table.
         n_max: The levels of the atomic model.
     """
 
@@ -517,6 +523,8 @@ class ElectronCRStopping:
         n_max: int = 10,
     ) -> None:
         """Tabulate ``S_CR`` with OpenCR."""
+        temperatures = to_unit(temperatures, "eV", "temperatures")
+        densities = to_unit(densities, "m^-3", "densities")
         try:
             import opencr
             from opencr.tables import effective_rate_table

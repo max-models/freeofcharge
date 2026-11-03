@@ -5,6 +5,10 @@ vertical) and a weight in atoms per second, held in a
 `plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
 the markers. `NeutralBeam.from_dataset` takes the markers a beamline
 model hands on, e.g. beamtracer's at the port.
+
+The physical settings of `tangential_injection` and `NeutralBeam.gaussian`
+take astropy Quantities (``60 * u.keV``), strings such as ``"60 keV"`` or
+plain numbers in SI units, eV for the energy and rad for the angles.
 """
 
 from __future__ import annotations
@@ -18,6 +22,7 @@ from maybempi import MPI
 from methodcard import method
 from plasmacoll import ParticleArrays, make_rng
 from plasmacoll.constants import ATOMIC_MASS, ELEMENTARY_CHARGE
+from plasmacoll.units import to_array, to_unit
 
 __all__ = ["NeutralBeam", "tangential_injection"]
 
@@ -38,12 +43,18 @@ def tangential_injection(
     toroidal_angle: float = 0.0,
     sense: int = 1,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return the start point and direction of a horizontal beam axis.
+    """Return the start point [m] and direction of a horizontal beam axis.
 
-    The axis is tangent to the circle ``R = tangency_radius`` at the toroidal
-    angle ``toroidal_angle`` and starts at ``R = start_radius``, at ``Z =
-    height``; ``sense = +1`` points along ``+phi`` at the tangency point.
+    The axis is tangent to the circle ``R = tangency_radius`` [m] at the
+    toroidal angle ``toroidal_angle`` [rad] and starts at ``R = start_radius``
+    [m], at ``Z = height`` [m]; ``sense = +1`` points along ``+phi`` at the
+    tangency point. The lengths and the angle take quantities (``"5.3 m"``,
+    ``30 * u.deg``).
     """
+    tangency_radius = to_unit(tangency_radius, "m", "tangency_radius")
+    start_radius = to_unit(start_radius, "m", "start_radius")
+    height = to_unit(height, "m", "height")
+    toroidal_angle = to_unit(toroidal_angle, "rad", "toroidal_angle")
     if start_radius <= tangency_radius:
         raise ValueError("the start radius must exceed the tangency radius")
     if sense not in (1, -1):
@@ -147,6 +158,10 @@ class NeutralBeam:
         describes a beamlet). The markers are split between the ranks of
         ``comm``; the weights give ``power`` [W] over all of them.
 
+        ``origin``, ``energy``, ``power``, ``width`` and the divergences take
+        astropy Quantities or strings (``"1 MeV"``, ``"16.5 MW"``, ``"5 mrad"``)
+        as well as numbers in the units below.
+
         Args:
             origin: Centre of the source plane [m].
             direction: Beam axis (any length).
@@ -161,6 +176,12 @@ class NeutralBeam:
             seed: Seed of the random streams (per rank).
             comm: Communicator; serial if None.
         """
+        origin = to_array(origin, "m", "origin")
+        energy = to_unit(energy, "eV", "energy")
+        power = to_unit(power, "W", "power")
+        width = to_unit(width, "m", "width")
+        divergence = to_unit(divergence, "rad", "divergence")
+        halo_divergence = to_unit(halo_divergence, "rad", "halo_divergence")
         rank, size = (0, 1) if comm is None else (comm.Get_rank(), comm.Get_size())
         local = markers // size + (1 if rank < markers % size else 0)
         rng = make_rng(seed, rank)

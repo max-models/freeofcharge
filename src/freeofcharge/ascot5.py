@@ -26,6 +26,7 @@ from pathlib import Path
 
 import cunumpy as xp
 import numpy as np
+from plasmacoll.units import to_unit
 
 from freeofcharge.beam import NeutralBeam, tangential_injection
 from freeofcharge.deposition import deposit
@@ -145,7 +146,9 @@ def injector(beam: NeutralBeam, *, ids: int = 1, divergence: float = 1.0e-10) ->
     Gaussian divergence of standard deviation ``divergence / sqrt(2)`` in
     two planes; with the default (nothing) it flies along the freeofcharge
     lines themselves. The markers must have one energy and equal weights.
+    ``divergence`` is in rad, or a quantity such as ``"5 mrad"``.
     """
+    divergence = to_unit(divergence, "rad", "divergence")
     beam_energies = xp.to_numpy(beam.energies)
     weights = xp.to_numpy(beam.markers.weights)
     if beam.size == 0:
@@ -245,9 +248,11 @@ def benchmark_case(
         shells: Shells of ``rho`` of the profiles.
         grid_points: Points of the (R, Z) grid each way.
         seed: Seed of the beam markers.
-        toroidal_field: B on the axis [T]. The Solov'ev flux scales with it
-            (q stays the same), so only the orbit widths change, as 1/B.
+        toroidal_field: B on the axis [T], or a quantity. The Solov'ev flux
+            scales with it (q stays the same), so only the orbit widths change,
+            as 1/B.
     """
+    toroidal_field = to_unit(toroidal_field, "T", "toroidal_field")
     parameters = {
         "major_radius": 1.65,
         "minor_radius": 0.5,

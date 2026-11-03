@@ -31,6 +31,7 @@ from maybempi import MPI
 from methodcard import method
 from plasmacoll import ParticleArrays, make_rng
 from plasmacoll.constants import ELEMENTARY_CHARGE
+from plasmacoll.units import to_unit
 
 from freeofcharge.beam import NeutralBeam
 from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
@@ -172,14 +173,17 @@ def deposit(
         equilibrium: Flux, boundary and (optional) wall.
         plasma: Profiles.
         stopping: Stopping model; `SuzukiStopping` if None.
-        step: Step ``ds`` along the lines [m].
+        step: Step ``ds`` along the lines [m]; a quantity such as ``"2 cm"``.
         rho_edges: Shells of the profiles; 50 equal ones if None.
         births_per_marker: Births sampled per marker (0 for profiles only).
-        max_length: Length of the lines [m]; long enough to cross the grid if None.
+        max_length: Length of the lines [m] (or a quantity); long enough to cross
+            the grid if None.
         seed: Seed of the birth sampling (per rank).
         comm: Communicator over which the markers are split; serial if None.
         chunk_points: Line points held at once (memory).
     """
+    step = to_unit(step, "m", "step")
+    max_length = to_unit(max_length, "m", "max_length")
     stopping = SuzukiStopping() if stopping is None else stopping
     rho_edges = (
         np.linspace(0.0, 1.0, 51) if rho_edges is None else np.asarray(rho_edges, float)

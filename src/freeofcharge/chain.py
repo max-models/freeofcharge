@@ -21,6 +21,10 @@ other max-models codes, imported only when called (``pip install 'freeofcharge[c
    neutralizer of line density ``pi``, from `plasmacoll.charge_state_fractions`,
    checked by `neutral_fraction_closed_form`.
 4. `duct_transmission`: the share of a Gaussian beam that passes a square duct.
+
+The physical arguments of the stages take astropy Quantities (``9 * u.kV``),
+strings such as ``"0.3 Pa"`` or plain numbers in SI units, eV for the gas
+temperature (or K) and rad for the divergence.
 """
 
 from __future__ import annotations
@@ -30,6 +34,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from methodcard import Rule, method
+from plasmacoll.units import to_array, to_unit
 from scipy.special import erf
 
 if TYPE_CHECKING:
@@ -79,7 +84,14 @@ def _child_langmuir_rules() -> dict:
     symbolic=lambda: _child_langmuir_rules(),
 )
 def child_langmuir(voltage: float, gap: float, mass: float = DEUTERIUM_MASS) -> float:
-    """The planar space-charge-limited current density (A/m^2) of singly charged ions."""
+    """The planar space-charge-limited current density (A/m^2) of singly charged ions.
+
+    ``voltage`` [V], ``gap`` [m] and the ion ``mass`` [kg] take quantities
+    (``"9 kV"``, ``"6 mm"``).
+    """
+    voltage = to_array(voltage, "V", "voltage")
+    gap = to_array(gap, "m", "gap")
+    mass = to_array(mass, "kg", "mass")
     return (
         4.0
         / 9.0
@@ -144,7 +156,16 @@ def deuterium_source(
     not data; the atoms recombine to D2 at the walls with probability
     ``recombination``. The negative-ion current density is ``extraction_ratio`` times the
     charge flux of the positive ions to the grid, ``e h n_e u_B`` (``u_B`` of D2+).
+
+    ``rf_power`` [W], ``pressure`` [Pa], ``volume`` [m^3], ``wall_area`` [m^2] and
+    ``gas_temperature`` [eV, or K] take quantities (``"200 kW"``, ``"300 K"``); the
+    other arguments are shares.
     """
+    rf_power = to_unit(rf_power, "W", "rf_power")
+    pressure = to_unit(pressure, "Pa", "pressure")
+    volume = to_unit(volume, "m^3", "volume")
+    wall_area = to_unit(wall_area, "m^2", "wall_area")
+    gas_temperature = to_unit(gas_temperature, "eV", "gas_temperature")
     from plasmacoll.constants import ELECTRON_MASS
     from wellbalanced import (
         ELECTRON,
@@ -395,9 +416,13 @@ def slit_divergence(
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
     """The neutral share of a D- beam after a gas target of ``line_density`` [m^-2].
 
-    From `plasmacoll.charge_state_fractions` with ``cross_sections``
+    From `plasmacoll.charge_state_fractions` with ``cross_sections`` [m^2]
     (`GAS_NEUTRALIZER` by default), all of the beam negative at the entrance.
+    Both take quantities (``"1.4e20 m^-2"``).
     """
+    line_density = to_array(line_density, "m^-2", "line_density")
+    if cross_sections is not None:
+        cross_sections = to_unit(cross_sections, "m^2", "cross_sections")
     from plasmacoll import ChargeStateTransitions, charge_state_fractions
 
     pis = np.atleast_1d(np.asarray(line_density, dtype=float))
@@ -453,7 +478,11 @@ def neutral_fraction_closed_form(line_density, cross_sections=None) -> np.ndarra
     ``F_- = exp(-(s1 + s2) pi)`` and
     ``F_0 = s1 / (s1 + s2 - s3) (exp(-s3 pi) - exp(-(s1 + s2) pi))``, with ``s1`` the
     single stripping, ``s2`` the double stripping and ``s3`` the re-ionization.
+    ``line_density`` [m^-2] and ``cross_sections`` [m^2] take quantities.
     """
+    line_density = to_array(line_density, "m^-2", "line_density")
+    if cross_sections is not None:
+        cross_sections = to_unit(cross_sections, "m^2", "cross_sections")
     sigma = GAS_NEUTRALIZER if cross_sections is None else cross_sections
     s1, s2, s3 = sigma[("-", "0")], sigma.get(("-", "+"), 0.0), sigma[("0", "+")]
     pi = np.asarray(line_density, dtype=float)
@@ -496,6 +525,11 @@ def duct_transmission(
     The beam has standard deviation ``width`` [m] at the source and ``divergence``
     [rad]; at ``length`` [m] its width is ``sqrt(width^2 + (length divergence)^2)``, and
     a square aperture of ``half_aperture`` [m] keeps ``erf(a / (sqrt(2) sigma))^2``.
+    Each takes a quantity (``"10 cm"``, ``"5 mrad"``).
     """
+    width = to_array(width, "m", "width")
+    divergence = to_array(divergence, "rad", "divergence")
+    length = to_array(length, "m", "length")
+    half_aperture = to_array(half_aperture, "m", "half_aperture")
     sigma = np.hypot(width, length * divergence)
     return float(erf(half_aperture / (np.sqrt(2.0) * sigma)) ** 2)
