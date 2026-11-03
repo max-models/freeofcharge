@@ -30,10 +30,8 @@ jobs:
       # The W7-X notebook takes DESC's example (the desc extra) and evaluates it through
       # PolarFEEC.jl: its Python wrapper (python/ of PolarFEEC.jl, not on PyPI) from a shallow
       # clone. Julia is installed and PolarFEEC.jl compiled by that notebook's first cell
-      # (juliacall), so only its job pays; its metadata docs_timeout allows for it, which needs
-      # the theme's notebook-timeout branch until that is released.
+      # (juliacall), so only its job pays; its metadata docs_timeout allows for it.
       extras: docs desc
-      theme-ref: notebook-timeout
       pre-notebooks: |
         git clone --depth 1 https://gitlab.mpcdf.mpg.de/rwr/polarfeec.jl.git ../polarfeec.jl
         uv pip install -e ../polarfeec.jl/python
