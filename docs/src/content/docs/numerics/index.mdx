@@ -1,0 +1,85 @@
+---
+title: Overview
+description: The equations of freeofcharge, from the equilibrium to the beam-driven current, and what the model leaves out.
+sidebar:
+  label: Overview
+---
+
+import MethodCard from '@max-models/starlight-theme/components/MethodCard.astro';
+
+freeofcharge follows a neutral beam into a tokamak or stellarator plasma: where its atoms are
+ionised, how much shines through onto the wall, and where the fast ions heat the plasma and
+drive current. Nothing is solved for the plasma itself. The equilibrium and the profiles are
+inputs, and every stage is a closed form or a one-dimensional integral per marker, so a design
+scan of the injector can call it in seconds.
+
+Each equation on these pages is declared on the code that implements it, as a method card, and
+checked by the tests: nine closed forms against SymPy rules, two discretisations against their
+order of convergence. The pages of the section list the cards module by module; this one shows
+how they fit together.
+
+## The pipeline
+
+Markers are streams of atoms (position, velocity, weight in atoms per second), split between
+MPI ranks. A run is `deposit`, then `slow_down` on the flux shells of the equilibrium.
+
+1. **[Equilibrium](/freeofcharge/numerics/equilibrium/).** The axisymmetric field from the
+   poloidal flux $\psi(R, Z)$ and $F(\psi) = R B_\phi$, the radius $\rho = \sqrt{\psi_n}$, the
+   shells with their volumes, $q$ and trapped fraction; the Solov'ev solution for the tests.
+   3D equilibria come through adapters ([GVEC](/freeofcharge/numerics/gvec-equilibrium/), DESC,
+   PolarFEEC) with the same interface.
+2. **[Plasma profiles](/freeofcharge/numerics/profiles/)** of $n_e$, $T_e$, $T_i$ and the ion
+   densities on $\rho$, quasi-neutral, zero density outside the last closed surface.
+3. **[Beam markers](/freeofcharge/numerics/beam/):** a mono-energetic beam with Gaussian width
+   and divergence, or the markers of a beamline model.
+4. **[Beam stopping](/freeofcharge/numerics/stopping/):** the effective cross section
+   $\sigma_s$ of all ionising channels, from Suzuki's fit.
+5. **[Deposition](/freeofcharge/numerics/deposition/):** every marker a straight line,
+   attenuated by $n_e \sigma_s$:
+
+<MethodCard name="freeofcharge.deposition.deposit" headingLevel={3} />
+
+6. **[Slowing down](/freeofcharge/numerics/slowing-down/):** each fast ion slows down on its
+   birth surface by Stix's drag on the electrons and the ions, its pitch relaxed by pitch-angle
+   scattering; the moments of the trajectories give the heating, the fast-ion density and
+   pressure, and the current, shielded by the electrons:
+
+<MethodCard name="freeofcharge.slowing_down.slow_down" headingLevel={3} />
+
+7. **[Orbit-averaged pitch](/freeofcharge/numerics/trapping/):** at zero orbit width, trapped
+   ions carry no current and passing ones their transit-averaged pitch; the scattering averaged
+   over the orbit decays in modes, found by finite volumes in $\lambda$.
+
+The **[injector chain](/freeofcharge/numerics/chain/)** adds closed forms for the stages before
+the plasma (the source, the extraction, the neutralizer and the duct), for an end-to-end scan
+of an injector.
+
+## Units and conventions
+
+SI units, except temperatures and particle energies in eV and Suzuki's fit, which takes the
+beam energy in keV/amu. The beam is a hydrogen isotope (mass number 1 to 3), and the fast-ion
+charge is $Z_b = 1$. $(R, \phi, Z)$ is right-handed; G-EQDSK files are read as they are, with
+their COCOS signs.
+
+## Not in the model
+
+- No Grad-Shafranov solve: the equilibrium is given.
+- No fast-ion distribution function: only its moments along the slowing-down trajectories.
+- Zero orbit width: the ions stay on their birth surface; no guiding-centre orbits, no prompt
+  or orbit losses, no wall loads from fast ions.
+- No charge-exchange losses, no radial transport, no anomalous diffusion of the fast ions.
+- No energy diffusion: the energy loss is the mean drag only.
+- Stix's drag assumes $v_{Ti} \ll v \ll v_{Te}$; the ions join the thermal ions when they
+  reach the end energy.
+- Deposition only inside the last closed surface; the wall crossing is resolved to one step.
+- No first wall for 3D equilibria.
+- The chain's source has no model of the negative-ion surface production and uses illustrative
+  rates.
+
+## Verification
+
+Besides the checks of the cards, the tests compare Suzuki's fit with ASCOT5's to 1e-10, the
+attenuation of a pencil beam with $e^{-n\sigma L}$, the slowing-down integrals with the
+equations of motion, the pitch modes with a Monte Carlo of Lorentz scattering, and the
+3D adapters with GVEC and DESC; the [ASCOT5 benchmark](/freeofcharge/benchmarks/ascot5/)
+compares a whole run.

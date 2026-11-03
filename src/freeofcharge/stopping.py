@@ -310,11 +310,11 @@ _E_MAX_KEV = 10000.0
 @dataclass(frozen=True)
 @method(
     equations={
-        "hydrogen": r"\sigma_H = \frac{A_1\, 10^{-16}}{E}\,(1 + A_2 \ln E + A_3 \ln^2 E) \left[1 + (1 - e^{-A_4 N})^{A_5}\,(A_6 + A_7 \ln E + A_8 \ln^2 E)\right] (1 + A_9 U + A_{10} U^2)",
+        "hydrogen": r"\begin{aligned} \sigma_H = {} & \frac{A_1\, 10^{-16}}{E}\,(1 + A_2 \ln E + A_3 \ln^2 E) \\ & \times \left[1 + (1 - e^{-A_4 N})^{A_5}\,(A_6 + A_7 \ln E + A_8 \ln^2 E)\right] \\ & \times (1 + A_9 U + A_{10} U^2) \end{aligned}",
         "impurity": r"S_Z = \sum_{i,j,k} B_{ijk}\, (\ln E)^i (\ln N)^j U^k, \quad i \in \{0,1,2\},\ j, k \in \{0,1\}",
-        "total": r"\sigma_s = 10^{-4}\,\sigma_H \left[1 + (Z_\mathrm{eff} - 1)\, \frac{\sum_Z Z(Z - 1)\, n_Z\, S_Z}{\sum_Z Z(Z - 1)\, n_Z}\right], \qquad Z_\mathrm{eff} = \frac{\sum_j n_j Z_j^2}{\sum_j n_j Z_j}",
-        "blend": r"\ln\sigma_s = (1 - w)\ln\sigma_\mathrm{low} + w \ln\sigma_\mathrm{high}, \quad w = \frac{\ln E - \ln(E_s/b)}{\ln(E_s b) - \ln(E_s/b)}, \quad E_s/b < E < E_s b",
-        "variables": r"E\ [\mathrm{keV/amu}], \quad N = n_e / 10^{19}\,\mathrm{m^{-3}}, \quad U = \ln(T_e / \mathrm{keV}), \quad \sigma_H\ [\mathrm{cm^2}], \quad \sigma_s\ [\mathrm{m^2}]",
+        "total": r"\begin{aligned} \sigma_s &= 10^{-4}\,\sigma_H \left[1 + (Z_\mathrm{eff} - 1)\, \frac{\sum_Z Z(Z - 1)\, n_Z\, S_Z}{\sum_Z Z(Z - 1)\, n_Z}\right], \\ Z_\mathrm{eff} &= \frac{\sum_j n_j Z_j^2}{\sum_j n_j Z_j} \end{aligned}",
+        "blend": r"\begin{aligned} \ln\sigma_s &= (1 - w)\ln\sigma_\mathrm{low} + w \ln\sigma_\mathrm{high}, \\ w &= \frac{\ln E - \ln(E_s/b)}{\ln(E_s b) - \ln(E_s/b)}, \qquad E_s/b < E < E_s b \end{aligned}",
+        "variables": r"\begin{aligned} & E\ [\mathrm{keV/amu}], \quad N = n_e / 10^{19}\,\mathrm{m^{-3}}, \quad U = \ln(T_e / \mathrm{keV}), \\ & \sigma_H\ [\mathrm{cm^2}], \quad \sigma_s\ [\mathrm{m^2}] \end{aligned}",
     },
     assumptions=(
         r"$E$ in $[9, 10^4)$ keV/amu (the paper's table starts at 10, ASCOT5's at 9)",

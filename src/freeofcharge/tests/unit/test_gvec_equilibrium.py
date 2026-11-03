@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -10,14 +12,39 @@ gvec = pytest.importorskip("gvec")
 from freeofcharge.gvec_equilibrium import GVECEquilibrium  # noqa: E402
 
 DATA = Path(__file__).parents[1] / "data"
+PARAMETERS = DATA / "parameter_ellipse_final.ini"
+STATE = DATA / "ellipse_State_final.dat"
+
+
+def _gvec_runs() -> str | None:
+    """Load the test state in a subprocess; why not, if GVEC's library crashes there.
+
+    A GVEC built for a newer CPU (a wheel from the build cache of another runner) dies with
+    SIGILL, which no test can catch in its own process.
+    """
+    code = (
+        "from freeofcharge.gvec_equilibrium import GVECEquilibrium; "
+        f"GVECEquilibrium.from_files({str(PARAMETERS)!r}, {str(STATE)!r})"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True
+    )
+    if result.returncode < 0:
+        return (
+            f"GVEC's compiled library crashed (signal {-result.returncode}) on this CPU"
+        )
+    return None
+
+
+_crash = _gvec_runs()
+if _crash:
+    pytest.skip(_crash, allow_module_level=True)
 
 
 @pytest.fixture(scope="module")
 def ellipse():
     """A small rotating ellipse with two field periods."""
-    return GVECEquilibrium.from_files(
-        DATA / "parameter_ellipse_final.ini", DATA / "ellipse_State_final.dat"
-    )
+    return GVECEquilibrium.from_files(PARAMETERS, STATE)
 
 
 def _gvec_points(equilibrium, rho, theta, zeta):
