@@ -9,18 +9,28 @@ A 16.5 MW beam of 1 MeV deuterium atoms, tangent to `R = 5.3 m`, in an ITER-size
 equilibrium with a deuterium plasma of 1e20 m^-3 and 20 keV in the centre and 2 % helium:
 
 ```python
+import astropy.units as u
 import freeofcharge as foc
 
 # or foc.Equilibrium.from_geqdsk(path)
-equilibrium = foc.Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
-plasma = foc.Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
-origin, direction = foc.tangential_injection(5.3, 12.0)
+equilibrium = foc.Equilibrium.solovev(6.2 * u.m, 1.8 * u.m, 1.7, 5.3 * u.T)
+plasma = foc.Plasma.parabolic(
+    1e20 * u.m**-3, 20 * u.keV, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)}
+)
+origin, direction = foc.tangential_injection(5.3 * u.m, 12 * u.m)
 beam = foc.NeutralBeam.gaussian(
-    origin, direction, 1e6, 16.5e6, width=0.3, divergence=0.005, markers=1000, seed=1
+    origin,
+    direction,
+    1 * u.MeV,
+    16.5 * u.MW,
+    width=30 * u.cm,
+    divergence=5 * u.mrad,
+    markers=1000,
+    seed=1,
 )
 
 deposition = foc.deposit(
-    beam, equilibrium, plasma, step=0.02, births_per_marker=2, seed=2
+    beam, equilibrium, plasma, step=2 * u.cm, births_per_marker=2, seed=2
 )
 print(f"shine-through {100 * deposition.shine_through_fraction:.2f} %")
 
@@ -38,6 +48,12 @@ driven current 0.59 MA
 ```
 
 It runs in a few seconds on a laptop.
+
+The physical settings take astropy Quantities (`pip install astropy`), strings such as
+`"20 keV"` (as in a configuration file) or plain numbers in the documented units: SI, eV
+for energies and temperatures (which may also be given in K) and rad for angles, so
+`Plasma.parabolic(1e20, 2e4, ...)` is the same plasma. A value of the wrong dimension
+raises an error.
 
 1. `Equilibrium.solovev(R0, a, kappa, B0)` is an analytic equilibrium; `Plasma.parabolic`
    gives parabolic density and temperature profiles in `rho = sqrt(psi_n)`, with each ion's

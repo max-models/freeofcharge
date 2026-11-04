@@ -30,6 +30,7 @@ from typing import Any, Protocol, runtime_checkable
 import cunumpy as xp
 import numpy as np
 from methodcard import method
+from plasmacoll.units import to_array, to_unit
 from scipy.interpolate import RectBivariateSpline
 from simgeometry.grid import Grid
 from simgeometry.objects.polygon import Polygon
@@ -305,15 +306,20 @@ class Equilibrium:
         r: Increasing major radii of the grid [m].
         z: Increasing heights of the grid [m].
         psi: Flux on the grid, shape ``(len(r), len(z))`` [Wb/rad].
-        psi_axis: Flux on the magnetic axis.
-        psi_boundary: Flux on the last closed flux surface.
+        psi_axis: Flux on the magnetic axis [Wb/rad].
+        psi_boundary: Flux on the last closed flux surface [Wb/rad].
         f: ``F = R B_phi`` on a uniform grid of ``psi_n`` from 0 to 1 [T m];
             the last value holds outside.
         axis: ``(R, Z)`` of the magnetic axis [m].
-        boundary: Last closed flux surface, vertices ``(n, 2)`` in ``(R, Z)``.
-        wall: First wall, vertices ``(n, 2)``, or None.
+        boundary: Last closed flux surface, vertices ``(n, 2)`` in ``(R, Z)``
+            [m].
+        wall: First wall, vertices ``(n, 2)`` [m], or None.
         method: Interpolation of ``psi`` and its derivatives
             (``RegularGridInterpolator`` methods: "linear", "cubic", ...).
+
+    Every argument with a unit also takes an astropy Quantity or a string
+    (``"[1.0, 1.5, 2.0] m"``); the flux is per radian, so a flux in Wb is
+    rejected.
     """
 
     def __init__(
@@ -331,9 +337,15 @@ class Equilibrium:
         method: str = "cubic",
     ) -> None:
         """Set up the interpolation of ``psi`` and its gradient."""
-        r = np.asarray(r, dtype=float)
-        z = np.asarray(z, dtype=float)
-        psi = np.asarray(psi, dtype=float)
+        r = np.asarray(to_array(r, "m", "r"), dtype=float)
+        z = np.asarray(to_array(z, "m", "z"), dtype=float)
+        psi = np.asarray(to_array(psi, "Wb/rad", "psi"), dtype=float)
+        psi_axis = to_unit(psi_axis, "Wb/rad", "psi_axis")
+        psi_boundary = to_unit(psi_boundary, "Wb/rad", "psi_boundary")
+        f = to_array(f, "T m", "f")
+        axis = to_unit(axis, "m", "axis")
+        boundary = np.asarray(to_array(boundary, "m", "boundary"), dtype=float)
+        wall = None if wall is None else np.asarray(to_array(wall, "m", "wall"), float)
         if psi.shape != (len(r), len(z)):
             raise ValueError(f"psi has shape {psi.shape}, expected {(len(r), len(z))}")
         self.grid = Grid(2, (r[0], z[0]), (r[-1], z[-1]), (len(r), len(z)))
@@ -405,9 +417,23 @@ class Equilibrium:
         ``R_0 + a`` on the outboard midplane and through ``sqrt(2 R_0^2 - (R_0
         + a)^2)`` on the inboard one, so the shape (triangular, wider inboard
         than ``R_0 - a``) is fixed by ``a / R_0``; the wall is the surface
-        ``psi_n = wall_psi_n`` (none if None).
+        ``psi_n = wall_psi_n`` (none if None). The radii and the field take
+        quantities (``"6.2 m"``, ``5.3 * u.T``).
+
+        Args:
+            major_radius: ``R_0`` [m].
+            minor_radius: Outboard minor radius ``a`` [m].
+            elongation: ``kappa``.
+            toroidal_field: ``B_0`` on the axis [T].
+            q_axis: Safety factor on the axis.
+            wall_psi_n: ``psi_n`` of the wall; no wall if None.
+            points: Grid points each way.
+            surface_points: Vertices of the boundary and the wall.
         """
-        r0, a, kappa = major_radius, minor_radius, elongation
+        r0 = to_unit(major_radius, "m", "major_radius")
+        a = to_unit(minor_radius, "m", "minor_radius")
+        toroidal_field = to_unit(toroidal_field, "T", "toroidal_field")
+        kappa = elongation
         r_inner_sq = 2.0 * r0**2 - (r0 + a) ** 2
         if r_inner_sq <= 0.0:
             raise ValueError("minor radius too large: the boundary would reach R = 0")

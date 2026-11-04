@@ -77,6 +77,7 @@ import xarray as xr
 from maybempi import MPI
 from methodcard import ConvergenceProblem, Rule, method
 from plasmacoll.constants import ATOMIC_MASS, ELECTRON_MASS, ELEMENTARY_CHARGE
+from plasmacoll.units import to_unit
 from scipy import constants
 
 from freeofcharge.deposition import allreduce
@@ -908,13 +909,15 @@ def slow_down(
             if False, the local pitch with Gaffey's decay, as if the field were
             uniform.
         thermal_factor: The ions are thermal below ``thermal_factor T_i`` ...
-        minimum_energy: ... or below this energy [eV], whichever is higher.
+        minimum_energy: ... or below this energy [eV], whichever is higher; a
+            quantity such as ``"1 keV"``.
         trapped_electron_correction: ``G`` per shell.
         modes: Pitch modes of the orbit average.
         speed_points: Points of the speed integrals (equal steps in ``ln v``),
             odd.
         comm: Communicator over which the births are split; serial if None.
     """
+    minimum_energy = to_unit(minimum_energy, "eV", "minimum_energy")
     if not np.array_equal(surfaces.rho_edges, deposition.rho_edges):
         raise ValueError("the surfaces and the deposition have different shells")
     n_shells = len(surfaces.rho_edges) - 1

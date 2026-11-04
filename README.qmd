@@ -56,18 +56,28 @@ Documentation: <https://max-models.github.io/freeofcharge/>
 ## Example
 
 ```python
+import astropy.units as u
 import freeofcharge as foc
 
 # or foc.Equilibrium.from_geqdsk(path)
-equilibrium = foc.Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
-plasma = foc.Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
-origin, direction = foc.tangential_injection(5.3, 12.0)
+equilibrium = foc.Equilibrium.solovev(6.2 * u.m, 1.8 * u.m, 1.7, 5.3 * u.T)
+plasma = foc.Plasma.parabolic(
+    1e20 * u.m**-3, 20 * u.keV, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)}
+)
+origin, direction = foc.tangential_injection(5.3 * u.m, 12 * u.m)
 beam = foc.NeutralBeam.gaussian(
-    origin, direction, 1e6, 16.5e6, width=0.3, divergence=0.005, markers=1000, seed=1
+    origin,
+    direction,
+    1 * u.MeV,
+    16.5 * u.MW,
+    width=30 * u.cm,
+    divergence=5 * u.mrad,
+    markers=1000,
+    seed=1,
 )
 
 deposition = foc.deposit(
-    beam, equilibrium, plasma, step=0.02, births_per_marker=2, seed=2
+    beam, equilibrium, plasma, step=2 * u.cm, births_per_marker=2, seed=2
 )
 surfaces = equilibrium.flux_surfaces(deposition.rho_edges)
 steady = foc.slow_down(deposition, plasma, surfaces)

@@ -7,6 +7,13 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- The physical settings of the setup take astropy Quantities (`60 * u.keV`), strings
+  (`"2.5 MW"`) or plain numbers in their documented units (SI, eV for energies and
+  temperatures, rad for angles, Wb/rad for the flux), converted once with
+  `plasmacoll.units`: `tangential_injection`, `NeutralBeam.gaussian`, `Plasma`,
+  `IonSpecies`, `Plasma.parabolic`, `Equilibrium`, `Equilibrium.solovev`, `deposit`,
+  `slow_down`, `ConstantStopping`, `ElectronCRStopping`, the injector-chain stages and the
+  ASCOT5 benchmark setup. A value of the wrong dimension raises.
 - A Numerics section in the docs (header and sidebar): an overview of the model's equations
   (`docs/src/content/docs/numerics/index.mdx`, with the main cards) and one page per module
   in the order of the pipeline (starlight-theme's `methodcard: { pages: true }`).

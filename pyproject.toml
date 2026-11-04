@@ -24,7 +24,7 @@ dependencies = [
   "maybempi>=0.1",
   "methodcard",
   "numpy",
-  "plasmacoll>=0.2.0",
+  "plasmacoll>=0.5.0",
   "scipy",
   "simgeometry>=0.1.0",
   "xarray",
@@ -53,7 +53,13 @@ optional-dependencies.chain = [
 optional-dependencies.cr = [ "opencr" ]
 optional-dependencies.desc = [ "desc-opt>=0.17" ]
 optional-dependencies.gvec = [ "gvec>=1.5" ]
-optional-dependencies.test = [ "freeofcharge[chain,cr,gvec]", "methodcard[symbolic]", "pytest", "pytest-cov" ]
+optional-dependencies.test = [
+  "astropy",
+  "freeofcharge[chain,cr,gvec]",
+  "methodcard[symbolic]",
+  "pytest",
+  "pytest-cov",
+]
 urls.Source = "https://github.com/max-models/freeofcharge"
 
 [tool.setuptools]

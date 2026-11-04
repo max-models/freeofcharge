@@ -1,4 +1,10 @@
-"""Plasma profiles as functions of the normalised poloidal flux radius."""
+"""Plasma profiles as functions of the normalised poloidal flux radius.
+
+The densities and temperatures take astropy Quantities (``1e20 * u.m**-3``,
+``20 * u.keV``, also arrays), strings such as ``"20 keV"`` or plain numbers in
+m^-3 and eV; temperatures may be given in K as well. They are kept as plain
+numbers in m^-3 and eV.
+"""
 
 from __future__ import annotations
 
@@ -9,13 +15,14 @@ import cunumpy as xp
 import numpy as np
 from methodcard import method
 from plasmacoll.constants import ATOMIC_MASS
+from plasmacoll.units import to_array, to_unit
 
 __all__ = ["IonSpecies", "Plasma"]
 
 
 @dataclass(frozen=True)
 class IonSpecies:
-    """A thermal ion species."""
+    """A thermal ion species; ``density`` takes quantities (m^-3)."""
 
     mass_number: int
     charge: int
@@ -23,6 +30,10 @@ class IonSpecies:
     """Atomic mass number (1 to 3 for hydrogen isotopes)."""
     """Charge number."""
     """Density on `Plasma.rho` [m^-3]."""
+
+    def __post_init__(self) -> None:
+        """Convert a density given as a quantity to m^-3."""
+        object.__setattr__(self, "density", to_array(self.density, "m^-3", "density"))
 
     @property
     def mass(self) -> float:
@@ -35,7 +46,8 @@ class Plasma:
     """Electron and ion profiles on a grid of ``rho = sqrt(psi_n)``.
 
     Between the grid points the profiles are linear; outside the last closed
-    flux surface (``rho > 1``) every density is zero.
+    flux surface (``rho > 1``) every density is zero. ``ne``, ``te`` and ``ti``
+    take quantities (``[5, 2] * u.keV`` or a temperature in K).
     """
 
     rho: np.ndarray
@@ -50,7 +62,9 @@ class Plasma:
     """Ion species by name."""
 
     def __post_init__(self) -> None:
-        """Check the shapes and quasi-neutrality (to 1%)."""
+        """Convert the quantities; check the shapes and quasi-neutrality (to 1%)."""
+        for name, unit in (("ne", "m^-3"), ("te", "eV"), ("ti", "eV")):
+            object.__setattr__(self, name, to_array(getattr(self, name), unit, name))
         n = len(self.rho)
         for name in ("ne", "te", "ti"):
             if len(getattr(self, name)) != n:
@@ -94,6 +108,9 @@ class Plasma:
     ) -> Plasma:
         """Return profiles ``x0 ((1 - f)(1 - rho^2)^alpha + f)``.
 
+        ``ne0``, ``te0`` and ``ti0`` take quantities (``"1e20 m^-3"``,
+        ``20 * u.keV``).
+
         Args:
             ne0: Central electron density [m^-3].
             te0: Central electron temperature [eV].
@@ -105,6 +122,9 @@ class Plasma:
             edge_fraction: Value at ``rho = 1`` relative to the centre.
             points: Number of grid points.
         """
+        ne0 = to_unit(ne0, "m^-3", "ne0")
+        te0 = to_unit(te0, "eV", "te0")
+        ti0 = to_unit(ti0, "eV", "ti0")
         rho = np.linspace(0.0, 1.0, points)
 
         def shape(alpha: float) -> np.ndarray:
