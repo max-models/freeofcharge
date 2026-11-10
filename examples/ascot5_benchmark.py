@@ -24,7 +24,7 @@ that freeofcharge leaves out (see the documentation page "ASCOT5 benchmark").
 from pathlib import Path
 
 import numpy as np
-import plasma_plots
+import plasma_plots  # noqa: F401  (registers the .plasma accessor)
 import xarray as xr
 
 from freeofcharge import ascot5
@@ -91,10 +91,9 @@ shine = xr.DataArray(
     attrs={"long_name": "shine-through", "units": "%"},
 )
 
-with plasma_plots.figure(3, 2, figsize=(10, 10)) as fig:
-    shine.plasma.plot.profiles(x="ne0", over="code", ax=fig[0])
-    power.plasma.plot.profiles(x="rho", over="code", ax=fig[1])
-    density.plasma.plot.profiles(x="rho", over="code", ax=fig[2])
-    electrons.plasma.plot.profiles(x="rho", over="code", ax=fig[3])
-    ions.plasma.plot.profiles(x="rho", over="code", ax=fig[4])
-    current.plasma.plot.profiles(x="rho", over="code", ax=fig[5])
+shine.plasma.plot.profiles(x="ne0", over="code")
+power.plasma.plot.profiles(x="rho", over="code")
+density.plasma.plot.profiles(x="rho", over="code")
+electrons.plasma.plot.profiles(x="rho", over="code")
+ions.plasma.plot.profiles(x="rho", over="code")
+current.plasma.plot.profiles(x="rho", over="code")

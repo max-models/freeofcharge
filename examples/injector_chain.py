@@ -130,7 +130,7 @@ print(
     f"shine-through {100 * shine_fraction[i]:.1f} %"
 )
 
-with plasma_plots.figure(2, 2, figsize=(11, 7.5)) as fig:
+with plasma_plots.figure(figsize=(6, 4)) as fig:
     ax = fig[0]
     ax.plot(RF_POWER / 1e3, current_density, "o-")
     ax.set_xlabel("RF power [kW]")
@@ -145,7 +145,9 @@ with plasma_plots.figure(2, 2, figsize=(11, 7.5)) as fig:
         transform=ax.transAxes,
         va="top",
     )
-    ax = fig[1]
+
+with plasma_plots.figure(figsize=(6, 4)) as fig:
+    ax = fig[0]
     ax.plot(PERVEANCE, 1e3 * curve, "o-", label="slit gap (tree-d-3d)")
     ax.plot(
         perveance, 1e3 * divergence / shrink, "s", color="C1", label="operating points"
@@ -154,7 +156,9 @@ with plasma_plots.figure(2, 2, figsize=(11, 7.5)) as fig:
     ax.set_ylabel("rms divergence at extraction [mrad]")
     ax.set_title("2. Extraction optics: the V-curve")
     ax.legend()
-    ax = fig[2]
+
+with plasma_plots.figure(figsize=(6, 4)) as fig:
+    ax = fig[0]
     ax.plot(pi_fine / 1e20, 100 * neutral_fine, label="plasmacoll")
     ax.plot(
         pi_fine[::25] / 1e20,
@@ -168,7 +172,9 @@ with plasma_plots.figure(2, 2, figsize=(11, 7.5)) as fig:
     ax.set_ylabel("neutral share [%]")
     ax.set_title("3. Gas neutralizer")
     ax.legend()
-    ax = fig[3]
+
+with plasma_plots.figure(figsize=(6, 4)) as fig:
+    ax = fig[0]
     ax.plot(
         RF_POWER / 1e3, 1e3 * divergence, "o-", label="divergence after acceleration"
     )
@@ -210,8 +216,8 @@ scan = xr.Dataset(
         ),
     },
 )
-with plasma_plots.figure(2, 2, figsize=(11, 8)) as fig:  # the fourth panel stays empty
-    for ax, name in zip(fig, ("delivered", "driven", "shone"), strict=False):
-        scan[name].plasma.plot.slice(x="line_density", y="rf_power", ax=ax)
-        ax.plot(LINE_DENSITY[k] / 1e20, RF_POWER[i] / 1e3, "w*", ms=12)
-    fig[1].set_title("driven current: the star marks the most")
+for name in ("delivered", "driven", "shone"):
+    result = scan[name].plasma.plot.slice(x="line_density", y="rf_power")
+    result.ax.plot(LINE_DENSITY[k] / 1e20, RF_POWER[i] / 1e3, "w*", ms=12)
+    if name == "driven":
+        result.ax.set_title("driven current: the star marks the most")

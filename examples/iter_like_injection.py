@@ -17,7 +17,7 @@ than ITER's.
 """
 
 import numpy as np
-import plasma_plots
+import plasma_plots  # noqa: F401  (registers the .plasma accessor)
 import xarray as xr
 
 import freeofcharge as foc
@@ -74,8 +74,6 @@ print(
     f"driven current {steady.driven_current / 1e6:.2f} MA, fast-ion energy {steady.stored_energy / 1e6:.2f} MJ"
 )
 
-with plasma_plots.figure(2, 2, figsize=(10, 7)) as fig:  # the fourth panel stays empty
-    shine.plasma.plot.lineout(x="ne0", ax=fig[0])
-    fig[0].set_yscale("log")
-    heating.plasma.plot.profiles(x="rho", over="species", ax=fig[1])
-    current.plasma.plot.lineout(x="rho", ax=fig[2])
+shine.plasma.plot.lineout(x="ne0", logy=True)
+heating.plasma.plot.profiles(x="rho", over="species")
+current.plasma.plot.lineout(x="rho")
