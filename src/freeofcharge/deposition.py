@@ -1,22 +1,22 @@
 r"""Deposition of a neutral beam in the plasma: births and shine-through.
 
 Every marker flies on a straight line from its position. Along it the line is
-cut into steps of length ``ds``; at each step's midpoint inside the last closed
-flux surface the optical depth grows by ``n_e sigma_s ds``, so the stream left
-after step ``k`` is ``w exp(-tau_k)`` and step ``k`` ionises
-``w (exp(-tau_{k-1}) - exp(-tau_k))`` atoms per second. Those are tallied on
-shells of ``rho`` (the birth profile, without sampling noise). Births are then
-sampled: for each of ``births_per_marker`` draws, the depth ``tau*`` where the
+cut into steps of length $\Delta s$; at each step's midpoint inside the last closed
+flux surface the optical depth grows by $n_e \sigma_s \Delta s$, so the stream left
+after step $k$ is $w\,e^{-\tau_k}$ and step $k$ ionises
+$w\,(e^{-\tau_{k-1}} - e^{-\tau_k})$ atoms per second. Those are tallied on
+shells of $\rho$ (the birth profile, without sampling noise). Births are then
+sampled: for each of ``births_per_marker`` draws, the depth $\tau^*$ where the
 cumulative ionised share reaches a uniform random fraction, the birth point by
-linear interpolation of ``tau`` within its step, and the weight ``w (1 -
-exp(-tau_total)) / births_per_marker``. A fast ion starts with the atom's
+linear interpolation of $\tau$ within its step, and the weight
+$w\,(1 - e^{-\tau_\mathrm{total}})$ / ``births_per_marker``. A fast ion starts with the atom's
 velocity.
 
 With a first wall, a line enters the vessel at the first step inside the wall
 and ends at the first step after that outside it: the shine-through hits the
-wall there (to within ``ds``). Without a wall the line runs to its end.
+wall there (to within $\Delta s$). Without a wall the line runs to its end.
 
-Charge exchange is part of ``sigma_s``: an ion that becomes a fast neutral
+Charge exchange is part of $\sigma_s$: an ion that becomes a fast neutral
 again counts as stopped, not followed.
 """
 
@@ -62,9 +62,9 @@ class Deposition:
     shine_through_power: float
     wall_hits: ParticleArrays | None
     """Birth positions ``(N, 3)``, velocities and weights [ions/s]."""
-    """``rho`` of each birth."""
-    """``v_par / v`` of each birth (positive along B)."""
-    """``|B|`` at each birth [T]."""
+    r"""$\rho$ of each birth."""
+    r"""$v_\parallel / v$ of each birth (positive along $\mathbf{B}$)."""
+    """$|B|$ at each birth [T]."""
     """Ions born per second in each shell."""
     """Beam power deposited in each shell [W]."""
     """Where the shine-through meets the wall: positions, velocities, weights
@@ -76,7 +76,7 @@ class Deposition:
         return self.shine_through_power / self.injected_power
 
     def power_density(self, surfaces: FluxSurfaces) -> np.ndarray:
-        """Return the deposited power per volume of each shell [W/m^3]."""
+        r"""Return the deposited power per volume of each shell [$\mathrm{W/m^3}$]."""
         return self.power / surfaces.volume
 
     def to_dataset(self, surfaces: FluxSurfaces | None = None) -> xr.Dataset:
@@ -107,7 +107,7 @@ class Deposition:
             )
         return xr.Dataset(
             variables,
-            coords={"rho": ("rho", rho, {"long_name": "rho_pol"})},
+            coords={"rho": ("rho", rho, {"long_name": r"$\rho_\mathrm{pol}$"})},
             attrs={
                 "injected_power": self.injected_power,
                 "absorbed_power": self.absorbed_power,
@@ -166,14 +166,14 @@ def deposit(
     comm: MPI.Comm | None = None,
     chunk_points: int = 2_000_000,
 ) -> Deposition:
-    """Return the deposition of ``beam`` in the plasma.
+    r"""Return the deposition of ``beam`` in the plasma.
 
     Args:
         beam: This rank's markers.
         equilibrium: Flux, boundary and (optional) wall.
         plasma: Profiles.
         stopping: Stopping model; `SuzukiStopping` if None.
-        step: Step ``ds`` along the lines [m]; a quantity such as ``"2 cm"``.
+        step: Step $\Delta s$ along the lines [m]; a quantity such as ``"2 cm"``.
         rho_edges: Shells of the profiles; 50 equal ones if None.
         births_per_marker: Births sampled per marker (0 for profiles only).
         max_length: Length of the lines [m] (or a quantity); long enough to cross

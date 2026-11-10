@@ -1,6 +1,6 @@
 """Neutral beam markers: fast hydrogen atoms on straight lines.
 
-A marker is a stream of atoms: a position and a velocity (Cartesian, ``z``
+A marker is a stream of atoms: a position and a velocity (Cartesian, $z$
 vertical) and a weight in atoms per second, held in a
 `plasmacoll.ParticleArrays`. With MPI every rank holds its own share of
 the markers. `NeutralBeam.from_dataset` takes the markers a beamline
@@ -43,11 +43,11 @@ def tangential_injection(
     toroidal_angle: float = 0.0,
     sense: int = 1,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return the start point [m] and direction of a horizontal beam axis.
+    r"""Return the start point [m] and direction of a horizontal beam axis.
 
-    The axis is tangent to the circle ``R = tangency_radius`` [m] at the
-    toroidal angle ``toroidal_angle`` [rad] and starts at ``R = start_radius``
-    [m], at ``Z = height`` [m]; ``sense = +1`` points along ``+phi`` at the
+    The axis is tangent to the circle $R$ = ``tangency_radius`` [m] at the
+    toroidal angle ``toroidal_angle`` [rad] and starts at $R$ = ``start_radius``
+    [m], at $Z$ = ``height`` [m]; ``sense = +1`` points along $+\varphi$ at the
     tangency point. The lengths and the angle take quantities (``"5.3 m"``,
     ``30 * u.deg``).
     """
@@ -153,7 +153,7 @@ class NeutralBeam:
         ``width`` [m] across the axis, and their directions with standard
         deviations ``divergence`` [rad] in the two planes containing the axis:
         each a scalar or ``(horizontal, vertical)``, horizontal being the
-        plane of the axis and ``z``-normal. A share ``halo_fraction`` of the
+        plane of the axis and $z$-normal. A share ``halo_fraction`` of the
         markers has the ``halo_divergence`` instead (core and halo, as BBNBI
         describes a beamlet). The markers are split between the ranks of
         ``comm``; the weights give ``power`` [W] over all of them.

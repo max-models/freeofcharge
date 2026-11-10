@@ -4,11 +4,11 @@ PolarFEEC.jl reads GVEC and DESC equilibria in Julia and inverts their maps
 robustly, across the magnetic axis included; ``polarfeec`` is its Python
 wrapper (``python/`` of PolarFEEC.jl, installed from a checkout:
 ``pip install -e <PolarFEEC.jl>/python``). Its logical coordinates are
-``(rho, y, z)`` in ``[0, 1]^3``: the flux label ``rho``, the poloidal angle
-``theta = 2 pi y`` and the toroidal angle ``zeta = 2 pi z`` over the whole
-torus. The flux surfaces need poloidal sections at fixed ``zeta`` in a
-cylindrical ``(R, Z)`` plane (GVEC with ``which_hmap = 1``, DESC); the
-derivatives of ``R`` and ``Z`` are central differences of the map.
+$(\rho, y, z)$ in $[0, 1]^3$: the flux label $\rho$, the poloidal angle
+$\theta = 2\pi y$ and the toroidal angle $\zeta = 2\pi z$ over the whole
+torus. The flux surfaces need poloidal sections at fixed $\zeta$ in a
+cylindrical $(R, Z)$ plane (GVEC with ``which_hmap = 1``, DESC); the
+derivatives of $R$ and $Z$ are central differences of the map.
 """
 
 from __future__ import annotations
@@ -35,17 +35,17 @@ def _require_polarfeec():
 
 
 class PolarFEECEquilibrium:
-    """A PolarFEEC.jl equilibrium as a `freeofcharge.MagneticEquilibrium`.
+    r"""A PolarFEEC.jl equilibrium as a `freeofcharge.MagneticEquilibrium`.
 
     Points outside the last closed surface, and points PolarFEEC.jl could not
-    invert, have ``rho = inf`` and the field ``NaN``.
+    invert, have $\rho$ = ``inf`` and the field ``NaN``.
 
     Args:
         equilibrium: A ``polarfeec.Equilibrium``.
-        boundary_grid: Points ``(theta, zeta)`` on the last closed surface over the
+        boundary_grid: Points $(\theta, \zeta)$ on the last closed surface over the
             whole torus for the bounding box.
-        step: Step of the central differences of ``R`` and ``Z`` in ``rho`` and
-            ``theta``.
+        step: Step of the central differences of $R$ and $Z$ in $\rho$ and
+            $\theta$.
     """
 
     has_wall = False
@@ -113,7 +113,7 @@ class PolarFEECEquilibrium:
     # ------------------------------------------------------------------
 
     def logical_at(self, points):
-        """Return the logical points ``(rho, y, z)`` of Cartesian ``points`` ``(..., 3)``.
+        r"""Return the logical points $(\rho, y, z)$ of Cartesian ``points`` ``(..., 3)``.
 
         ``NaN`` outside the last closed surface and where the inversion failed.
         """
@@ -123,7 +123,7 @@ class PolarFEECEquilibrium:
         return logical.reshape(points.shape)
 
     def rho_at(self, points):
-        """Return ``rho`` at Cartesian ``points`` ``(..., 3)``, ``inf`` outside."""
+        r"""Return $\rho$ at Cartesian ``points`` ``(..., 3)``, ``inf`` outside."""
         rho = self.logical_at(points)[..., 0]
         return xp.asarray(np.where(np.isnan(rho), np.inf, rho))
 
@@ -136,14 +136,18 @@ class PolarFEECEquilibrium:
         return xp.ones(xp.asarray(points).shape[:-1], dtype=bool)
 
     def field_at(self, points):
-        """Return ``B`` [T] at Cartesian ``points`` ``(..., 3)``, ``NaN`` outside."""
+        r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, ``NaN`` outside."""
         logical = self.logical_at(points)
         flat = logical.reshape(-1, 3)
         field = self.equilibrium.field(flat) if flat.shape[0] else flat.copy()
         return xp.asarray(field.reshape(logical.shape))
 
     def _shape(self, rho, theta, zeta):
-        """Return ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, |B|, iota."""
+        r"""Return the surface shape and the field at flux coordinates.
+
+        $R$, $\partial_\rho R$, $\partial_\theta R$, $\partial_\rho Z$, $\partial_\theta Z$,
+        $|B|$ and $\iota$.
+        """
         rho, theta, zeta = (np.asarray(c, dtype=float) for c in (rho, theta, zeta))
         y, z = theta / (2.0 * np.pi), zeta / (2.0 * np.pi)
         h = self.step

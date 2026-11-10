@@ -1,4 +1,4 @@
-"""The ASCOT5 benchmark: one case in both codes, and its comparison.
+r"""The ASCOT5 benchmark: one case in both codes, and its comparison.
 
 ASCOT5 (Hirvijoki et al., Comput. Phys. Commun. 185, 1310, 2014; Varje et al.,
 arXiv:1908.02482, 2019; https://github.com/ascot4fusion/ascot5)
@@ -10,7 +10,7 @@ return keyword arguments of a5py's ``Ascot.data.create_input`` for the inputs
 ``B_2DS``, ``plasma_1D``, ``wall_2D`` and the ``Injector`` of ``nbi``: plain
 NumPy arrays, so neither a5py nor h5py is needed here. The script
 ``benchmarks/ascot5/run_ascot5.py`` writes them with a5py, runs BBNBI5 and
-ASCOT5 and stores what they give, per shell of ``rho``, in a JSON file of the
+ASCOT5 and stores what they give, per shell of $\rho$, in a JSON file of the
 format of `run_freeofcharge`; `compare` sets the two side by side.
 
 The case (`benchmark_case`) is a Solov'ev equilibrium of ASDEX Upgrade's
@@ -58,13 +58,13 @@ __all__ = [
 
 
 def bfield_2ds(equilibrium: Equilibrium, *, psi_axis_margin: float = 1.0e-6) -> dict:
-    """Return the ``B_2DS`` input: ``psi`` and ``B_phi`` on the equilibrium grid.
+    r"""Return the ``B_2DS`` input: $\psi$ and $B_\varphi$ on the equilibrium grid.
 
-    ASCOT5 computes ``B_R`` and ``B_Z`` from ``psi`` with the signs of
+    ASCOT5 computes $B_R$ and $B_Z$ from $\psi$ with the signs of
     `freeofcharge.equilibrium`, so ``br`` and ``bz`` are zero. It stops a
-    marker where its splines of ``psi`` dip below ``psi0``, so ``psi0`` is
+    marker where its splines of $\psi$ dip below ``psi0``, so ``psi0`` is
     moved past the axis value by ``psi_axis_margin`` of the flux difference;
-    ``rho^2`` shifts by as much.
+    $\rho^2$ shifts by as much.
     """
     r, z = equilibrium.r, equilibrium.z
     rr, zz = np.meshgrid(r, z, indexing="ij")
@@ -90,12 +90,12 @@ def bfield_2ds(equilibrium: Equilibrium, *, psi_axis_margin: float = 1.0e-6) -> 
 
 
 def plasma_1d(plasma: Plasma, *, rho_max: float = 10.0) -> dict:
-    """Return the ``plasma_1D`` input on the grid of ``plasma``, extended outside.
+    r"""Return the ``plasma_1D`` input on the grid of ``plasma``, extended outside.
 
     ASCOT5 needs profiles wherever a marker goes, and stops it beyond the last
-    point of the grid; freeofcharge's densities are zero outside ``rho = 1``.
-    Two points are added, just outside 1 and at ``rho_max``, with the
-    composition of the edge scaled to ``n_e = 1 m^-3`` and the edge
+    point of the grid; freeofcharge's densities are zero outside $\rho = 1$.
+    Two points are added, just outside 1 and at $\rho$ = ``rho_max``, with the
+    composition of the edge scaled to $n_e = 1\,\mathrm{m^{-3}}$ and the edge
     temperatures.
     """
     rho = np.asarray(plasma.rho, dtype=float)
@@ -130,7 +130,7 @@ def plasma_1d(plasma: Plasma, *, rho_max: float = 10.0) -> dict:
 
 
 def wall_2d(equilibrium: Equilibrium) -> dict:
-    """Return the ``wall_2D`` input: the first wall as an open (R, Z) polygon."""
+    """Return the ``wall_2D`` input: the first wall as an open $(R, Z)$ polygon."""
     if equilibrium.wall is None:
         raise ValueError("the equilibrium has no wall")
     vertices = np.asarray(equilibrium.wall.vertices, dtype=float)
@@ -140,10 +140,10 @@ def wall_2d(equilibrium: Equilibrium) -> dict:
 
 
 def injector(beam: NeutralBeam, *, ids: int = 1, divergence: float = 1.0e-10) -> dict:
-    """Return the ``Injector`` of the ``nbi`` input: one beamlet per marker.
+    r"""Return the ``Injector`` of the ``nbi`` input: one beamlet per marker.
 
     BBNBI5 draws a beamlet at random for each of its markers and adds a
-    Gaussian divergence of standard deviation ``divergence / sqrt(2)`` in
+    Gaussian divergence of standard deviation ``divergence`` $/\sqrt{2}$ in
     two planes; with the default (nothing) it flies along the freeofcharge
     lines themselves. The markers must have one energy and equal weights.
     ``divergence`` is in rad, or a quantity such as ``"5 mrad"``.
@@ -183,10 +183,10 @@ def injector(beam: NeutralBeam, *, ids: int = 1, divergence: float = 1.0e-10) ->
 
 
 def shell_sums(rho, values, rho_edges) -> tuple[np.ndarray, np.ndarray]:
-    """Return the sum of ``values`` in each shell and its Monte Carlo error.
+    r"""Return the sum of ``values`` in each shell and its Monte Carlo error.
 
     ``values`` are per marker (weights, powers); the error is the standard
-    error of the sum, ``sqrt(sum v^2)``.
+    error of the sum, $\sqrt{\sum v^2}$.
     """
     rho = np.asarray(rho, dtype=float)
     values = np.asarray(values, dtype=float)
@@ -217,7 +217,7 @@ class BenchmarkCase:
     rho_edges: np.ndarray
     densities: np.ndarray
     parameters: dict = field(default_factory=dict)
-    """Central electron densities of the shine-through scan [m^-3]."""
+    r"""Central electron densities of the shine-through scan [$\mathrm{m^{-3}}$]."""
 
     def plasma_at(self, ne0: float) -> Plasma:
         """Return the case's plasma with the central density ``ne0``."""
@@ -232,25 +232,25 @@ def benchmark_case(
     seed: int = 1,
     toroidal_field: float = 2.5,
 ) -> BenchmarkCase:
-    """Return the benchmark case.
+    r"""Return the benchmark case.
 
-    A Solov'ev equilibrium of ASDEX Upgrade's size (R0 = 1.65 m, outboard
-    minor radius 0.5 m, elongation 1.6, 2.5 T, q = 1 on the axis, a wall on
-    ``psi_n = 1.3``); deuterium with 1% carbon (``Z_eff = 1.3``), parabolic
-    profiles with 5e19 m^-3 and 2.5 keV in the centre; one 2.5 MW beam of 60
-    keV deuterium tangent to R = 1.0 m from R = 3.5 m, 10 cm wide with 10
-    mrad divergence, injected along the field. The shine-through is also
-    scanned over the central density. The fast ions are slowed down until
-    ``max(2 T_i, 1 keV)``.
+    A Solov'ev equilibrium of ASDEX Upgrade's size ($R_0 = 1.65$ m, outboard
+    minor radius 0.5 m, elongation 1.6, 2.5 T, $q = 1$ on the axis, a wall on
+    $\psi_n = 1.3$); deuterium with 1% carbon ($Z_\mathrm{eff} = 1.3$), parabolic
+    profiles with $5 \times 10^{19}\,\mathrm{m^{-3}}$ and 2.5 keV in the centre;
+    one 2.5 MW beam of 60 keV deuterium tangent to $R = 1.0$ m from $R = 3.5$ m,
+    10 cm wide with 10 mrad divergence, injected along the field. The
+    shine-through is also scanned over the central density. The fast ions are
+    slowed down until $\max(2 T_i, 1\,\mathrm{keV})$.
 
     Args:
         markers: Beam markers (BBNBI5 beamlets).
-        shells: Shells of ``rho`` of the profiles.
-        grid_points: Points of the (R, Z) grid each way.
+        shells: Shells of $\rho$ of the profiles.
+        grid_points: Points of the $(R, Z)$ grid each way.
         seed: Seed of the beam markers.
-        toroidal_field: B on the axis [T], or a quantity. The Solov'ev flux
-            scales with it (q stays the same), so only the orbit widths change,
-            as 1/B.
+        toroidal_field: $B$ on the axis [T], or a quantity. The Solov'ev flux
+            scales with it ($q$ stays the same), so only the orbit widths change,
+            as $1/B$.
     """
     toroidal_field = to_unit(toroidal_field, "T", "toroidal_field")
     parameters = {
@@ -334,11 +334,11 @@ def run_freeofcharge(
     seed: int = 2,
     surfaces: FluxSurfaces | None = None,
 ) -> dict:
-    """Return freeofcharge's results for ``case`` in the format of the benchmark file.
+    r"""Return freeofcharge's results for ``case`` in the format of the benchmark file.
 
     Per shell: the birth rate [1/s] and deposited power [W] (no sampling
     noise), the heating of electrons and ions [W], the fast-ion density
-    [m^-3] and parallel current density [A/m^2]; the shine-through fraction
+    [$\mathrm{m^{-3}}$] and parallel current density [$\mathrm{A/m^2}$]; the shine-through fraction
     at each central density of the scan; the totals. The slowing down with
     the current of the orbits (``orbit_average``) is at the top level, the
     one with the local pitch under ``"local"``, as in the ASCOT5 file.

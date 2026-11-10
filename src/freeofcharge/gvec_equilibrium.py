@@ -1,14 +1,14 @@
 r"""3D equilibria from GVEC (github.com/gvec-group/gvec), the optional extra ``gvec``.
 
-GVEC maps flux coordinates ``(rho, theta, zeta)`` to ``(X1, X2)`` with its
-``hmap``; only ``which_hmap = 1`` is supported, ``(X1, X2) = (R, Z)`` and
+GVEC maps flux coordinates $(\rho, \theta, \zeta)$ to $(X_1, X_2)$ with its
+``hmap``; only ``which_hmap = 1`` is supported, $(X_1, X_2) = (R, Z)$ and
 
 $$
 \mathbf{x} = (R \cos\zeta, -R \sin\zeta, Z),
 $$
 
-so a Cartesian point fixes ``zeta`` and the inverse map is a 2D Newton
-iteration for ``(R, Z)`` in ``(u, v) = (rho cos theta, rho sin theta)``, which
+so a Cartesian point fixes $\zeta$ and the inverse map is a 2D Newton
+iteration for $(R, Z)$ in $(u, v) = (\rho\cos\theta, \rho\sin\theta)$, which
 stays regular on the axis. The start is the nearest node of a grid cached per
 toroidal slice. The field is
 
@@ -58,13 +58,13 @@ def _require_gvec():
     references=("[GVEC](https://github.com/gvec-group/gvec)",),
 )
 class GVECEquilibrium:
-    """A GVEC equilibrium as a `freeofcharge.MagneticEquilibrium`.
+    r"""A GVEC equilibrium as a `freeofcharge.MagneticEquilibrium`.
 
     Args:
         state: A ``gvec.State``.
-        grid: Nodes ``(rho, theta, zeta)`` of the cached starting grid, ``zeta``
+        grid: Nodes $(\rho, \theta, \zeta)$ of the cached starting grid, $\zeta$
             over one field period.
-        tolerance: Newton tolerance on ``(R, Z)`` relative to the minor radius.
+        tolerance: Newton tolerance on $(R, Z)$ relative to the minor radius.
         iterations: Most Newton iterations.
     """
 
@@ -124,14 +124,14 @@ class GVECEquilibrium:
     # ------------------------------------------------------------------
 
     def _evaluate(self, quantity: str, rho, theta, zeta):
-        """Return ``Q`` and its ``rho``, ``theta`` and ``zeta`` derivatives."""
+        r"""Return $Q$ and its $\rho$, $\theta$ and $\zeta$ derivatives."""
         rtz = np.stack([rho, theta, zeta])
         return self.state.evaluate_base_list_rtz_all(quantity, rtz)[:4]
 
     def flux_coordinates(self, points):
-        """Return ``(rho, theta, zeta)`` of Cartesian ``points`` ``(..., 3)``.
+        r"""Return $(\rho, \theta, \zeta)$ of Cartesian ``points`` ``(..., 3)``.
 
-        ``rho`` is 1 plus the distance to the last closed surface over the
+        $\rho$ is 1 plus the distance to the last closed surface over the
         minor radius for points outside it.
         """
         points = xp.to_numpy(xp.asarray(points, dtype=float))
@@ -204,7 +204,7 @@ class GVECEquilibrium:
     # ------------------------------------------------------------------
 
     def rho_at(self, points):
-        """Return ``rho`` at Cartesian ``points`` ``(..., 3)``."""
+        r"""Return $\rho$ at Cartesian ``points`` ``(..., 3)``."""
         return xp.asarray(self.flux_coordinates(points)[0])
 
     def inside_at(self, points):
@@ -216,7 +216,7 @@ class GVECEquilibrium:
         return xp.ones(xp.asarray(points).shape[:-1], dtype=bool)
 
     def _field(self, rho, theta, zeta):
-        """Return ``B`` ``(n, 3)`` at flux coordinates."""
+        r"""Return $\mathbf{B}$, shape ``(n, 3)``, at flux coordinates."""
         x1, x1_r, x1_t, x1_z = self._evaluate("X1", rho, theta, zeta)
         x2, x2_r, x2_t, x2_z = self._evaluate("X2", rho, theta, zeta)
         _, _, la_t, la_z = self._evaluate("LA", rho, theta, zeta)
@@ -238,7 +238,7 @@ class GVECEquilibrium:
         return b_theta[:, None] * e_theta + b_zeta[:, None] * e_zeta
 
     def field_at(self, points):
-        """Return ``B`` [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``.
+        r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``.
 
         Points outside the last closed surface get the field on it.
         """
@@ -248,7 +248,11 @@ class GVECEquilibrium:
         return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
 
     def _shape(self, rho, theta, zeta):
-        """Return ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, |B|, iota."""
+        r"""Return the surface shape and the field at flux coordinates.
+
+        $R$, $\partial_\rho R$, $\partial_\theta R$, $\partial_\rho Z$, $\partial_\theta Z$,
+        $|B|$ and $\iota$.
+        """
         x1, x1_r, x1_t, _ = self._evaluate("X1", rho, theta, zeta)
         _, x2_r, x2_t, _ = self._evaluate("X2", rho, theta, zeta)
         strength = np.linalg.norm(self._field(rho, theta, zeta), axis=-1)

@@ -1,4 +1,4 @@
-"""ASCOT5 benchmark.
+r"""ASCOT5 benchmark.
 
 The ASCOT5 benchmark: deposition, shine-through, heating and current.
 
@@ -9,7 +9,7 @@ freeofcharge and compared with the ASCOT5 results stored in
 the shine-through along the same lines (one beamlet per freeofcharge marker)
 with the same stopping cross sections (Suzuki's fit), so the deposition agrees
 to within its Monte Carlo noise. ascot5_main slows the ions down twice, as
-guiding centres with Monte Carlo Coulomb collisions until max(2 T_i, 1 keV):
+guiding centres with Monte Carlo Coulomb collisions until $\max(2T_i, 1\,\mathrm{keV})$:
 once following their orbits, and once without orbits, the markers staying
 where they were born. freeofcharge slows them down on their birth surfaces to
 the same end, with a Coulomb logarithm per species, and gives the current of
@@ -57,7 +57,10 @@ def profile(name: str, scale: float, long_name: str, units: str, codes) -> xr.Da
     """Return a profile of several runs, with a ``code`` axis."""
     return xr.DataArray(
         np.stack([np.asarray(runs[code][name]) for code in codes]) * scale,
-        coords={"code": codes, "rho": ("rho", rho, {"long_name": "rho_pol"})},
+        coords={
+            "code": codes,
+            "rho": ("rho", rho, {"long_name": r"$\rho_\mathrm{pol}$"}),
+        },
         dims=("code", "rho"),
         attrs={"long_name": long_name, "units": units},
     )
@@ -70,7 +73,7 @@ power = profile(
 )
 electrons = profile("electron_heating", 1e-3, "electron heating per shell", "kW", codes)
 ions = profile("ion_heating", 1e-3, "ion heating per shell", "kW", codes)
-density = profile("fast_ion_density", 1e-17, "fast-ion density", "1e17/m^3", codes)
+density = profile("fast_ion_density", 1e-17, "fast-ion density", "10^17/m^3", codes)
 current = profile(
     "fast_ion_current_density", 1e-3, "fast-ion current density", "kA/m^2", codes
 )

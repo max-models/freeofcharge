@@ -136,6 +136,10 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
 
 def main() -> None:
     """Regenerate all example script pages and assets."""
+    import plasma_plots
+
+    # the figures' formulas as LaTeX, typeset by the theme's PlotlyFigure (MathJax)
+    plasma_plots.set_math("latex")
     shutil.rmtree(CONTENT, ignore_errors=True)
     shutil.rmtree(PUBLIC, ignore_errors=True)
     examples = sorted(SOURCES.glob("*.py"))

@@ -1,33 +1,33 @@
-"""Injector chain.
+r"""Injector chain.
 
 An injector from source to plasma: RF power and neutralizer gas against current drive.
 
 A negative-ion neutral-beam injector of ITER's size, one stage per max-models code. The
 deuterium RF source is a wellbalanced global model: more RF power gives a denser plasma
-at the same electron temperature, and the extracted D- current density is taken as 30 %
-of the positive-ion Bohm flux to the plasma grid, from 78 A/m^2 at 200 kW to 430 A/m^2
-at 1.1 MW. Against the Child-Langmuir limit of a 9 kV first gap of 6 mm, 914 A/m^2,
-that is a normalized perveance from 0.09 to 0.47, and over 0.2 m^2 of apertures a D-
+at the same electron temperature, and the extracted D$^-$ current density is taken as 30 %
+of the positive-ion Bohm flux to the plasma grid, from $78\,\mathrm{A/m^2}$ at 200 kW to $430\,\mathrm{A/m^2}$
+at 1.1 MW. Against the Child-Langmuir limit of a 9 kV first gap of 6 mm, $914\,\mathrm{A/m^2}$,
+that is a normalized perveance from 0.09 to 0.47, and over $0.2\,\mathrm{m^2}$ of apertures a D$^-$
 current from 16 to 86 A. The beamlet optics come from tree-d-3d: a slit extraction gap,
 solved with boundary-integral electrodes and meshless space charge, gives the classic
 V-curve of the divergence against the perveance, smallest near 0.15, and the
-acceleration to 1 MeV shrinks the angles by ``sqrt(9 kV / 1 MV)``, to 1.3-7 mrad. A
+acceleration to 1 MeV shrinks the angles by $\sqrt{9\,\mathrm{kV} / 1\,\mathrm{MV}}$, to 1.3-7 mrad. A
 fixed 70 % of the extracted ions survive the accelerator. The gas neutralizer is
 plasmacoll's charge-state solution, whose neutral share peaks at 57.5 % near
-1.4e20 m^-2 (and agrees with the closed form to 1e-14), and a 23 m duct of 0.5 m passes
+$1.4\times10^{20}\,\mathrm{m^{-2}}$ (and agrees with the closed form to $10^{-14}$), and a 23 m duct of 0.5 m passes
 a share of the Gaussian beam that falls with its divergence. The neutral beam enters
-freeofcharge's ITER-like plasma at a central density of 5e19 m^-3.
+freeofcharge's ITER-like plasma at a central density of $5\times10^{19}\,\mathrm{m^{-3}}$.
 
 The two knobs pull against each other: more RF power gives more current but, past the
 optimum perveance, a more divergent beam, more of which the duct scrapes (65 % passes at
 1.1 MW); more gas neutralizes more of the beam up to the maximum and then re-ionizes it.
 The scan maps the neutral power delivered, the driven current and the power shone
 through onto the inboard wall over the two: the most current, 2.0 MA from 23 MW, comes
-at 950 kW and a line density of 1.5e20 m^-2, next to the neutralizer's optimum.
+at 950 kW and a line density of $1.5\times10^{20}\,\mathrm{m^{-2}}$, next to the neutralizer's optimum.
 
 What is modelled, and what is not:
 
-- Modelled: the source plasma's particle and power balance (illustrative D2 rates, not
+- Modelled: the source plasma's particle and power balance (illustrative D$_2$ rates, not
   data); space-charge-limited slit optics with a fixed emitter between 50-degree
   plasma-electrode wings; the charge states in a uniform gas cell (round-number cross
   sections of plausible size, not data); duct transmission of a Gaussian beam; the
@@ -134,7 +134,7 @@ with plasma_plots.figure(figsize=(6, 4)) as fig:
     ax = fig[0]
     ax.plot(RF_POWER / 1e3, current_density, "o-")
     ax.set_xlabel("RF power [kW]")
-    ax.set_ylabel("D- current density [A/m^2]")
+    ax.set_ylabel("D$^-$ current density [A/m$^2$]")
     ax.set_title("1. Source (wellbalanced)")
     ax.text(
         0.04,
@@ -152,7 +152,7 @@ with plasma_plots.figure(figsize=(6, 4)) as fig:
     ax.plot(
         perveance, 1e3 * divergence / shrink, "s", color="C1", label="operating points"
     )
-    ax.set_xlabel("normalized perveance j / j_CL")
+    ax.set_xlabel(r"normalized perveance $j / j_\mathrm{CL}$")
     ax.set_ylabel("rms divergence at extraction [mrad]")
     ax.set_title("2. Extraction optics: the V-curve")
     ax.legend()
@@ -168,7 +168,7 @@ with plasma_plots.figure(figsize=(6, 4)) as fig:
         label="closed form",
     )
     ax.axvline(best_pi / 1e20, color="0.6", ls=":")
-    ax.set_xlabel("neutralizer line density [1e20 m^-2]")
+    ax.set_xlabel("neutralizer line density [$10^{20}$ m$^{-2}$]")
     ax.set_ylabel("neutral share [%]")
     ax.set_title("3. Gas neutralizer")
     ax.legend()
@@ -212,7 +212,7 @@ scan = xr.Dataset(
         "line_density": (
             "line_density",
             LINE_DENSITY / 1e20,
-            {"long_name": "neutralizer line density", "units": "1e20 m^-2"},
+            {"long_name": "neutralizer line density", "units": "10^20 m^-2"},
         ),
     },
 )

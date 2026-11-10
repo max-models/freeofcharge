@@ -1,7 +1,7 @@
 r"""Equilibria: the protocol the beam codes use, and the axisymmetric one.
 
 `MagneticEquilibrium` is what deposition and slowing down need from an
-equilibrium, at Cartesian points ``(..., 3)``: the radius ``rho``, the field,
+equilibrium, at Cartesian points ``(..., 3)``: the radius $\rho$, the field,
 inside the plasma and the wall, a bounding box, and the shells between radii.
 `Equilibrium` is the axisymmetric implementation; 3D ones (GVEC, DESC)
 are adapters in their own modules.
@@ -11,14 +11,14 @@ The axisymmetric field is
 $$
 B_R = -\frac{1}{R}\frac{\partial\psi}{\partial Z}, \qquad
 B_Z = \frac{1}{R}\frac{\partial\psi}{\partial R}, \qquad
-B_\phi = \frac{F(\psi)}{R},
+B_\varphi = \frac{F(\psi)}{R},
 $$
 
-with ``psi`` the poloidal flux per radian [Wb/rad] and ``(R, phi, Z)``
+with $\psi$ the poloidal flux per radian [Wb/rad] and $(R, \varphi, Z)$
 right-handed. G-EQDSK files from different codes differ in these signs (the
 COCOS convention); `Equilibrium.from_geqdsk` takes the file as it is.
-Radii are ``rho = sqrt(psi_n)``, ``psi_n = (psi - psi_axis) / (psi_boundary -
-psi_axis)``.
+Radii are $\rho = \sqrt{\psi_n}$ with
+$\psi_n = (\psi - \psi_\mathrm{axis}) / (\psi_\mathrm{boundary} - \psi_\mathrm{axis})$.
 """
 
 from __future__ import annotations
@@ -98,19 +98,19 @@ class FluxSurfaces:
     surface_weight: np.ndarray | None = field(default=None, repr=False)
     safety_factor: np.ndarray | None = None
     major_radius: np.ndarray | None = None
-    """Shell edges in ``rho``, increasing from 0 to 1."""
-    """Volume of each shell [m^3]."""
-    """Poloidal cross-section area of each shell [m^2]."""
-    """``(R_max - R_min) / (R_max + R_min)`` of the surface at each shell centre
-    (averaged over the toroidal angle in 3D)."""
-    """``|B|`` [T] at points on the surface at each shell centre, shape
-    ``(shells, points)``: around it in 2D, on a ``(theta, zeta)`` grid in 3D."""
+    r"""Shell edges in $\rho$, increasing from 0 to 1."""
+    r"""Volume of each shell [$\mathrm{m^3}$]."""
+    r"""Poloidal cross-section area of each shell [$\mathrm{m^2}$]."""
+    r"""$(R_\mathrm{max} - R_\mathrm{min}) / (R_\mathrm{max} + R_\mathrm{min})$ of the surface
+    at each shell centre (averaged over the toroidal angle in 3D)."""
+    r"""$|B|$ [T] at points on the surface at each shell centre, shape
+    ``(shells, points)``: around it in 2D, on a $(\theta, \zeta)$ grid in 3D."""
     """Weights of those points in the flux-surface average, normalised to a sum
-    of one: ``dl_p / B_p`` in 2D (``dl_p`` the poloidal arc length), the
+    of one: $dl_p / B_p$ in 2D ($dl_p$ the poloidal arc length), the
     Jacobian in 3D."""
-    """``q = 1 / iota`` at each shell centre; in 2D ``F / (2 pi) * oint dl_p /
-    (R^2 B_p)``."""
-    """``(R_max + R_min) / 2`` of the surface at each shell centre [m]."""
+    r"""$q = 1 / \iota$ at each shell centre; in 2D
+    $q = \frac{F}{2\pi} \oint \frac{dl_p}{R^2 B_p}$."""
+    r"""$(R_\mathrm{max} + R_\mathrm{min}) / 2$ of the surface at each shell centre [m]."""
 
     @property
     def rho(self) -> np.ndarray:
@@ -138,16 +138,16 @@ class FluxSurfaces:
         field_points: tuple[int, int] = (32, 32),
         radial_points: int = 8,
     ) -> FluxSurfaces:
-        """Return the shells of a 3D equilibrium in flux coordinates.
+        r"""Return the shells of a 3D equilibrium in flux coordinates.
 
         ``shape(rho, theta, zeta)`` returns, at flat arrays of flux coordinates,
-        ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, ``|B|``
-        and ``iota`` (``zeta`` the toroidal angle up to sign). Volumes and the
-        toroidally averaged cross-section areas come from Gauss-Legendre
-        quadrature in ``rho`` within each shell and the trapezoidal rule on a
-        ``field_points`` ``(theta, zeta)`` grid over one of the ``nfp`` field
+        $R$, $\partial_\rho R$, $\partial_\theta R$, $\partial_\rho Z$,
+        $\partial_\theta Z$, $|B|$ and $\iota$ ($\zeta$ the toroidal angle up to sign).
+        Volumes and the toroidally averaged cross-section areas come from Gauss-Legendre
+        quadrature in $\rho$ within each shell and the trapezoidal rule on a
+        ``field_points`` $(\theta, \zeta)$ grid over one of the ``nfp`` field
         periods; the field strength and the averaging weights (the Jacobian
-        ``R dA``) from that grid on the surface through each shell centre.
+        $R\,dA$) from that grid on the surface through each shell centre.
         """
         rho_edges = np.asarray(rho_edges, dtype=float)
         n_theta, n_zeta = field_points
@@ -203,7 +203,7 @@ class FluxSurfaces:
 
     @property
     def rotational_transform(self) -> np.ndarray | None:
-        """Return ``iota = 1 / q`` at each shell centre."""
+        r"""Return $\iota = 1 / q$ at each shell centre."""
         return None if self.safety_factor is None else 1.0 / self.safety_factor
 
     def to_dataset(self) -> xr.Dataset:
@@ -234,12 +234,12 @@ class FluxSurfaces:
             variables["safety_factor"] = (
                 "rho",
                 self.safety_factor,
-                {"long_name": "safety factor q"},
+                {"long_name": "safety factor $q$"},
             )
             variables["rotational_transform"] = (
                 "rho",
                 1.0 / self.safety_factor,
-                {"long_name": "rotational transform iota"},
+                {"long_name": r"rotational transform $\iota$"},
             )
         if self.major_radius is not None:
             variables["major_radius"] = (
@@ -255,7 +255,7 @@ class FluxSurfaces:
             )
         return xr.Dataset(
             variables,
-            coords={"rho": ("rho", self.rho, {"long_name": "rho_pol"})},
+            coords={"rho": ("rho", self.rho, {"long_name": r"$\rho_\mathrm{pol}$"})},
             attrs={"rho_edges": self.rho_edges},
         )
 
@@ -287,7 +287,7 @@ class FluxSurfaces:
         $$
 
         (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995), by Gauss-Legendre
-        quadrature in ``lambda``.
+        quadrature in $\lambda$.
         """
         if self.field_strength is None or self.surface_weight is None:
             raise ValueError("these surfaces have no field points")
@@ -302,7 +302,7 @@ class FluxSurfaces:
         return 1.0 - 0.75 * self.surface_average(b**2) * integral
 
     def shell_index(self, rho):
-        """Return the shell of each ``rho``, -1 outside ``[0, 1)``."""
+        r"""Return the shell of each $\rho$, -1 outside $[0, 1)$."""
         edges = xp.asarray(self.rho_edges)
         index = xp.searchsorted(edges, xp.asarray(rho), side="right") - 1
         return xp.where((index >= 0) & (index < len(self.rho_edges) - 1), index, -1)
@@ -327,11 +327,11 @@ class MagneticEquilibrium(Protocol):
         ...
 
     def rho_at(self, points) -> Any:
-        """Return the radius ``rho``, 0 on the axis and 1 on the boundary."""
+        r"""Return the radius $\rho$, 0 on the axis and 1 on the boundary."""
         ...
 
     def field_at(self, points) -> Any:
-        """Return ``B`` [T]."""
+        r"""Return $\mathbf{B}$ [T]."""
         ...
 
     def inside_at(self, points) -> Any:
@@ -348,13 +348,13 @@ class MagneticEquilibrium(Protocol):
 
 
 def _cylindrical(points):
-    """Return ``(R, Z)`` of Cartesian ``points`` ``(..., 3)``."""
+    """Return $(R, Z)$ of Cartesian ``points`` ``(..., 3)``."""
     points = xp.asarray(points, dtype=float)
     return xp.hypot(points[..., 0], points[..., 1]), points[..., 2]
 
 
 class Equilibrium:
-    """The flux ``psi(R, Z)`` on a rectilinear grid, ``F(psi_n)``, boundary and wall.
+    r"""The flux $\psi(R, Z)$ on a rectilinear grid, $F(\psi_n)$, boundary and wall.
 
     Args:
         r: Increasing major radii of the grid [m].
@@ -362,13 +362,13 @@ class Equilibrium:
         psi: Flux on the grid, shape ``(len(r), len(z))`` [Wb/rad].
         psi_axis: Flux on the magnetic axis [Wb/rad].
         psi_boundary: Flux on the last closed flux surface [Wb/rad].
-        f: ``F = R B_phi`` on a uniform grid of ``psi_n`` from 0 to 1 [T m];
+        f: $F = R B_\varphi$ on a uniform grid of $\psi_n$ from 0 to 1 [T m];
             the last value holds outside.
-        axis: ``(R, Z)`` of the magnetic axis [m].
-        boundary: Last closed flux surface, vertices ``(n, 2)`` in ``(R, Z)``
+        axis: $(R, Z)$ of the magnetic axis [m].
+        boundary: Last closed flux surface, vertices ``(n, 2)`` in $(R, Z)$
             [m].
         wall: First wall, vertices ``(n, 2)`` [m], or None.
-        method: Interpolation of ``psi`` and its derivatives
+        method: Interpolation of $\psi$ and its derivatives
             (``RegularGridInterpolator`` methods: "linear", "cubic", ...).
 
     Every argument with a unit also takes an astropy Quantity or a string
@@ -390,7 +390,7 @@ class Equilibrium:
         wall=None,
         method: str = "cubic",
     ) -> None:
-        """Set up the interpolation of ``psi`` and its gradient."""
+        r"""Set up the interpolation of $\psi$ and its gradient."""
         r = np.asarray(to_array(r, "m", "r"), dtype=float)
         z = np.asarray(to_array(z, "m", "z"), dtype=float)
         psi = np.asarray(to_array(psi, "Wb/rad", "psi"), dtype=float)
@@ -463,24 +463,24 @@ class Equilibrium:
         points: int = 129,
         surface_points: int = 256,
     ) -> Equilibrium:
-        r"""Return the Solov'ev equilibrium ``psi = c (R^2 Z^2 + kappa^2/4 (R^2 - R_0^2)^2)``.
+        r"""Return the Solov'ev equilibrium $\psi = c\,[R^2 Z^2 + \kappa^2 (R^2 - R_0^2)^2 / 4]$.
 
-        It solves the Grad-Shafranov equation with ``F = B_0 R_0`` constant and
-        ``mu_0 p' = -2 c (1 + kappa^2)``; ``c = B_0 / (2 R_0^2 kappa q_0)`` sets
+        It solves the Grad-Shafranov equation with $F = B_0 R_0$ constant and
+        $\mu_0 p' = -2c\,(1 + \kappa^2)$; $c = B_0 / (2 R_0^2 \kappa q_0)$ sets
         the safety factor on the axis. The last closed surface passes through
-        ``R_0 + a`` on the outboard midplane and through ``sqrt(2 R_0^2 - (R_0
-        + a)^2)`` on the inboard one, so the shape (triangular, wider inboard
-        than ``R_0 - a``) is fixed by ``a / R_0``; the wall is the surface
-        ``psi_n = wall_psi_n`` (none if None). The radii and the field take
+        $R_0 + a$ on the outboard midplane and through $\sqrt{2 R_0^2 - (R_0 + a)^2}$
+        on the inboard one, so the shape (triangular, wider inboard than $R_0 - a$)
+        is fixed by $a / R_0$; the wall is the surface $\psi_n$ = ``wall_psi_n``
+        (none if None). The radii and the field take
         quantities (``"6.2 m"``, ``5.3 * u.T``).
 
         Args:
-            major_radius: ``R_0`` [m].
-            minor_radius: Outboard minor radius ``a`` [m].
-            elongation: ``kappa``.
-            toroidal_field: ``B_0`` on the axis [T].
+            major_radius: $R_0$ [m].
+            minor_radius: Outboard minor radius $a$ [m].
+            elongation: $\kappa$.
+            toroidal_field: $B_0$ on the axis [T].
             q_axis: Safety factor on the axis.
-            wall_psi_n: ``psi_n`` of the wall; no wall if None.
+            wall_psi_n: $\psi_n$ of the wall; no wall if None.
             points: Grid points each way.
             surface_points: Vertices of the boundary and the wall.
         """
@@ -562,7 +562,7 @@ class Equilibrium:
         )
 
     def to_geqdsk(self, path: str | Path, *, description: str = "freeofcharge") -> None:
-        """Write the equilibrium as a G-EQDSK file (pressure and q left zero)."""
+        """Write the equilibrium as a G-EQDSK file (pressure and $q$ left zero)."""
         n_r = len(self.r)
         psi_n = np.linspace(0.0, 1.0, n_r)
         geqdsk.write(
@@ -592,11 +592,11 @@ class Equilibrium:
         return [values[:, k].reshape(r.shape) for k in range(3)]
 
     def psi(self, r, z):
-        """Return ``psi`` at ``(r, z)`` (NaN outside the grid)."""
+        r"""Return $\psi$ at ``(r, z)`` (NaN outside the grid)."""
         return self._evaluate(r, z)[0]
 
     def psi_normalized(self, r, z):
-        """Return ``psi_n`` at ``(r, z)``."""
+        r"""Return $\psi_n$ at ``(r, z)``."""
         return (self.psi(r, z) - self.psi_axis) / (self.psi_boundary - self.psi_axis)
 
     @method(
@@ -606,7 +606,7 @@ class Equilibrium:
         assumptions=(r"negative $\psi_n$ clipped to 0",),
     )
     def rho(self, r, z):
-        """Return ``rho = sqrt(psi_n)`` at ``(r, z)``."""
+        r"""Return $\rho = \sqrt{\psi_n}$ at ``(r, z)``."""
         return xp.sqrt(xp.maximum(self.psi_normalized(r, z), 0.0))
 
     def inside(self, r, z):
@@ -642,7 +642,7 @@ class Equilibrium:
         ),
     )
     def magnetic_field(self, r, z):
-        """Return ``(B_R, B_Z, B_phi)`` at ``(r, z)`` [T]."""
+        r"""Return $(B_R, B_Z, B_\varphi)$ at ``(r, z)`` [T]."""
         psi, dpsi_dr, dpsi_dz = self._evaluate(r, z)
         r = xp.asarray(r, dtype=float)
         psi_n = (psi - self.psi_axis) / (self.psi_boundary - self.psi_axis)
@@ -660,7 +660,7 @@ class Equilibrium:
 
     @property
     def bounds(self) -> tuple[np.ndarray, np.ndarray]:
-        """Return the box swept by the ``(R, Z)`` grid about the axis [m]."""
+        """Return the box swept by the $(R, Z)$ grid about the axis [m]."""
         lower, upper = self.grid.lower_bound, self.grid.upper_bound
         r_max = float(upper[0])
         return (
@@ -669,7 +669,7 @@ class Equilibrium:
         )
 
     def rho_at(self, points):
-        """Return ``rho`` at Cartesian ``points`` ``(..., 3)``."""
+        r"""Return $\rho$ at Cartesian ``points`` ``(..., 3)``."""
         return self.rho(*_cylindrical(points))
 
     def inside_at(self, points):
@@ -681,7 +681,7 @@ class Equilibrium:
         return self.inside_wall(*_cylindrical(points))
 
     def field_at(self, points):
-        """Return ``B`` [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``."""
+        r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``."""
         points = xp.asarray(points, dtype=float)
         x, y = points[..., 0], points[..., 1]
         r, zc = _cylindrical(points)
@@ -699,10 +699,10 @@ class Equilibrium:
     def flux_surface(
         self, psi_n: float, points: int = 256, iterations: int = 60
     ) -> np.ndarray:
-        """Return the surface ``psi_n`` as vertices ``(points, 2)`` in ``(R, Z)``.
+        r"""Return the surface $\psi_n$ = ``psi_n`` as vertices ``(points, 2)`` in $(R, Z)$.
 
         Bisection along rays from the axis to the edge of the grid, so the
-        surface must be star-shaped about the axis and ``psi_n`` must increase
+        surface must be star-shaped about the axis and $\psi_n$ must increase
         along every ray up to it.
         """
         theta = xp.linspace(0.0, 2.0 * np.pi, points, endpoint=False)

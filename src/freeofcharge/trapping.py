@@ -1,11 +1,12 @@
 r"""Orbit-averaged pitch of fast ions: trapping and bounce-averaged scattering.
 
 A fast ion on a flux surface (zero orbit width) keeps its energy and magnetic
-moment along its orbit, so ``lambda = (1 - xi^2) B_min / B`` is constant while
-its local pitch ``xi = v_par / v = sigma sqrt(1 - lambda b)``, ``b = B /
-B_min``, changes. Ions with ``lambda > lambda_c = B_min / B_max`` are trapped:
-over a bounce their parallel velocity averages to zero. A passing ion moves
-along B at the transit average
+moment along its orbit, so $\lambda = (1 - \xi^2) B_\mathrm{min} / B$ is constant
+while its local pitch $\xi = v_\parallel / v = \sigma\sqrt{1 - \lambda b}$,
+$b = B / B_\mathrm{min}$, changes. Ions with
+$\lambda > \lambda_c = B_\mathrm{min} / B_\mathrm{max}$ are trapped: over a bounce
+their parallel velocity averages to zero. A passing ion moves along $\mathbf{B}$ at
+the transit average
 
 $$
 \langle\xi\rangle_t = \frac{\oint dl}{\oint dl / |\xi|}
@@ -13,13 +14,14 @@ $$
 \overline{T}(\lambda) = \overline{(1 - \lambda b)^{-1/2}},
 $$
 
-the bar being the average over the length of a field line, ``\overline{A} =
-\langle A B\rangle / \langle B\rangle``. That is the parallel velocity its
-orbit carries, so the current of the fast ions is ``e v <xi>_t`` per ion, not
-``e v xi`` at its birth point.
+the bar being the average over the length of a field line,
+$\overline{A} = \langle A B\rangle / \langle B\rangle$. That is the parallel velocity
+its orbit carries, so the current of the fast ions is $e v \langle\xi\rangle_t$ per
+ion, not $e v \xi$ at its birth point.
 
-Pitch-angle scattering, the Lorentz operator ``nu_D / 2 d/dxi (1 - xi^2)
-d/dxi``, averaged over the orbit, becomes (Helander and Sigmar, *Collisional
+Pitch-angle scattering, the Lorentz operator
+$\frac{\nu_D}{2} \frac{\partial}{\partial\xi} (1 - \xi^2) \frac{\partial}{\partial\xi}$,
+averaged over the orbit, becomes (Helander and Sigmar, *Collisional
 Transport in Magnetized Plasmas*, 2002, ch. 11)
 
 $$
@@ -29,19 +31,19 @@ $$
 \overline{Q}(\lambda) = \overline{\sqrt{1 - \lambda b}\,/\,b}.
 $$
 
-Its odd eigenfunctions ``sigma F_k(lambda)``, zero in the trapped region,
-decay as ``exp(-kappa_k int nu_D dt)``; in a uniform field they are the odd
-Legendre polynomials with ``kappa = l (l + 1) / 2`` (1, 6, 15, ...), and the
+Its odd eigenfunctions $\sigma F_k(\lambda)$, zero in the trapped region,
+decay as $e^{-\kappa_k \int \nu_D\,dt}$; in a uniform field they are the odd
+Legendre polynomials with $\kappa = l (l + 1) / 2$ (1, 6, 15, ...), and the
 first gives Gaffey's decay of the mean pitch. The expected transit-averaged
-pitch of an ion born at ``(lambda_0, sigma_0)`` is then
+pitch of an ion born at $(\lambda_0, \sigma_0)$ is then
 
 $$
 E[\langle\xi\rangle_t](t) = \sigma_0 \sum_k F_k(\lambda_0)
     \left(F_k, \overline{T}^{-1}\right) e^{-\kappa_k \int \nu_D dt},
 $$
 
-with the inner product weighted by ``T``. `pitch_modes` solves the
-eigenproblem on each shell by finite volumes in ``lambda``; the slowing down
+with the inner product weighted by $\overline{T}$. `pitch_modes` solves the
+eigenproblem on each shell by finite volumes in $\lambda$; the slowing down
 uses the modes in place of Gaffey's single exponential (RABBIT, Weiland et al.,
 Nucl. Fusion 58, 082032, 2018, averages over guiding-centre orbits instead,
 with their width).
@@ -65,7 +67,7 @@ _GL_NODES, _GL_WEIGHTS = np.polynomial.legendre.leggauss(4)
 
 
 def _line_averages(b, line_weight, lam):
-    """Return ``T(lambda)`` and ``Q(lambda)``, averages along the field line."""
+    r"""Return $\overline{T}(\lambda)$ and $\overline{Q}(\lambda)$, field-line averages."""
     lam = np.asarray(lam, dtype=float)
     arg = np.maximum(1.0 - lam[..., None] * b, 1.0e-300)
     root = np.sqrt(arg)
@@ -85,12 +87,12 @@ def _line_averages(b, line_weight, lam):
     ),
 )
 def transit_pitch(b, line_weight, lam):
-    """Return the transit-averaged ``|xi|`` of passing ions, zero for trapped ones.
+    r"""Return the transit-averaged $|\xi|$ of passing ions, zero for trapped ones.
 
     Args:
-        b: ``B / B_min`` at points along a field line.
+        b: $B / B_\mathrm{min}$ at points along a field line.
         line_weight: Their share of the field-line length (sum one).
-        lam: ``lambda = (1 - xi^2) / b`` of the ions.
+        lam: $\lambda = (1 - \xi^2) / b$ of the ions.
     """
     lam = np.asarray(lam, dtype=float)
     lam_c = 1.0 / np.max(b)
@@ -110,14 +112,14 @@ class PitchModes:
     b_birth_scale: np.ndarray
     field: np.ndarray
     line_weight: np.ndarray
-    """Nodes in ``lambda`` from 0 to ``lambda_c``, shape ``(shells, nodes)``."""
-    """Decay rates ``kappa_k`` in units of ``nu_D``, shape ``(shells, modes)``;
+    r"""Nodes in $\lambda$ from 0 to $\lambda_c$, shape ``(shells, nodes)``."""
+    r"""Decay rates $\kappa_k$ in units of $\nu_D$, shape ``(shells, modes)``;
     the last is the rate given to the remainder (see `amplitudes`)."""
-    """``F_k`` on the nodes, normalised with the weight ``T``, zero at
-    ``lambda_c``; shape ``(shells, modes - 1, nodes)``."""
-    """``(F_k, 1 / T)``, shape ``(shells, modes - 1)``."""
-    """``B_min`` of each shell [T], to turn the field at a birth into ``b``."""
-    """``B / B_min`` along the field line of each shell."""
+    r"""$F_k$ on the nodes, normalised with the weight $\overline{T}$, zero at
+    $\lambda_c$; shape ``(shells, modes - 1, nodes)``."""
+    r"""$(F_k, 1 / \overline{T})$, shape ``(shells, modes - 1)``."""
+    r"""$B_\mathrm{min}$ of each shell [T], to turn the field at a birth into $b$."""
+    r"""$B / B_\mathrm{min}$ along the field line of each shell."""
     """Shares of the field-line length of those points."""
 
     @method(
@@ -131,16 +133,16 @@ class PitchModes:
         ),
     )
     def amplitudes(self, shell, pitch, field_strength):
-        """Return the amplitude of each mode for births, shape ``(births, modes)``.
+        r"""Return the amplitude of each mode for births, shape ``(births, modes)``.
 
         The sum of the amplitudes is the birth's transit-averaged pitch (signed
-        along B). The modes beyond those kept are lumped into one remainder,
+        along $\mathbf{B}$). The modes beyond those kept are lumped into one remainder,
         given the first rate left out: an upper bound on how long it lasts.
 
         Args:
             shell: Shell of each birth.
-            pitch: Local ``xi`` at each birth.
-            field_strength: ``|B|`` at each birth [T].
+            pitch: Local $\xi$ at each birth.
+            field_strength: $|B|$ at each birth [T].
         """
         shell = np.asarray(shell)
         pitch = np.asarray(pitch, dtype=float)
@@ -240,12 +242,12 @@ def _pitch_modes_problem() -> ConvergenceProblem:
 def pitch_modes(
     surfaces: FluxSurfaces, *, modes: int = 8, nodes: int = 200
 ) -> PitchModes:
-    """Return the odd eigenmodes of the bounce-averaged Lorentz operator per shell.
+    r"""Return the odd eigenmodes of the bounce-averaged Lorentz operator per shell.
 
     Args:
         surfaces: Shells with their field points (`Equilibrium.flux_surfaces`).
         modes: Modes kept; one more rate is computed for the remainder.
-        nodes: Finite-volume nodes in ``lambda``.
+        nodes: Finite-volume nodes in $\lambda$.
     """
     if surfaces.field_strength is None or surfaces.surface_weight is None:
         raise ValueError("the surfaces have no field points")

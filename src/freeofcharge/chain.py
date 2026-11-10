@@ -1,4 +1,4 @@
-"""The stages of a negative-ion neutral-beam injector, from the source to the duct.
+r"""The stages of a negative-ion neutral-beam injector, from the source to the duct.
 
 Each stage is a small function on plain numbers, so an injector design can be scanned
 end to end (see ``examples/injector_chain.py``); the plasma side is freeofcharge's own
@@ -11,14 +11,14 @@ other max-models codes, imported only when called (``pip install 'freeofcharge[c
    The negative-ion surface production on caesiated walls is not modelled: that share is
    an input.
 2. `slit_divergence`: the rms divergence of a slit beamlet, and the share the
-   extraction electrode lets through, against its normalized perveance ``j / j_CL``,
+   extraction electrode lets through, against its normalized perveance $j / j_\mathrm{CL}$,
    from tree-d-3d's boundary-integral electrodes and meshless space charge (a gun-code
    fixed point, after tree-d-3d's ``examples/pierce_gun.py``). The plasma meniscus is
    replaced by a fixed planar emitter between focusing plasma-electrode wings, so the
    V-curve comes from the electrode focusing against the space charge, not from a
    moving meniscus.
 3. `neutral_fraction`: the neutral share of a negative-ion beam after a gas
-   neutralizer of line density ``pi``, from `plasmacoll.charge_state_fractions`,
+   neutralizer of line density $\pi$, from `plasmacoll.charge_state_fractions`,
    checked by `neutral_fraction_closed_form`.
 4. `duct_transmission`: the share of a Gaussian beam that passes a square duct.
 
@@ -84,7 +84,7 @@ def _child_langmuir_rules() -> dict:
     symbolic=lambda: _child_langmuir_rules(),
 )
 def child_langmuir(voltage: float, gap: float, mass: float = DEUTERIUM_MASS) -> float:
-    """The planar space-charge-limited current density (A/m^2) of singly charged ions.
+    r"""The planar space-charge-limited current density ($\mathrm{A/m^2}$) of singly charged ions.
 
     ``voltage`` [V], ``gap`` [m] and the ion ``mass`` [kg] take quantities
     (``"9 kV"``, ``"6 mm"``).
@@ -104,15 +104,15 @@ def child_langmuir(voltage: float, gap: float, mass: float = DEUTERIUM_MASS) -> 
 
 @dataclass(frozen=True)
 class Source:
-    """The plasma of the source and the negative-ion current density it supplies.
+    r"""The plasma of the source and the negative-ion current density it supplies.
 
     Attributes:
         rf_power: RF power delivered to the source [W].
-        electron_density: [m^-3].
+        electron_density: [$\mathrm{m^{-3}}$].
         electron_temperature: [eV].
-        positive_flux: Positive-ion flux density to the plasma grid, ``h n_e u_B``
-            [m^-2 s^-1].
-        current_density: Extracted negative-ion current density [A/m^2].
+        positive_flux: Positive-ion flux density to the plasma grid, $h n_e u_B$
+            [$\mathrm{m^{-2}\,s^{-1}}$].
+        current_density: Extracted negative-ion current density [$\mathrm{A/m^2}$].
         state: The steady state of the global model, with every term of its balances.
     """
 
@@ -147,17 +147,19 @@ def deuterium_source(
     gas_temperature: float = 0.05,
     recombination: float = 0.1,
 ) -> Source:
-    """The steady plasma of a deuterium RF source, and its negative-ion current density.
+    r"""The steady plasma of a deuterium RF source, and its negative-ion current density.
 
-    A `wellbalanced.GlobalModel` of D2 at ``pressure`` [Pa] in a chamber of
-    ``volume`` [m^3] and ``wall_area`` [m^2] absorbs ``absorbed_fraction`` of
-    ``rf_power``. Its reactions (ionization and dissociation of D2, elastic collisions)
-    use Arrhenius rates of plausible size, wellbalanced's illustrative deuterium set,
-    not data; the atoms recombine to D2 at the walls with probability
-    ``recombination``. The negative-ion current density is ``extraction_ratio`` times the
-    charge flux of the positive ions to the grid, ``e h n_e u_B`` (``u_B`` of D2+).
+    A `wellbalanced.GlobalModel` of $\mathrm{D_2}$ at ``pressure`` [Pa] in a chamber
+    of ``volume`` [$\mathrm{m^3}$] and ``wall_area`` [$\mathrm{m^2}$] absorbs
+    ``absorbed_fraction`` of ``rf_power``. Its reactions (ionization and dissociation of
+    $\mathrm{D_2}$, elastic collisions) use Arrhenius rates of plausible size,
+    wellbalanced's illustrative deuterium set, not data; the atoms recombine to
+    $\mathrm{D_2}$ at the walls with probability ``recombination``. The negative-ion
+    current density is ``extraction_ratio`` times the charge flux of the positive ions
+    to the grid, $e h n_e u_B$ ($u_B$ of $\mathrm{D_2^+}$).
 
-    ``rf_power`` [W], ``pressure`` [Pa], ``volume`` [m^3], ``wall_area`` [m^2] and
+    ``rf_power`` [W], ``pressure`` [Pa], ``volume`` [$\mathrm{m^3}$], ``wall_area``
+    [$\mathrm{m^2}$] and
     ``gas_temperature`` [eV, or K] take quantities (``"200 kW"``, ``"300 K"``); the
     other arguments are shares.
     """
@@ -376,17 +378,17 @@ def slit_divergence(
     panel: float = 0.05,
     dt: float = 0.02,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """The rms divergence [rad] of a slit beamlet, and its transmitted share, per perveance.
+    r"""The rms divergence [rad] of a slit beamlet, and its transmitted share, per perveance.
 
-    Code units ``eps0 = |q| / m = 1``, gap ``d = 1`` and extraction voltage ``V = 1``;
-    angles do not depend on the scale. The ions start at the emitter, a strip of
-    half-width ``w = 0.5`` between plasma-electrode wings at 50 degrees from the axis
+    Code units $\varepsilon_0 = |q| / m = 1$, gap $d = 1$ and extraction voltage
+    $V = 1$; angles do not depend on the scale. The ions start at the emitter, a strip
+    of half-width $w = 0.5$ between plasma-electrode wings at 50 degrees from the axis
     (steeper than Pierce's 67.5, so that the vacuum field focuses; potential 0), with
-    the current density ``perveance * J_CL`` across it; they are accelerated over the
-    gap to an extraction electrode at ``V`` (a slit of half-width ``2 w``, thickness
-    ``0.2``). The steady beam is the fixed point of tracing the rays, turning them into
+    the current density ``perveance`` $\times\, j_\mathrm{CL}$ across it; they are
+    accelerated over the gap to an extraction electrode at $V$ (a slit of half-width
+    $2w$, thickness 0.2). The steady beam is the fixed point of tracing the rays, turning them into
     line charges for tree-d-3d's tree code and solving the electrodes' response,
-    under-relaxed. The divergence is the rms of ``v_y / v_x`` of the rays one gap past
+    under-relaxed. The divergence is the rms of $v_y / v_x$ of the rays one gap past
     the extraction electrode; rays that reach a plate first are intercepted, and the
     transmitted share is the fraction of rays (of the current) that get through. With
     the default resolution the fixed point converges up to a perveance of about 0.5;
@@ -414,11 +416,11 @@ def slit_divergence(
     ),
 )
 def neutral_fraction(line_density, cross_sections=None) -> np.ndarray:
-    """The neutral share of a D- beam after a gas target of ``line_density`` [m^-2].
+    r"""The neutral share of a $\mathrm{D^-}$ beam after a gas target of ``line_density``.
 
-    From `plasmacoll.charge_state_fractions` with ``cross_sections`` [m^2]
+    From `plasmacoll.charge_state_fractions` with ``cross_sections`` [$\mathrm{m^2}$]
     (`GAS_NEUTRALIZER` by default), all of the beam negative at the entrance.
-    Both take quantities (``"1.4e20 m^-2"``).
+    ``line_density`` is in $\mathrm{m^{-2}}$; both take quantities (``"1.4e20 m^-2"``).
     """
     line_density = to_array(line_density, "m^-2", "line_density")
     if cross_sections is not None:
@@ -473,12 +475,13 @@ def _closed_form_rules() -> dict:
     symbolic=_closed_form_rules,
 )
 def neutral_fraction_closed_form(line_density, cross_sections=None) -> np.ndarray:
-    """The neutral share in closed form, with no electron capture (``+ -> 0``, ``0 -> -``).
+    r"""The neutral share in closed form, with no electron capture ($+ \to 0$, $0 \to -$).
 
-    ``F_- = exp(-(s1 + s2) pi)`` and
-    ``F_0 = s1 / (s1 + s2 - s3) (exp(-s3 pi) - exp(-(s1 + s2) pi))``, with ``s1`` the
-    single stripping, ``s2`` the double stripping and ``s3`` the re-ionization.
-    ``line_density`` [m^-2] and ``cross_sections`` [m^2] take quantities.
+    $F_- = e^{-(s_1 + s_2) \pi}$ and
+    $F_0 = \frac{s_1}{s_1 + s_2 - s_3} \left(e^{-s_3 \pi} - e^{-(s_1 + s_2) \pi}\right)$,
+    with $s_1$ the single stripping, $s_2$ the double stripping and $s_3$ the
+    re-ionization, $\pi$ the line density. ``line_density`` [$\mathrm{m^{-2}}$] and
+    ``cross_sections`` [$\mathrm{m^2}$] take quantities.
     """
     line_density = to_array(line_density, "m^-2", "line_density")
     if cross_sections is not None:
@@ -520,11 +523,12 @@ def _duct_rules() -> dict:
 def duct_transmission(
     width: float, divergence: float, length: float, half_aperture: float
 ) -> float:
-    """The share of a round Gaussian beam that passes a square duct.
+    r"""The share of a round Gaussian beam that passes a square duct.
 
-    The beam has standard deviation ``width`` [m] at the source and ``divergence``
-    [rad]; at ``length`` [m] its width is ``sqrt(width^2 + (length divergence)^2)``, and
-    a square aperture of ``half_aperture`` [m] keeps ``erf(a / (sqrt(2) sigma))^2``.
+    The beam has standard deviation $w$ = ``width`` [m] at the source and
+    $\theta$ = ``divergence`` [rad]; at $L$ = ``length`` [m] its width is
+    $\sigma = \sqrt{w^2 + (L\theta)^2}$, and a square aperture of half-width
+    $a$ = ``half_aperture`` [m] keeps $\mathrm{erf}\left(a / (\sqrt{2}\,\sigma)\right)^2$.
     Each takes a quantity (``"10 cm"``, ``"5 mrad"``).
     """
     width = to_array(width, "m", "width")
