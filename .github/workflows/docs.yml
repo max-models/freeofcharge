@@ -52,5 +52,6 @@ jobs:
         api/freeofcharge/index.html
         api/freeofcharge/deposition/index.html
         examples/equilibrium-and-flux-surfaces/equilibrium_and_flux_surfaces.ipynb
-        examples/stopping-and-shine-through/1.png
+        examples/stopping-and-shine-through/1.plotly.json
+        example-scripts/iter-like-injection/plot-1.plotly.json
         example-scripts/iter-like-injection/plot-1.png

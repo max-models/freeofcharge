@@ -29,6 +29,7 @@ from typing import Any, Protocol, runtime_checkable
 
 import cunumpy as xp
 import numpy as np
+import xarray as xr
 from methodcard import method
 from plasmacoll.units import to_array, to_unit
 from scipy.interpolate import RectBivariateSpline
@@ -204,6 +205,59 @@ class FluxSurfaces:
     def rotational_transform(self) -> np.ndarray | None:
         """Return ``iota = 1 / q`` at each shell centre."""
         return None if self.safety_factor is None else 1.0 / self.safety_factor
+
+    def to_dataset(self) -> xr.Dataset:
+        """Return the shells' volumes and shapes on the shell centres as an xarray dataset.
+
+        The variables are ``volume``, ``area`` and ``inverse_aspect_ratio``, and where the
+        surfaces have them ``safety_factor``, ``rotational_transform``, ``major_radius`` and
+        ``trapped_fraction``, over the coordinate ``rho``, with ``rho_edges`` in the attributes.
+        """
+        variables = {
+            "volume": (
+                "rho",
+                self.volume,
+                {"long_name": "shell volume", "units": "m^3"},
+            ),
+            "area": (
+                "rho",
+                self.area,
+                {"long_name": "poloidal cross-section area", "units": "m^2"},
+            ),
+            "inverse_aspect_ratio": (
+                "rho",
+                self.inverse_aspect_ratio,
+                {"long_name": "inverse aspect ratio"},
+            ),
+        }
+        if self.safety_factor is not None:
+            variables["safety_factor"] = (
+                "rho",
+                self.safety_factor,
+                {"long_name": "safety factor q"},
+            )
+            variables["rotational_transform"] = (
+                "rho",
+                1.0 / self.safety_factor,
+                {"long_name": "rotational transform iota"},
+            )
+        if self.major_radius is not None:
+            variables["major_radius"] = (
+                "rho",
+                self.major_radius,
+                {"long_name": "major radius", "units": "m"},
+            )
+        if self.field_strength is not None and self.surface_weight is not None:
+            variables["trapped_fraction"] = (
+                "rho",
+                self.trapped_fraction,
+                {"long_name": "trapped fraction"},
+            )
+        return xr.Dataset(
+            variables,
+            coords={"rho": ("rho", self.rho, {"long_name": "rho_pol"})},
+            attrs={"rho_edges": self.rho_edges},
+        )
 
     def surface_average(self, values) -> np.ndarray:
         """Return the flux-surface average of ``values`` given at the field points."""

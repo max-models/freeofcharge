@@ -176,3 +176,22 @@ def test_rotational_transform_is_one_over_q(solovev):
     )
     bare = FluxSurfaces(np.linspace(0.0, 1.0, 3), np.zeros(2), np.zeros(2), np.zeros(2))
     assert bare.rotational_transform is None
+
+
+def test_flux_surfaces_convert_to_a_dataset(solovev):
+    surfaces = solovev.flux_surfaces(np.linspace(0.0, 1.0, 5), resolution=50)
+    shells = surfaces.to_dataset()
+    np.testing.assert_allclose(shells.rho, surfaces.rho)
+    np.testing.assert_allclose(shells.attrs["rho_edges"], surfaces.rho_edges)
+    np.testing.assert_allclose(shells.volume, surfaces.volume)
+    np.testing.assert_allclose(
+        shells.rotational_transform, surfaces.rotational_transform
+    )
+    np.testing.assert_allclose(shells.trapped_fraction, surfaces.trapped_fraction)
+    assert shells.volume.attrs["units"] == "m^3"
+    bare = FluxSurfaces(np.linspace(0.0, 1.0, 3), np.zeros(2), np.zeros(2), np.zeros(2))
+    assert set(bare.to_dataset().data_vars) == {
+        "volume",
+        "area",
+        "inverse_aspect_ratio",
+    }

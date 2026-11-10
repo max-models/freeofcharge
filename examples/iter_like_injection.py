@@ -74,7 +74,7 @@ print(
     f"driven current {steady.driven_current / 1e6:.2f} MA, fast-ion energy {steady.stored_energy / 1e6:.2f} MJ"
 )
 
-with plasma_plots.figure(1, 3, figsize=(13, 3.8)) as fig:
+with plasma_plots.figure(2, 2, figsize=(10, 7)) as fig:  # the fourth panel stays empty
     shine.plasma.plot.lineout(x="ne0", ax=fig[0])
     fig[0].set_yscale("log")
     heating.plasma.plot.profiles(x="rho", over="species", ax=fig[1])

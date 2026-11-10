@@ -91,7 +91,7 @@ shine = xr.DataArray(
     attrs={"long_name": "shine-through", "units": "%"},
 )
 
-with plasma_plots.figure(2, 3, figsize=(13, 7)) as fig:
+with plasma_plots.figure(3, 2, figsize=(10, 10)) as fig:
     shine.plasma.plot.profiles(x="ne0", over="code", ax=fig[0])
     power.plasma.plot.profiles(x="rho", over="code", ax=fig[1])
     density.plasma.plot.profiles(x="rho", over="code", ax=fig[2])

@@ -9,10 +9,14 @@ The site in `docs/` is built with [Astro](https://astro.build/) and
 - **Hand-written pages** in `docs/src/content/docs/`, as Markdown or MDX.
 - **Examples**, converted from the Jupyter notebooks in `tutorials/` by `starlight-notebooks`
   (the `section` setting in `docs/package.json` publishes them under `examples/`). Each
-  notebook is executed and its outputs (text, images, tables) are written into an MDX page.
+  notebook is executed and its outputs (text, figures, tables) are written into an MDX page.
+  The figures are drawn with [plasma-plots](https://max-models.github.io/plasma-plots/) and
+  its Plotly backend (`plasma_plots.set_backend("plotly")` in the first cell), so the page
+  embeds them interactively, in the site's light and dark colours.
 - **Example scripts**, a "Scripts" group of the Examples, built from the Python scripts in
   `examples/` by `docs/tools/examples.py`. Each page shows the module docstring, the complete
-  source file, and its Matplotlib plots.
+  source file, and its figures, converted to web figures (`*.plotly.json`, with a picture for
+  each in light and dark mode) and embedded with the theme's `PlotlyFigure`.
 - **API reference**, generated from the docstrings by
   [starlight-pydocs](https://ewels.github.io/starlight-pydocs/), one page per module.
 
@@ -28,14 +32,16 @@ change them there, and update the version in `docs/package.json` and
 ## Requirements
 
 - Node 22 or newer.
-- The package installed with the `docs` extra: `pip install -e ".[docs]"`.
+- The package installed with the `docs` extra: `pip install -e ".[docs]"`. The pictures of the
+  example scripts' figures need kaleido's browser (`plotly_get_chrome` if none is installed);
+  without one the figures are still embedded, only without a picture while they load.
 
 ## Commands
 
 ```bash
 make docs-install     # npm packages and the Python docs extra
 make docs-notebooks   # execute tutorials/*.ipynb and convert them to pages
-make docs-examples    # run examples/*.py and publish their plots
+make docs-examples    # run examples/*.py and publish their figures
 make docs-dev         # live preview at http://localhost:4321/freeofcharge/
 make docs-build       # the static site in docs/dist, as in CI
 make docs-preview     # serve docs/dist
@@ -63,5 +69,7 @@ Math in `$...$` and `$$...$$` is rendered with KaTeX.
 ## Writing example scripts
 
 Put a Python script in `examples/` with a module docstring. Its first line becomes the page
-title and the rest becomes the description. Leave Matplotlib figures open at the end of the
-script so the docs builder can save them as plots. The complete script is shown on the page.
+title and the rest becomes the description. Draw the figures with plasma-plots
+(`plasma_plots.figure` and the `.plasma.plot` accessors) and leave them open at the end of the
+script: the docs builder converts every open figure to a web figure and embeds it. The complete
+script is shown on the page.

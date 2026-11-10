@@ -142,6 +142,13 @@ def test_slowing_down_conserves_the_absorbed_power(equilibrium):
         np.abs(steady.current_density) <= np.abs(steady.fast_ion_current_density)
     )
     assert steady.stored_energy > 0.0
+    profiles = steady.to_dataset(surfaces)
+    np.testing.assert_allclose(
+        profiles.heating_density.sel(species="ions"),
+        steady.ion_heating / surfaces.volume,
+    )
+    assert profiles.heating_density.attrs["units"] == "W/m^3"
+    assert "heating_density" not in steady.to_dataset()
 
 
 def test_slowing_down_needs_the_same_shells(equilibrium):

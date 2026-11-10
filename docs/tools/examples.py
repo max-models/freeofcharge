@@ -1,4 +1,4 @@
-"""Build the example script pages from Python scripts and their Matplotlib figures."""
+"""Build the example script pages from Python scripts and their figures, as web figures."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ import re
 import runpy
 import shutil
 import sys
+import warnings
 from pathlib import Path
 
 DOCS = Path(__file__).resolve().parents[1]
@@ -24,6 +25,12 @@ SOURCES = ROOT / "examples"
 # the "Scripts" group of the Examples section, next to the notebook pages in examples/
 CONTENT = DOCS / "src" / "content" / "docs" / "example-scripts"
 PUBLIC = DOCS / "public" / "example-scripts"
+# site-root path of PUBLIC; the PlotlyFigure component adds the base path
+URL = "/example-scripts"
+PLOTLY_FIGURE = (
+    "import PlotlyFigure from "
+    "'@max-models/starlight-theme/components/PlotlyFigure.astro';"
+)
 
 
 def source_fence(code: str) -> str:
@@ -32,6 +39,40 @@ def source_fence(code: str) -> str:
     while ticks in code:
         ticks += "`"
     return f"{ticks}python\n{code.rstrip()}\n{ticks}"
+
+
+def figure_alt(fig, fallback: str) -> str:
+    """A text alternative for a figure: its title, or the titles of its panels."""
+    titles = [ax.get_title() for ax in fig.axes if ax.get_title()]
+    panels = ", ".join(dict.fromkeys(titles))  # each once, in order
+    return fig.get_suptitle() or (panels if len(titles) <= 6 else "") or fallback
+
+
+def web_figure(fig, stem: Path, alt: str) -> list[str]:
+    """Write a Matplotlib figure as a web figure ``<stem>.plotly.json`` with its posters.
+
+    The figure is converted with plasma-plots (the same conversion as ``backend="plotly"``),
+    so the page embeds it interactively in the site's colours; the posters (``<stem>.png`` and
+    ``<stem>.dark.png``) are shown until it has loaded. Returns the attributes of the
+    ``PlotlyFigure`` tag.
+    """
+    from plasma_plots.plotly_backend import save_posters
+    from plasma_plots.plotting import PlotResult
+
+    result = PlotResult(fig).to_plotly()
+    result.save(f"{stem}.plotly.json", alt=alt)
+    attributes = [f'src="{URL}/{stem.parent.name}/{stem.name}.plotly.json"']
+    try:
+        posters = save_posters(result.fig, stem)
+    except Exception as error:  # noqa: BLE001  (kaleido or its browser missing)
+        warnings.warn(f"{stem.name}: no posters written: {error}", stacklevel=2)
+        posters = []
+    for poster in posters:
+        name = Path(poster).name
+        attribute = "posterDark" if name.endswith(".dark.png") else "poster"
+        attributes.append(f'{attribute}="{URL}/{stem.parent.name}/{name}"')
+    attributes.append(f"alt={json.dumps(alt)}")
+    return attributes
 
 
 def build_example(source: Path, order: int) -> tuple[str, str]:
@@ -62,11 +103,10 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
         os.chdir(previous)
     plots = []
     for index, number in enumerate(plt.get_fignums(), start=1):
-        filename = f"plot-{index}.png"
-        plt.figure(number).savefig(output / filename, dpi=150, bbox_inches="tight")
-        plots.append(
-            f"![Plot {index} from {title}](/freeofcharge/example-scripts/{slug}/{filename})"
-        )
+        fig = plt.figure(number)
+        alt = figure_alt(fig, f"Plot {index} of {title}")
+        attributes = web_figure(fig, output / f"plot-{index}", alt)
+        plots.append(f"<PlotlyFigure {' '.join(attributes)} />")
     plt.close("all")
     page = [
         "---",
@@ -75,6 +115,8 @@ def build_example(source: Path, order: int) -> tuple[str, str]:
         "sidebar:",
         f"  order: {order}",
         "---",
+        "",
+        PLOTLY_FIGURE if plots else "",
         "",
         sanitize_markdown(description) if description else "",
         "",
@@ -107,9 +149,8 @@ def main() -> None:
     (CONTENT / "index.md").write_text(
         "---\ntitle: Scripts\ndescription: Complete Python scripts and their plots.\n"
         "sidebar:\n  order: 0\n---\n\n"
-        "Complete Python scripts are listed below. Each page shows the script and its plots.\n\n"
-        + "\n".join(listing)
-        + "\n"
+        "Complete Python scripts are listed below. Each page shows the script and its plots, "
+        "interactive and in the site's colours.\n\n" + "\n".join(listing) + "\n"
     )
 
 
