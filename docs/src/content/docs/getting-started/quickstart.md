@@ -5,8 +5,8 @@ description: Deposit a neutral beam in a tokamak plasma, slow down its fast ions
 
 First, ensure that `freeofcharge` is [installed](/freeofcharge/getting-started/installation/).
 
-A 16.5 MW beam of 1 MeV deuterium atoms, tangent to `R = 5.3 m`, in an ITER-sized
-equilibrium with a deuterium plasma of 1e20 m^-3 and 20 keV in the centre and 2 % helium:
+A 16.5 MW beam of 1 MeV deuterium atoms, tangent to $R = 5.3$ m, in an ITER-sized
+equilibrium with a deuterium plasma of $10^{20}\,\mathrm{m^{-3}}$ and 20 keV in the centre and 2 % helium:
 
 ```python
 import astropy.units as u
@@ -56,7 +56,7 @@ for energies and temperatures (which may also be given in K) and rad for angles,
 raises an error.
 
 1. `Equilibrium.solovev(R0, a, kappa, B0)` is an analytic equilibrium; `Plasma.parabolic`
-   gives parabolic density and temperature profiles in `rho = sqrt(psi_n)`, with each ion's
+   gives parabolic density and temperature profiles in $\rho = \sqrt{\psi_n}$, with each ion's
    share of the electron density.
 2. `NeutralBeam.gaussian` draws the markers, streams of atoms with a weight in atoms per
    second, about the axis from `tangential_injection`.

@@ -4,8 +4,8 @@ The layout (format ``(6a8, 3i4)`` then ``(5e16.9)``): a header line ending in
 ``nw nh``; 20 scalars (``rdim zdim rcentr rleft zmid``, ``rmaxis zmaxis simag
 sibry bcentr``, ``current simag - rmaxis -``, ``zmaxis - sibry - -``); the
 profiles ``fpol pres ffprim pprime`` on ``nw`` points uniform in flux from the
-axis to the boundary; ``psirz`` with R varying fastest; ``qpsi``; a line
-``nbbbs limitr``; the boundary and the limiter as interleaved ``(R, Z)`` pairs.
+axis to the boundary; ``psirz`` with $R$ varying fastest; ``qpsi``; a line
+``nbbbs limitr``; the boundary and the limiter as interleaved $(R, Z)$ pairs.
 Numbers may run together (``1.0e+00-2.0e+00``), so they are read by pattern,
 not by splitting on spaces.
 """

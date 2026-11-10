@@ -1,15 +1,15 @@
-"""Beam-stopping cross sections of fast hydrogen atoms in a plasma.
+r"""Beam-stopping cross sections of fast hydrogen atoms in a plasma.
 
-A neutral beam is attenuated as ``dI/ds = -n_e sigma_s I``, with the effective
-stopping cross section ``sigma_s`` of all ionising channels (ionisation by
+A neutral beam is attenuated as $dI/ds = -n_e \sigma_s I$, with the effective
+stopping cross section $\sigma_s$ of all ionising channels (ionisation by
 electrons and ions, charge exchange, and their multi-step paths through excited
 states). A stopping model is a callable
 
 ``sigma_s(energy_per_amu, ne, te, ion_densities, ion_masses, ion_charges)``
 
-of the beam energy per nucleon [eV], the electron density [m^-3] and
-temperature [eV], and the density [m^-3], mass number and charge number of
-each ion species, returning ``sigma_s`` [m^2] on the broadcast shape of the
+of the beam energy per nucleon [eV], the electron density [$\mathrm{m^{-3}}$] and
+temperature [eV], and the density [$\mathrm{m^{-3}}$], mass number and charge number of
+each ion species, returning $\sigma_s$ [$\mathrm{m^2}$] on the broadcast shape of the
 arrays.
 """
 
@@ -44,7 +44,7 @@ class StoppingModel(Protocol):
         ion_mass_numbers: Sequence[int],
         ion_charges: Sequence[int],
     ) -> Any:
-        """Return ``sigma_s`` [m^2]."""
+        r"""Return $\sigma_s$ [$\mathrm{m^2}$]."""
         ...
 
 
@@ -53,16 +53,16 @@ class ConstantStopping:
     """A constant stopping cross section, for tests and estimates."""
 
     sigma: float = unit_field("m^2")
-    """The cross section [m^2], or a quantity such as ``"1e-20 m^2"``."""
+    r"""The cross section [$\mathrm{m^2}$], or a quantity such as ``"1e-20 m^2"``."""
 
     def __post_init__(self) -> None:
-        """Convert a cross section given as a quantity to m^2."""
+        r"""Convert a cross section given as a quantity to $\mathrm{m^2}$."""
         convert_units(self)
 
     def __call__(
         self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
     ) -> Any:
-        """Return ``sigma`` on the broadcast shape of the arguments."""
+        r"""Return $\sigma$ on the broadcast shape of the arguments."""
         shape = np.broadcast_shapes(
             np.shape(energy_per_amu), np.shape(ne), np.shape(te)
         )
@@ -334,19 +334,19 @@ _E_MAX_KEV = 10000.0
     ),
 )
 class SuzukiStopping:
-    """Suzuki's fit of the stopping cross section of H, D, T beams.
+    r"""Suzuki's fit of the stopping cross section of H, D, T beams.
 
     Valid for 10 keV/amu to 10 MeV/amu, plasmas of H, D or T with He, B, C, N,
-    O or Fe impurities in the Z_eff ranges of the fit. A hydrogen species is
+    O or Fe impurities in the $Z_\mathrm{eff}$ ranges of the fit. A hydrogen species is
     picked by its mass number (1 to 3); with several, their cross sections are
     averaged with their densities.
 
     The paper fits 10 to 100 and 100 to 10000 keV/amu separately (its tables 3
     and 2), and the two fits do not meet at 100 keV/amu: they differ there by a
-    few per cent, with a sign that depends on T_e (+1.7 % at 1 keV and -4.4 %
-    at 10 keV, for 5e19 m^-3). The coefficients agree with ASCOT5 and STELLOPT,
-    so the step is in the published fit. Within a factor ``blend`` of 100
-    keV/amu, ``log sigma`` is interpolated linearly in ``log E`` between the
+    few per cent, with a sign that depends on $T_e$ (+1.7 % at 1 keV and -4.4 %
+    at 10 keV, for $5 \times 10^{19}\,\mathrm{m^{-3}}$). The coefficients agree with
+    ASCOT5 and STELLOPT, so the step is in the published fit. Within a factor ``blend`` of 100
+    keV/amu, $\log\sigma$ is interpolated linearly in $\log E$ between the
     two fits, which makes the cross section continuous; ``blend=1`` gives the
     fits as published.
     """
@@ -380,7 +380,7 @@ class SuzukiStopping:
     def _fit(
         self, e_kev, ne, te, ion_densities, ion_mass_numbers, ion_charges, low
     ) -> Any:
-        """Return ``sigma_s`` [m^2] from the low-energy table where ``low``."""
+        r"""Return $\sigma_s$ [$\mathrm{m^2}$] from the low-energy table where ``low``."""
         ne = xp.asarray(ne, dtype=float)
         log_e = xp.log(e_kev)
         n19 = ne * 1.0e-19
@@ -456,7 +456,7 @@ class SuzukiStopping:
     def __call__(
         self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
     ) -> Any:
-        """Return ``sigma_s`` [m^2]; raise ValueError outside the fit."""
+        r"""Return $\sigma_s$ [$\mathrm{m^2}$]; raise ValueError outside the fit."""
         e_kev = xp.asarray(energy_per_amu, dtype=float) * 1.0e-3
         if xp.any((e_kev < _E_MIN_KEV) | (e_kev >= _E_MAX_KEV)):
             raise ValueError(
@@ -496,13 +496,13 @@ _E = 1.602176634e-19
     references=("OpenCR `hydrogen/atomic/basic`, `effective_rate:H(n=1)>H+`",),
 )
 class ElectronCRStopping:
-    """The electron-impact part of the stopping, from OpenCR's collisional-radiative model.
+    r"""The electron-impact part of the stopping, from OpenCR's collisional-radiative model.
 
     A fast atom is ionized by the plasma electrons, directly and through its
     excited levels, at OpenCR's collisional-radiative ionization coefficient
-    ``S_CR(T_e, n_e)`` of ``hydrogen/atomic/basic`` (``opencr``, the ``cr``
+    $S_\mathrm{CR}(T_e, n_e)$ of ``hydrogen/atomic/basic`` (``opencr``, the ``cr``
     extra). The electrons are much faster than the beam, so the cross section
-    per electron is ``sigma_e = S_CR / v_beam``. The excited levels here are
+    per electron is $\sigma_e = S_\mathrm{CR} / v_\mathrm{beam}$. The excited levels here are
     populated by electrons only: proton impact, which populates them in a
     fusion plasma and dominates the stopping above about 30 keV/amu, needs
     proton-impact data for H(n) that OpenCR does not have yet. So this is the
@@ -512,7 +512,7 @@ class ElectronCRStopping:
     Args:
         temperatures: The electron temperatures (eV, or quantities in eV or K)
             of the table.
-        densities: The electron densities (m^-3, or quantities) of the table.
+        densities: The electron densities ($\mathrm{m^{-3}}$, or quantities) of the table.
         n_max: The levels of the atomic model.
     """
 
@@ -522,7 +522,7 @@ class ElectronCRStopping:
         densities: Sequence[float] = tuple(np.geomspace(1e18, 1e21, 7)),
         n_max: int = 10,
     ) -> None:
-        """Tabulate ``S_CR`` with OpenCR."""
+        r"""Tabulate $S_\mathrm{CR}$ with OpenCR."""
         temperatures = to_unit(temperatures, "eV", "temperatures")
         densities = to_unit(densities, "m^-3", "densities")
         try:
@@ -545,7 +545,7 @@ class ElectronCRStopping:
     def __call__(
         self, energy_per_amu, ne, te, ion_densities, ion_mass_numbers, ion_charges
     ) -> Any:
-        """Return ``sigma_e = S_CR(T_e, n_e) / v_beam`` [m^2]."""
+        r"""Return $\sigma_e = S_\mathrm{CR}(T_e, n_e) / v_\mathrm{beam}$ [$\mathrm{m^2}$]."""
         energy = np.asarray(energy_per_amu, dtype=float)
         speed = np.sqrt(2.0 * energy * _E / _AMU)
         rate = self.table(

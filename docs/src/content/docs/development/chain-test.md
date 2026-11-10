@@ -16,7 +16,7 @@ that a release of one package that no longer fits the others shows up.
 - **The interfaces between them**:
   - species named by formula (`"e"`, `"D2"`, `"D"`, `"D2+"` in wellbalanced) and the
     charge states in plasmacoll's order (`"-"`, `"0"`, `"+"`, the neutral share second);
-  - units: temperatures in eV, not K; the chain's Bohm flux from `T_e` in eV against
+  - units: temperatures in eV, not K; the chain's Bohm flux from $T_e$ in eV against
     wellbalanced's D2+ wall loss; marker energies in eV and weights in atoms/s that carry
     the beam power;
   - shapes: one divergence and transmitted share per perveance, `(N, 3)` positions and

@@ -1,10 +1,10 @@
 r"""3D equilibria from DESC (github.com/PlasmaControl/DESC), the optional extra ``desc``.
 
-DESC's ``(R, phi, Z)`` is right-handed and ``zeta = phi``, so a Cartesian point
-is ``(R cos phi, R sin phi, Z)``. The inverse map is DESC's own
+DESC's $(R, \varphi, Z)$ is right-handed and $\zeta = \varphi$, so a Cartesian point
+is $(R\cos\varphi, R\sin\varphi, Z)$. The inverse map is DESC's own
 ``map_coordinates`` (Newton iterations in flux coordinates); points it cannot
 reach lie outside the last closed surface. The field is DESC's ``B``, in the
-``(R, phi, Z)`` basis.
+$(R, \varphi, Z)$ basis.
 """
 
 from __future__ import annotations
@@ -94,9 +94,9 @@ class DESCEquilibrium:
         return self._bounds
 
     def flux_coordinates(self, points):
-        """Return ``(rho, theta, zeta)`` of Cartesian ``points`` ``(..., 3)``.
+        r"""Return $(\rho, \theta, \zeta)$ of Cartesian ``points`` ``(..., 3)``.
 
-        ``rho`` is 1 plus the residual of the inverse map over the minor radius
+        $\rho$ is 1 plus the residual of the inverse map over the minor radius
         for points outside the last closed surface.
         """
         points = xp.to_numpy(xp.asarray(points, dtype=float))
@@ -135,7 +135,7 @@ class DESCEquilibrium:
     # ------------------------------------------------------------------
 
     def rho_at(self, points):
-        """Return ``rho`` at Cartesian ``points`` ``(..., 3)``."""
+        r"""Return $\rho$ at Cartesian ``points`` ``(..., 3)``."""
         return xp.asarray(self.flux_coordinates(points)[0])
 
     def inside_at(self, points):
@@ -147,7 +147,7 @@ class DESCEquilibrium:
         return xp.ones(xp.asarray(points).shape[:-1], dtype=bool)
 
     def field_at(self, points):
-        """Return ``B`` [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``.
+        r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``.
 
         Points outside the last closed surface get the field on it.
         """
@@ -165,7 +165,11 @@ class DESCEquilibrium:
         return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
 
     def _shape(self, rho, theta, zeta):
-        """Return ``R``, ``dR/drho``, ``dR/dtheta``, ``dZ/drho``, ``dZ/dtheta``, |B|, iota."""
+        r"""Return the surface shape and the field at flux coordinates.
+
+        $R$, $\partial_\rho R$, $\partial_\theta R$, $\partial_\rho Z$, $\partial_\theta Z$,
+        $|B|$ and $\iota$.
+        """
         names = ["R", "R_r", "R_t", "Z_r", "Z_t", "|B|"]
         data = self._compute(names, rho, theta, zeta)
         # iota is a surface quantity: on whole surfaces, then per point

@@ -1,16 +1,16 @@
-"""ITER-like injection.
+r"""ITER-like injection.
 
 A 1 MeV deuterium beam in an ITER-like plasma: shine-through, heating, current.
 
-One 16.5 MW beam of 1 MeV atoms, tangent to R = 5.3 m, enters a Solov'ev
-equilibrium of ITER's size (R0 = 6.2 m, outboard minor radius 1.8 m, elongation
+One 16.5 MW beam of 1 MeV atoms, tangent to $R = 5.3$ m, enters a Solov'ev
+equilibrium of ITER's size ($R_0 = 6.2$ m, outboard minor radius 1.8 m, elongation
 1.7, 5.3 T) filled with deuterium and 2% helium. Each marker is a straight line
 attenuated with Suzuki's stopping cross sections; the fast ions it leaves slow
 down on their flux surface (Stix), heating mostly the electrons at this energy
 and driving a current along the field. The density scan shows why a beam may
 only be switched on above a minimum density: the shine-through onto the inboard
-wall falls from 40% of the power at a central density of 1.5e19 m^-3 to 4% at
-5e19 and below 0.1% at 1e20. The Solov'ev shape is wider
+wall falls from 40% of the power at a central density of $1.5\times10^{19}\,\mathrm{m^{-3}}$ to 4% at
+$5\times10^{19}$ and below 0.1% at $10^{20}$. The Solov'ev shape is wider
 inboard than ITER's, and the trapped-electron correction of the current is a
 fit still to be checked, so the numbers show what the model computes rather
 than ITER's.

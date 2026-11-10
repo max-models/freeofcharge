@@ -65,7 +65,19 @@ paragraph its description. Cell tags control the output:
 | `remove-output`    | the outputs are left out                 |
 | `raises-exception` | an error output is shown, not a failure  |
 
-Math in `$...$` and `$$...$$` is rendered with KaTeX.
+Math in `$...$` and `$$...$$` is rendered with KaTeX. Write formulas and symbols as math,
+not as code: `$\rho = \sqrt{\psi_n}$`, not `` `rho = sqrt(psi_n)` ``; code font is for what a
+reader types (function and parameter names).
+
+## Formulas in figures
+
+The notebooks call `plasma_plots.set_math("latex")` after `set_backend("plotly")`, and the
+example scripts' figures are converted the same way: labels written with Matplotlib's mathtext
+(`ax.set_xlabel("$R$ [m]")`, `long_name=r"$\rho_\mathrm{pol}$"`) are typeset as LaTeX by
+MathJax on the page, like the KaTeX math of the text. A label is typeset as one formula, so
+keep a label's math in `$...$` and its words outside. Units stay plain strings (`"W/m^3"`); the
+labels show their exponents as superscripts. The pictures of the example scripts' figures are
+drawn by kaleido, which loads MathJax from a CDN.
 
 ## Writing example scripts
 
