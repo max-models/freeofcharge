@@ -38,7 +38,7 @@ docs-notebooks:  ## execute the changed notebooks and convert all of them (FORCE
 	$(NOTEBOOKS) execute $(if $(FORCE),--force,)
 	$(NOTEBOOKS) convert
 
-docs-examples:  ## run the example scripts and generate pages with their plots
+docs-examples:  ## run the example scripts and generate pages with their figures (web figures)
 	$(PYTHON) docs/tools/examples.py
 
 docs-hero:  ## redraw the home page figure (docs/src/assets/hero.svg)

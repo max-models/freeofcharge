@@ -39,8 +39,9 @@ What is modelled, and what is not:
   re-ionization in the duct, and beam halos.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
+import plasma_plots
+import xarray as xr
 
 import freeofcharge as foc
 from freeofcharge import chain
@@ -129,60 +130,88 @@ print(
     f"shine-through {100 * shine_fraction[i]:.1f} %"
 )
 
-fig, axes = plt.subplots(2, 2, figsize=(11, 7.5), layout="constrained")
-ax = axes[0, 0]
-ax.plot(RF_POWER / 1e3, current_density, "o-")
-ax.set_xlabel("RF power [kW]")
-ax.set_ylabel("D- current density [A/m^2]")
-ax.set_title("1. Source (wellbalanced)")
-ax.text(
-    0.04,
-    0.96,
-    f"T_e = {sources[0].electron_temperature:.1f} eV at every power;\n"
-    f"n_e from {sources[0].electron_density:.1e} to "
-    f"{sources[-1].electron_density:.1e} m^-3",
-    transform=ax.transAxes,
-    va="top",
-)
-ax = axes[0, 1]
-ax.plot(PERVEANCE, 1e3 * curve, "o-", label="slit gap (tree-d-3d)")
-ax.plot(perveance, 1e3 * divergence / shrink, "s", color="C1", label="operating points")
-ax.set_xlabel("normalized perveance j / j_CL")
-ax.set_ylabel("rms divergence at extraction [mrad]")
-ax.set_title("2. Extraction optics: the V-curve")
-ax.legend()
-ax = axes[1, 0]
-ax.plot(pi_fine / 1e20, 100 * neutral_fine, label="plasmacoll")
-ax.plot(
-    pi_fine[::25] / 1e20,
-    100 * chain.neutral_fraction_closed_form(pi_fine[::25]),
-    "o",
-    mfc="none",
-    label="closed form",
-)
-ax.axvline(best_pi / 1e20, color="0.6", ls=":")
-ax.set_xlabel("neutralizer line density [1e20 m^-2]")
-ax.set_ylabel("neutral share [%]")
-ax.set_title("3. Gas neutralizer")
-ax.legend()
-ax = axes[1, 1]
-ax.plot(RF_POWER / 1e3, 1e3 * divergence, "o-", label="divergence after acceleration")
-ax.set_xlabel("RF power [kW]")
-ax.set_ylabel("beam divergence [mrad]")
-ax.set_title("4. Beam line")
-twin = ax.twinx()
-twin.plot(RF_POWER / 1e3, 100 * transmission, "s--", color="C1")
-twin.set_ylabel("duct transmission [%]", color="C1")
-
-fig, axes = plt.subplots(1, 3, figsize=(14, 4), layout="constrained")
-for ax, values, label, scale in (
-    (axes[0], delivered, "neutral power delivered [MW]", 1e-6),
-    (axes[1], driven, "driven current [MA]", 1e-6),
-    (axes[2], shone, "shine-through onto the wall [MW]", 1e-6),
-):
-    mesh = ax.contourf(LINE_DENSITY / 1e20, RF_POWER / 1e3, values * scale, levels=14)
-    fig.colorbar(mesh, ax=ax, label=label)
-    ax.plot(LINE_DENSITY[k] / 1e20, RF_POWER[i] / 1e3, "w*", ms=12)
+with plasma_plots.figure(2, 2, figsize=(11, 7.5)) as fig:
+    ax = fig[0]
+    ax.plot(RF_POWER / 1e3, current_density, "o-")
+    ax.set_xlabel("RF power [kW]")
+    ax.set_ylabel("D- current density [A/m^2]")
+    ax.set_title("1. Source (wellbalanced)")
+    ax.text(
+        0.04,
+        0.96,
+        f"T_e = {sources[0].electron_temperature:.1f} eV at every power;\n"
+        f"n_e from {sources[0].electron_density:.1e} to "
+        f"{sources[-1].electron_density:.1e} m^-3",
+        transform=ax.transAxes,
+        va="top",
+    )
+    ax = fig[1]
+    ax.plot(PERVEANCE, 1e3 * curve, "o-", label="slit gap (tree-d-3d)")
+    ax.plot(
+        perveance, 1e3 * divergence / shrink, "s", color="C1", label="operating points"
+    )
+    ax.set_xlabel("normalized perveance j / j_CL")
+    ax.set_ylabel("rms divergence at extraction [mrad]")
+    ax.set_title("2. Extraction optics: the V-curve")
+    ax.legend()
+    ax = fig[2]
+    ax.plot(pi_fine / 1e20, 100 * neutral_fine, label="plasmacoll")
+    ax.plot(
+        pi_fine[::25] / 1e20,
+        100 * chain.neutral_fraction_closed_form(pi_fine[::25]),
+        "o",
+        mfc="none",
+        label="closed form",
+    )
+    ax.axvline(best_pi / 1e20, color="0.6", ls=":")
     ax.set_xlabel("neutralizer line density [1e20 m^-2]")
-    ax.set_ylabel("RF power [kW]")
-axes[1].set_title("the star: most driven current")
+    ax.set_ylabel("neutral share [%]")
+    ax.set_title("3. Gas neutralizer")
+    ax.legend()
+    ax = fig[3]
+    ax.plot(
+        RF_POWER / 1e3, 1e3 * divergence, "o-", label="divergence after acceleration"
+    )
+    ax.set_xlabel("RF power [kW]")
+    ax.set_ylabel("beam divergence [mrad]")
+    ax.set_title("4. Beam line")
+    twin = ax.twinx()
+    twin.plot(RF_POWER / 1e3, 100 * transmission, "s--", color="C1")
+    twin.set_ylabel("duct transmission [%]", color="C1")
+
+scan = xr.Dataset(
+    {
+        "delivered": (
+            ("rf_power", "line_density"),
+            delivered / 1e6,
+            {"long_name": "neutral power delivered", "units": "MW"},
+        ),
+        "driven": (
+            ("rf_power", "line_density"),
+            driven / 1e6,
+            {"long_name": "driven current", "units": "MA"},
+        ),
+        "shone": (
+            ("rf_power", "line_density"),
+            shone / 1e6,
+            {"long_name": "shine-through onto the wall", "units": "MW"},
+        ),
+    },
+    coords={
+        "rf_power": (
+            "rf_power",
+            RF_POWER / 1e3,
+            {"long_name": "RF power", "units": "kW"},
+        ),
+        "line_density": (
+            "line_density",
+            LINE_DENSITY / 1e20,
+            {"long_name": "neutralizer line density", "units": "1e20 m^-2"},
+        ),
+    },
+)
+with plasma_plots.figure(2, 2, figsize=(11, 8)) as fig:  # the fourth panel stays empty
+    for ax, name in zip(fig, ("delivered", "driven", "shone"), strict=False):
+        scan[name].plasma.plot.slice(x="line_density", y="rf_power", ax=ax)
+        ax.plot(LINE_DENSITY[k] / 1e20, RF_POWER[i] / 1e3, "w*", ms=12)
+    fig[1].set_title("driven current: the star marks the most")

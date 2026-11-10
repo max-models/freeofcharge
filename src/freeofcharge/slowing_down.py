@@ -804,10 +804,17 @@ class SlowingDown:
     """Energy rate the ions still have when they join the thermal ions [W]."""
     """Share of the births on trapped orbits (zero orbit width)."""
 
-    def to_dataset(self) -> xr.Dataset:
-        """Return the profiles on the shell centres as an xarray dataset."""
+    def to_dataset(self, surfaces: FluxSurfaces | None = None) -> xr.Dataset:
+        """Return the profiles on the shell centres, with the heating density if ``surfaces``."""
         rho = 0.5 * (self.rho_edges[1:] + self.rho_edges[:-1])
         heating = np.stack([self.electron_heating, self.ion_heating])
+        densities = {}
+        if surfaces is not None:
+            densities["heating_density"] = (
+                ("species", "rho"),
+                heating / surfaces.volume,
+                {"long_name": "heating", "units": "W/m^3"},
+            )
         return xr.Dataset(
             {
                 "heating": (
@@ -815,6 +822,7 @@ class SlowingDown:
                     heating,
                     {"long_name": "heating", "units": "W"},
                 ),
+                **densities,
                 "fast_ion_density": (
                     "rho",
                     self.fast_ion_density,
