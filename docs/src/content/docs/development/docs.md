@@ -12,7 +12,8 @@ The site in `docs/` is built with [Astro](https://astro.build/) and
   notebook is executed and its outputs (text, figures, tables) are written into an MDX page.
   The figures are drawn with [plasma-plots](https://max-models.github.io/plasma-plots/) and
   its Plotly backend (`plasma_plots.set_backend("plotly")` in the first cell), so the page
-  embeds them interactively, in the site's light and dark colours.
+  embeds them interactively, in the site's light and dark colours. One figure per plot: a plot
+  that is the last expression of a cell is shown, an earlier one with `.show()`.
 - **Example scripts**, a "Scripts" group of the Examples, built from the Python scripts in
   `examples/` by `docs/tools/examples.py`. Each page shows the module docstring, the complete
   source file, and its figures, converted to web figures (`*.plotly.json`, with a picture for
@@ -69,7 +70,8 @@ Math in `$...$` and `$$...$$` is rendered with KaTeX.
 ## Writing example scripts
 
 Put a Python script in `examples/` with a module docstring. Its first line becomes the page
-title and the rest becomes the description. Draw the figures with plasma-plots
-(`plasma_plots.figure` and the `.plasma.plot` accessors) and leave them open at the end of the
-script: the docs builder converts every open figure to a web figure and embeds it. The complete
-script is shown on the page.
+title and the rest becomes the description. Draw the figures with plasma-plots (the
+`.plasma.plot` accessors, or a `plasma_plots.figure` block for a drawing of your own), one figure
+per plot rather than a grid of panels, which is too crowded on the page and on a phone, and leave
+them open at the end of the script: the docs builder converts every open figure to a web figure
+and embeds it. The complete script is shown on the page.
