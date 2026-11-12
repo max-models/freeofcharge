@@ -80,6 +80,38 @@ def test_from_file(example, tmp_path):
     np.testing.assert_allclose(loaded.bounds[1], example.bounds[1])
 
 
+def test_rho_and_field_at_once_and_symmetry(example):
+    _, points, field = _points(example, n=6, seed=1)
+    rho, both = example.rho_and_field_at(points)
+    np.testing.assert_allclose(rho, example.rho_at(points))
+    np.testing.assert_allclose(both, field, rtol=1e-6, atol=1e-9)
+    # stellarator symmetry: (x, y, z) -> (x, -y, -z) keeps rho, B_R flips, B_phi, B_Z stay
+    assert example.stellarator_symmetric
+    mirrored = points * np.array([1.0, -1.0, -1.0])
+    rho_m, field_m = example.rho_and_field_at(mirrored)
+    np.testing.assert_allclose(rho_m, rho, atol=1e-8)
+    np.testing.assert_allclose(field_m, field * np.array([-1.0, 1.0, 1.0]), atol=1e-6)
+
+
+def test_gridded(example):
+    from freeofcharge import GriddedEquilibrium
+
+    # coarse, to keep the sampling (about 2800 inversions) short: errors of a few 1e-2
+    gridded = GriddedEquilibrium(example, (16, 20, 16), r_range=(4.64, 6.21))
+    assert gridded.nfp == 5 and gridded.stellarator_symmetric
+    nodes, points, field = _points(example, n=40, seed=2)
+    plasma = nodes[:, 0] < 0.8
+    rho = np.asarray(gridded.rho_at(points))
+    # rho**2 is what is interpolated; rho itself has a cone on the axis, where a small
+    # error in rho**2 is a large one in rho
+    # on this coarse grid: rms about 7e-3, max about 3e-2 (it varies with the platform)
+    error2 = rho[plasma] ** 2 - nodes[plasma, 0] ** 2
+    assert np.sqrt(np.mean(error2**2)) < 0.015
+    assert np.max(np.abs(error2)) < 0.06
+    error = np.linalg.norm(np.asarray(gridded.field_at(points)) - field, axis=-1)
+    assert np.all(error[plasma] < 3e-2 * np.linalg.norm(field[plasma], axis=-1))
+
+
 def test_vmec_reads_desc_wout(example, tmp_path):
     """DESC's own wout export through the VMEC adapter: the same equilibrium."""
     pytest.importorskip("vmecpp")

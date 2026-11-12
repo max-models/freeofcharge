@@ -137,10 +137,18 @@ class PolarFEECEquilibrium:
 
     def field_at(self, points):
         r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, ``NaN`` outside."""
+        return self.rho_and_field_at(points)[1]
+
+    def rho_and_field_at(self, points):
+        r"""Return $\rho$ and $\mathbf{B}$ [T] at Cartesian ``points``, one inversion for both."""
         logical = self.logical_at(points)
         flat = logical.reshape(-1, 3)
         field = self.equilibrium.field(flat) if flat.shape[0] else flat.copy()
-        return xp.asarray(field.reshape(logical.shape))
+        rho = logical[..., 0]
+        return (
+            xp.asarray(np.where(np.isnan(rho), np.inf, rho)),
+            xp.asarray(field.reshape(logical.shape)),
+        )
 
     def _shape(self, rho, theta, zeta):
         r"""Return the surface shape and the field at flux coordinates.

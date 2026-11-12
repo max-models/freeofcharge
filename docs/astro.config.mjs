@@ -17,6 +17,7 @@ export default defineDocs({
 		labels: {
 			'freeofcharge.equilibrium': 'Equilibrium',
 			'freeofcharge.gvec_equilibrium': 'GVEC equilibria',
+			'freeofcharge.gridded_equilibrium': 'Gridded equilibria',
 			'freeofcharge.vmec_equilibrium': 'VMEC equilibria',
 			'freeofcharge.profiles': 'Plasma profiles',
 			'freeofcharge.beam': 'Beam markers',

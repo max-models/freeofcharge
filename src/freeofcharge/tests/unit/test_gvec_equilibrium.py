@@ -121,3 +121,24 @@ def test_flux_surfaces_match_gvec_volume(ellipse):
         ellipse.state.evaluate_profile("iota", surfaces.rho),
     )
     assert np.all(np.abs(surfaces.major_radius - 3.0) < 0.1)
+
+
+def test_rho_and_field_at_once(ellipse):
+    pos, field, rr, *_ = _gvec_points(
+        ellipse, np.array([0.2, 0.6]), np.linspace(0, 6, 3), np.linspace(0, 3, 3)
+    )
+    rho, both = ellipse.rho_and_field_at(pos)
+    np.testing.assert_allclose(rho, rr, atol=1e-8)
+    np.testing.assert_allclose(both, field, rtol=1e-7, atol=1e-10)
+
+
+def test_gridded(ellipse):
+    from freeofcharge import GriddedEquilibrium
+
+    gridded = GriddedEquilibrium(ellipse, (32, 16, 32))
+    assert gridded.nfp == ellipse.nfp
+    pos, field, rr, *_ = _gvec_points(
+        ellipse, np.array([0.3, 0.6, 0.8]), np.linspace(0, 6, 5), np.linspace(0, 3, 5)
+    )
+    np.testing.assert_allclose(gridded.rho_at(pos), rr, atol=1e-2)
+    np.testing.assert_allclose(gridded.field_at(pos), field, rtol=1e-2, atol=1e-2)
