@@ -155,3 +155,50 @@ def test_gridded_deposition_matches_the_direct_one(example):
     )
     np.testing.assert_allclose(on_grid.birth_rho, direct.birth_rho, atol=0.02)
     assert on_grid.to_dataset().rho.attrs["long_name"] == r"$\rho_\mathrm{tor}$"
+
+
+def test_vmec_reads_desc_wout(example, tmp_path):
+    """DESC's own wout export through the VMEC adapter: the same equilibrium."""
+    pytest.importorskip("vmecpp")
+    from desc.vmec import VMECIO
+
+    from freeofcharge.vmec_equilibrium import VMECEquilibrium
+
+    path = tmp_path / "wout_w7x.nc"
+    VMECIO.save(example.equilibrium, path, surfs=17, verbose=0)
+    vmec = VMECEquilibrium.from_wout(path)
+    nodes, points, field = _points(example, n=40, seed=1)
+    # 3e-6 from VMEC's 17 radial surfaces; 1e-7 at 33
+    np.testing.assert_allclose(vmec.rho_at(points), nodes[:, 0], atol=1e-5)
+    # 2.6e-4 at most, at any number of surfaces: the Fourier truncation of DESC's export
+    difference = np.linalg.norm(vmec.field_at(points) - field, axis=-1)
+    assert np.max(difference / np.linalg.norm(field, axis=-1)) < 1e-3
+
+
+def test_vmec_run_agrees_with_desc(example, tmp_path):
+    """VMEC++ on DESC's W7-X input (boundary, pressure, iota) against DESC's equilibrium.
+
+    The difference is that of the two equilibria, not of the adapters: it does not
+    shrink with VMEC's radial resolution (17 to 65 surfaces), and VMEC's axis lies
+    0.9 mm from DESC's at phi = 0 (rho about 2e-3 there).
+    """
+    vmecpp = pytest.importorskip("vmecpp")
+    from desc.vmec import VMECIO
+
+    from freeofcharge.vmec_equilibrium import VMECEquilibrium
+
+    path = tmp_path / "input.w7x"
+    VMECIO.write_vmec_input(example.equilibrium, str(path))
+    vmec_input = vmecpp.VmecInput.from_file(path)
+    vmec_input.ns_array = np.array([9, 17])
+    vmec_input.ftol_array = np.array([1e-10, 1e-12])
+    vmec_input.niter_array = np.array([10000, 20000])
+    vmec = VMECEquilibrium.from_input(vmec_input)
+    nodes, points, field = _points(example, n=40, seed=2)
+    rho = np.asarray(vmec.rho_at(points))
+    assert np.mean(np.abs(rho - nodes[:, 0])) < 5e-3
+    assert np.max(np.abs(rho - nodes[:, 0])) < 1.5e-2
+    difference = np.linalg.norm(vmec.field_at(points) - field, axis=-1)
+    difference /= np.linalg.norm(field, axis=-1)
+    assert np.mean(difference) < 1e-3
+    assert np.max(difference) < 4e-3
