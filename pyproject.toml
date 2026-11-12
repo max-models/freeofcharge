@@ -20,12 +20,13 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-  "cunumpy",
+  "cunumpy>=0.7.2",
   "maybempi>=0.1",
   "methodcard",
   "numpy",
   "plasmacoll>=0.5.0",
   "scipy",
+  "scope-profiler>=0.7.5",
   "simgeometry>=0.1.0",
   "xarray",
 ]
@@ -59,13 +60,19 @@ optional-dependencies.test = [
   "astropy",
   "freeofcharge[chain,coils,cr,gvec]",
   "methodcard[symbolic]",
+  "pyccel>2.0",
   "pytest",
   "pytest-cov",
 ]
 urls.Source = "https://github.com/max-models/freeofcharge"
 
+[project.entry-points."scope_profiler.opt_in_tags"]
+freeofcharge = "freeofcharge"
+
 [tool.setuptools]
 package-data."*" = [ "py.typed" ]
+# CUDA versions of the kernels (freeofcharge.kernels.catalog)
+package-data.freeofcharge = [ "kernels/*/*_cuda.cu" ]
 packages.find.where = [ "src" ]
 
 [tool.uv.sources]
@@ -93,7 +100,8 @@ lint.pydocstyle.convention = "google"
 
 [tool.pyright]
 include = [ "src" ]
-exclude = [ "**/tests" ]
+# the Pyccel kernels annotate in Pyccel's array dialect ("float[:]"), not Python typing
+exclude = [ "**/tests", "**/*_pyccel.py" ]
 pythonVersion = "3.10"
 typeCheckingMode = "standard"
 
