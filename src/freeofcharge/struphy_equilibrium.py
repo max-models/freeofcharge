@@ -117,11 +117,14 @@ class StruphyEquilibrium:
         _require_struphy()
         self.equilibrium = equilibrium
         self.domain = equilibrium.domain
+        numerical = type(equilibrium).__name__ in (
+            "DESCequilibrium",
+            "GVECequilibrium",
+        )
+        # DESC's and GVEC's radius is the root of the normalised toroidal flux; an
+        # analytic equilibrium's eta1 is a geometric radius
+        self.radial_coordinate = "toroidal" if numerical else "unspecified"
         if rho_inner is None:
-            numerical = type(equilibrium).__name__ in (
-                "DESCequilibrium",
-                "GVECequilibrium",
-            )
             rho_inner = float(equilibrium.params["rmin"]) if numerical else 0.0
         self.rho_inner = rho_inner
         self.tolerance = tolerance
