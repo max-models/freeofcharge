@@ -1,0 +1,10 @@
+{
+ "constellaration_boundary_id": "D2CGds64NiqPgdkgrt8MqV5",
+ "desc_coilset_id": "D8g9wcixnhFsjJTS38bbdxi",
+ "n_coils_per_half_period": 5,
+ "n_field_periods": 3,
+ "desc_metrics/normalized_coil_to_coil_min_distances/min": 0.6327821236622183,
+ "desc_metrics/normalized_coil_to_plasma_min_distances/min": 0.8597580353338545,
+ "desc_metrics/normalized_coil_curvatures/max": 3.994332451877272,
+ "desc_metrics/normalized_field_error/mean": 0.0027360058536810964
+}

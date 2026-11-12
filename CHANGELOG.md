@@ -7,6 +7,18 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Stellarator coils (`freeofcharge.coils`): `CoilSet` holds closed filaments with their
+  currents, read from a CoilStellaration coilset (`CoilSet.from_coilset`, through
+  plasma-plots, the new extra `coils`), from plasma-plots' coil Dataset or built as planar
+  circular coils. `CoilSet.field_at` is their Biot–Savart field (exact per straight
+  segment); `CoilField` is an equilibrium inside its last closed surface and the coils'
+  vacuum field outside, as one `MagneticEquilibrium`, with `jump` for the difference on the
+  boundary; `normal_field_error` is CoilStellaration's $|B_n|/|B|$ on a surface (0.290 % on
+  the sample in the tests, the dataset's 0.274 %). The coils as obstacles: `first_hit`
+  (lines into tubes around the filaments), `clearance` (segments to the filaments),
+  `blocked_fraction` (the share of a beam hitting a coil before the plasma) and
+  `injection_access` (a scan of tangential injection lines over tangency radius, toroidal
+  position and vertical angle).
 - The physical settings of the setup take astropy Quantities (`60 * u.keV`), strings
   (`"2.5 MW"`) or plain numbers in their documented units (SI, eV for energies and
   temperatures, rad for angles, Wb/rad for the flux), converted once with
