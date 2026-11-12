@@ -64,10 +64,21 @@ of their orbits: trapped ions carry none, and pitch-angle scattering is averaged
 the orbit (`freeofcharge.trapping`). The beam-driven current is the
 fast-ion current shielded by the electrons,
 $j = j_f\,[1 - Z_b / Z_\mathrm{eff}\,(1 - G)]$, with the trapped-electron correction $G$.
+
+On the shells of a 3D equilibrium (`FluxSurfaces.axisymmetric` False) the local
+part carries over unchanged: heating, fast-ion density and pressure per shell,
+the shell volumes from the 3D Jacobian. Two parts assume axisymmetry and are
+guarded: the orbit average (the bounce averages of `freeofcharge.trapping`,
+an error in 3D; use ``orbit_average=False``, the local pitch) and the
+trapped-electron correction of the current (Sauter's and Start and Cordey's fits
+are tokamak results; without an explicit correction the driven current is NaN
+in 3D, with a warning). The power balance $P_e + P_i + P_\mathrm{th} = P_\mathrm{birth}$
+holds in any geometry (`SlowingDown.power_balance`).
 """
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -796,6 +807,7 @@ class SlowingDown:
     thermalised_power: float = 0.0
     trapped_births: float = 0.0
     radial_coordinate: str = "poloidal"
+    birth_power: float = 0.0
     """Power to the electrons in each shell [W]."""
     """Power to the ions in each shell, while the ions are fast [W]."""
     r"""[$\mathrm{m^{-3}}$]."""
@@ -809,6 +821,14 @@ class SlowingDown:
     """Energy rate the ions still have when they join the thermal ions [W]."""
     """Share of the births on trapped orbits (zero orbit width)."""
     r"""The flux $\rho$ is the root of, the surfaces' (`freeofcharge.rho_coordinate`)."""
+    """Energy rate of the births [W], all ranks: what the heating and the
+    thermalised power share out."""
+
+    @property
+    def power_balance(self) -> float:
+        r"""Return $(P_e + P_i + P_\mathrm{th}) / P_\mathrm{birth} - 1$: zero but for roundoff."""
+        heating = float(np.sum(self.electron_heating) + np.sum(self.ion_heating))
+        return (heating + self.thermalised_power) / self.birth_power - 1.0
 
     def to_dataset(self, surfaces: FluxSurfaces | None = None) -> xr.Dataset:
         """Return the profiles on the shell centres, with the heating density if ``surfaces``."""
@@ -860,6 +880,7 @@ class SlowingDown:
                 "stored_energy": self.stored_energy,
                 "thermalised_power": self.thermalised_power,
                 "trapped_births": self.trapped_births,
+                "birth_power": self.birth_power,
             },
         )
 
@@ -872,11 +893,13 @@ class SlowingDown:
         "end_energy": r"E_\mathrm{end} = \min\!\left(\max(f_\mathrm{th}\, T_i,\ E_\mathrm{min}),\ E_0\right), \qquad f_\mathrm{th} = \texttt{thermal\_factor}, \quad E_\mathrm{min} = \texttt{minimum\_energy}",
         "speed_grid": r"v_i = v_0\, r^{i/(G-1)}, \qquad r = \max\!\left(\sqrt{E_\mathrm{end}/E_0},\ 10^{-4}\right)",
         "current": r"j = j_f \left(1 - \frac{Z_b}{Z_\mathrm{eff}}(1 - G)\right), \qquad I = \sum_k j_k A_k",
+        "balance": r"\sum_k \left(P_{e,k} + P_{i,k}\right) + P_\mathrm{th} = \sum_b w_b E_b",
     },
     assumptions=(
         r"$v_{Ti} \ll v \ll v_{Te}$ (not checked)",
         r"zero orbit width: slowing down on the birth surface; no losses, no charge exchange, no energy diffusion",
         r"$Z_b = 1$; $p_f$ an isotropic estimate; births with $\rho > 1$ take the plasma at $\rho = 1$",
+        r"on 3D shells: the local pitch only (no orbit average), and no trapped-electron correction unless one is given",
     ),
     references=(
         "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
@@ -900,9 +923,7 @@ def slow_down(
     orbit_average: bool = True,
     thermal_factor: float = 0.0,
     minimum_energy: float = 0.0,
-    trapped_electron_correction: TrappedElectronCorrection = (
-        sauter_trapped_electron_correction
-    ),
+    trapped_electron_correction: TrappedElectronCorrection | None = None,
     modes: int = 8,
     speed_points: int = 201,
     comm: MPI.Comm | None = None,
@@ -920,19 +941,28 @@ def slow_down(
         ln_lambda: One Coulomb logarithm for all species (a number or one
             per birth); each its own (`coulomb_logarithms`) if None.
         orbit_average: Carry the current of the orbits, trapped ions none and
-            scattering averaged over the orbit (`freeofcharge.trapping`);
-            if False, the local pitch with Gaffey's decay, as if the field were
-            uniform.
+            scattering averaged over the orbit (`freeofcharge.trapping`,
+            axisymmetric surfaces only: a ValueError in 3D); if False, the
+            local pitch with Gaffey's decay, as if the field were uniform.
         thermal_factor: The ions are thermal below ``thermal_factor`` $\times\, T_i$ ...
         minimum_energy: ... or below this energy [eV], whichever is higher; a
             quantity such as ``"1 keV"``.
-        trapped_electron_correction: $G$ per shell.
+        trapped_electron_correction: $G$ per shell; if None,
+            `sauter_trapped_electron_correction` on axisymmetric surfaces, and
+            in 3D none: the driven current is NaN, with a warning (pass a
+            correction to take the tokamak fits anyway).
         modes: Pitch modes of the orbit average.
         speed_points: Points of the speed integrals (equal steps in $\ln v$),
             odd.
         comm: Communicator over which the births are split; serial if None.
     """
     minimum_energy = to_unit(minimum_energy, "eV", "minimum_energy")
+    if orbit_average and not surfaces.axisymmetric:
+        raise ValueError(
+            "the orbit average uses the bounce averages of axisymmetric surfaces "
+            "(freeofcharge.trapping); on 3D surfaces pass orbit_average=False for the "
+            "local pitch"
+        )
     if not np.array_equal(surfaces.rho_edges, deposition.rho_edges):
         raise ValueError("the surfaces and the deposition have different shells")
     if "unspecified" not in (
@@ -1016,6 +1046,7 @@ def slow_down(
                 w * end_energy,
                 w * trapped,
                 w,
+                w * energy,
             ],
             axis=-1,
         ),
@@ -1025,8 +1056,22 @@ def slow_down(
     sums = xp.to_numpy(allreduce(sums, comm))
     volume = surfaces.volume
     zeff = xp.to_numpy(plasma.zeff(surfaces.rho))
-    g = np.asarray(trapped_electron_correction(surfaces, plasma))
     j_fast = _E * sums[:, 4] / volume
+    if trapped_electron_correction is None and not surfaces.axisymmetric:
+        warnings.warn(
+            "3D surfaces: the trapped-electron correction of the driven current "
+            "(Sauter, Start-Cordey) assumes axisymmetry, so current_density and "
+            "driven_current are NaN; pass trapped_electron_correction to use one",
+            stacklevel=2,
+        )
+        g = np.full(n_shells, np.nan)
+    else:
+        correction = (
+            sauter_trapped_electron_correction
+            if trapped_electron_correction is None
+            else trapped_electron_correction
+        )
+        g = np.asarray(correction(surfaces, plasma))
     j_net = j_fast * (1.0 - (1.0 - g) / zeff)
     total_births = float(np.sum(sums[:, 7]))
     return SlowingDown(
@@ -1044,4 +1089,5 @@ def slow_down(
         if total_births > 0.0
         else 0.0,
         radial_coordinate=surfaces.radial_coordinate,
+        birth_power=float(np.sum(sums[:, 8])),
     )

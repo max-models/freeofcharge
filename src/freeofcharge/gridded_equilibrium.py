@@ -108,9 +108,28 @@ class _HelicalTestField:
             [b_r * cos_p - b_phi * sin_p, b_r * sin_p + b_phi * cos_p, b_z], axis=-1
         )
 
-    def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:  # pragma: no cover
-        """Not available."""
-        raise NotImplementedError
+    def _shape(self, rho, theta, zeta):
+        r"""Return $R$, its and $Z$'s derivatives, $|B|$ and $\iota$ at flux coordinates.
+
+        $u = a\rho\cos\theta$, $v = a\rho\sin\theta$, so the Jacobian
+        $R\,(R_\rho Z_\theta - R_\theta Z_\rho) = R_0 a^2 \rho$ and the shell
+        volumes are $2\pi^2 R_0 a^2 (\rho_{k+1}^2 - \rho_k^2)$.
+        """
+        u = self.a * rho * np.cos(theta) + self.delta * np.cos(self.nfp * zeta)
+        z = self.a * rho * np.sin(theta) + self.delta * np.sin(self.nfp * zeta)
+        r = np.sqrt(self.r0**2 + 2.0 * self.r0 * u)
+        r_rho = self.r0 * self.a * np.cos(theta) / r
+        r_theta = -self.r0 * self.a * rho * np.sin(theta) / r
+        z_rho, z_theta = self.a * np.sin(theta), self.a * rho * np.cos(theta)
+        points = np.stack([r * np.cos(zeta), r * np.sin(zeta), z], axis=-1)
+        strength = np.linalg.norm(xp.to_numpy(self.field_at(points)), axis=-1)
+        return r, r_rho, r_theta, z_rho, z_theta, strength, np.full(r.shape, 0.4)
+
+    def flux_surfaces(self, rho_edges, **kwargs) -> FluxSurfaces:
+        """Return the shells, see `FluxSurfaces.from_flux_coordinates`."""
+        return FluxSurfaces.from_flux_coordinates(
+            self._shape, self.nfp, rho_edges, **kwargs
+        )
 
 
 def _interpolation_problem() -> ConvergenceProblem:
