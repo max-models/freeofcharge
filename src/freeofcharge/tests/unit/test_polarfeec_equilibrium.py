@@ -83,3 +83,9 @@ def test_flux_surfaces_match_gvec(ellipse, reference):
     np.testing.assert_allclose(
         mine.trapped_fraction, theirs.trapped_fraction, rtol=1e-6
     )
+
+
+def test_rho_and_field_at_once(ellipse, points):
+    rho, field = ellipse.rho_and_field_at(points[:50])
+    np.testing.assert_array_equal(rho, ellipse.rho_at(points[:50]))
+    np.testing.assert_array_equal(field, ellipse.field_at(points[:50]))

@@ -27,7 +27,9 @@ MPI ranks. A run is `deposit`, then `slow_down` on the flux shells of the equili
    poloidal flux $\psi(R, Z)$ and $F(\psi) = R B_\phi$, the radius $\rho = \sqrt{\psi_n}$, the
    shells with their volumes, $q$ and trapped fraction; the Solov'ev solution for the tests.
    3D equilibria come through adapters ([GVEC](/freeofcharge/numerics/gvec-equilibrium/), DESC,
-   PolarFEEC) with the same interface.
+   PolarFEEC) with the same interface; a
+   [gridded equilibrium](/freeofcharge/numerics/gridded-equilibrium/) samples any of them once
+   per field period and interpolates, for the many points of the deposition.
 2. **[Plasma profiles](/freeofcharge/numerics/profiles/)** of $n_e$, $T_e$, $T_i$ and the ion
    densities on $\rho$, quasi-neutral, zero density outside the last closed surface.
 3. **[Beam markers](/freeofcharge/numerics/beam/):** a mono-energetic beam with Gaussian width

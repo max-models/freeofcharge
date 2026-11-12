@@ -7,6 +7,16 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Fast evaluation of 3D equilibria: `GriddedEquilibrium` wraps any `MagneticEquilibrium`,
+  samples $\rho^2$ and the cylindrical components of $\mathbf{B}$ once on a grid in
+  $(R, \varphi, Z)$ over one field period (half of one with stellarator symmetry, from the
+  equilibrium's `nfp` and `stellarator_symmetric`) and answers `rho_at`, `field_at` and
+  `inside_at` by cubic B-spline interpolation (`scipy.ndimage` through cunumpy), about 1 µs
+  per point for $\rho$ and $\mathbf{B}$ against 30 µs (GVEC) and 8–13 ms (DESC); the wall
+  and the flux shells stay the equilibrium's. Fourth order inside the plasma, first order
+  within about two cells of $\rho = 1$; NaN outside the grid; `save` and `load` keep the
+  samples in a netCDF file. The DESC, GVEC and PolarFEEC adapters get `rho_and_field_at`
+  (one inversion for both, used when sampling) and DESC `stellarator_symmetric`.
 - `StruphyEquilibrium` (`freeofcharge.struphy_equilibrium`, the new extra `struphy`): a
   Struphy MHD equilibrium on its mapped domain as a `MagneticEquilibrium`, Struphy's DESC
   and GVEC stellarator equilibria as well as its analytic ones. `rho_at` inverts Struphy's
