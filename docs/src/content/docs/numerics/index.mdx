@@ -27,7 +27,7 @@ MPI ranks. A run is `deposit`, then `slow_down` on the flux shells of the equili
    poloidal flux $\psi(R, Z)$ and $F(\psi) = R B_\phi$, the radius $\rho = \sqrt{\psi_n}$, the
    shells with their volumes, $q$ and trapped fraction; the Solov'ev solution for the tests.
    3D equilibria come through adapters ([GVEC](/freeofcharge/numerics/gvec-equilibrium/), DESC,
-   PolarFEEC) with the same interface; a
+   [VMEC](/freeofcharge/numerics/vmec-equilibrium/), PolarFEEC) with the same interface; a
    [gridded equilibrium](/freeofcharge/numerics/gridded-equilibrium/) samples any of them once
    per field period and interpolates, for the many points of the deposition.
 2. **[Plasma profiles](/freeofcharge/numerics/profiles/)** of $n_e$, $T_e$, $T_i$ and the ion
@@ -94,5 +94,6 @@ their COCOS signs.
 Besides the checks of the cards, the tests compare Suzuki's fit with ASCOT5's to $10^{-10}$, the
 attenuation of a pencil beam with $e^{-n\sigma L}$, the slowing-down integrals with the
 equations of motion, the pitch modes with a Monte Carlo of Lorentz scattering, and the
-3D adapters with GVEC and DESC; the [ASCOT5 benchmark](/freeofcharge/benchmarks/ascot5/)
+3D adapters with GVEC and DESC, VMEC++ with DESC's W7-X and a Solov'ev tokamak, and the coils'
+field with a vacuum VMEC++ equilibrium; the [ASCOT5 benchmark](/freeofcharge/benchmarks/ascot5/)
 compares a whole run.
