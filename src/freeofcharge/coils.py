@@ -32,11 +32,15 @@ from collections.abc import Callable
 
 import cunumpy as xp
 import numpy as np
+import scope_profiler as sp
 import xarray as xr
 from methodcard import method
 from plasmacoll.units import to_unit
 
+from freeofcharge._profiling import PROFILE_TAGS
 from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
+from freeofcharge.kernels.biot_savart_polylines import kernel as biot_savart_polylines
+from freeofcharge.kernels.segment_distance import kernel as segment_distance
 
 __all__ = [
     "CoilField",
@@ -56,17 +60,6 @@ _MAX_PAIRS = 2_000_000
 
 def _dot(a, b):
     return xp.sum(a * b, axis=-1)
-
-
-def _cross(a, b):
-    return xp.stack(
-        [
-            a[..., 1] * b[..., 2] - a[..., 2] * b[..., 1],
-            a[..., 2] * b[..., 0] - a[..., 0] * b[..., 2],
-            a[..., 0] * b[..., 1] - a[..., 1] * b[..., 0],
-        ],
-        axis=-1,
-    )
 
 
 def _chunks(n: int, m: int):
@@ -164,6 +157,11 @@ class CoilSet:
         self.ends = ends.reshape(-1, 3)
         self.segment_currents = xp.repeat(currents, n_points)
         self.segment_coils = xp.repeat(xp.arange(filaments.shape[0]), n_points)
+        # for the kernels: nodes and edges component-major (3, m), C-ordered
+        edges = self.ends - self.starts
+        self._nodes = xp.array(self.starts.T, order="C")
+        self._edges = xp.array(edges.T, order="C")
+        self._inverse_length2 = 1.0 / xp.maximum(_dot(edges, edges), 1e-300)
 
     @property
     def n_coils(self) -> int:
@@ -246,6 +244,16 @@ class CoilSet:
         # (R, Z) circulating counter-clockwise seen along +phi drives B along +phi
         return cls(points[:, ::-1], np.full(n_coils, float(current)), nfp=n_coils)
 
+    @staticmethod
+    def _kernel_points(points):
+        """Return ``points`` ``(..., 3)`` as a new C-ordered ``(3, n)`` array, and their shape.
+
+        A copy, not ``ascontiguousarray``: the transpose of ``(1, 3)`` is flagged
+        contiguous but keeps strides that Pyccel's order check rejects.
+        """
+        points = xp.asarray(points, dtype=float)
+        return xp.array(points.reshape(-1, 3).T, order="C"), points.shape[:-1]
+
     @method(
         equations={
             "biot_savart": r"\mathbf{B}(\mathbf{x}) = \frac{\mu_0}{4\pi} \sum_k I_k \oint \frac{d\mathbf{l}_k \times (\mathbf{x} - \mathbf{l}_k)}{|\mathbf{x} - \mathbf{l}_k|^3}",
@@ -256,40 +264,26 @@ class CoilSet:
             r"a segment adds nothing at its own end points (the field diverges on a filament)",
         ),
     )
+    @sp.profile("freeofcharge.coil_field", tags=PROFILE_TAGS)
     def field_at(self, points):
         r"""Return the coils' vacuum field $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``."""
-        points = xp.asarray(points, dtype=float)
-        shape = points.shape[:-1]
-        flat = points.reshape(-1, 3)
-        field = xp.zeros_like(flat)
-        m = self.starts.shape[0]
-        for part in _chunks(flat.shape[0], m):
-            ra = flat[part, None, :] - self.starts[None]
-            rb = flat[part, None, :] - self.ends[None]
-            na = xp.sqrt(_dot(ra, ra))
-            nb = xp.sqrt(_dot(rb, rb))
-            denom = na * nb * (na * nb + _dot(ra, rb))
-            factor = xp.where(
-                denom > 0.0,
-                self.segment_currents * (na + nb) / xp.where(denom > 0.0, denom, 1.0),
-                0.0,
+        points, shape = self._kernel_points(points)
+        field = xp.zeros_like(points)
+        if points.shape[1]:
+            biot_savart_polylines(
+                points, self._nodes, self.filaments.shape[1], self.currents, field
             )
-            field[part] = xp.sum(factor[..., None] * _cross(ra, rb), axis=1)
-        return (MU_0 / (4.0 * np.pi) * field).reshape(*shape, 3)
+        return (MU_0 / (4.0 * np.pi) * field.T).reshape(*shape, 3)
 
+    @sp.profile("freeofcharge.coil_distance", tags=PROFILE_TAGS)
     def distance_at(self, points):
         """Return the distance of Cartesian ``points`` ``(..., 3)`` to the nearest filament [m]."""
-        points = xp.asarray(points, dtype=float)
-        shape = points.shape[:-1]
-        flat = points.reshape(-1, 3)
-        edge = self.ends - self.starts
-        length2 = xp.maximum(_dot(edge, edge), 1e-300)
-        result = xp.empty(flat.shape[0])
-        for part in _chunks(flat.shape[0], edge.shape[0]):
-            w = flat[part, None, :] - self.starts[None]
-            t = xp.clip(_dot(w, edge[None]) / length2, 0.0, 1.0)
-            gap = w - t[..., None] * edge[None]
-            result[part] = xp.sqrt(xp.min(_dot(gap, gap), axis=1))
+        points, shape = self._kernel_points(points)
+        result = xp.zeros(points.shape[1])
+        if points.shape[1]:
+            segment_distance(
+                points, self._nodes, self._edges, self._inverse_length2, result
+            )
         return result.reshape(shape)
 
     @method(
