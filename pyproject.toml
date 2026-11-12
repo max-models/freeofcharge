@@ -38,7 +38,7 @@ optional-dependencies.dev = [
   "freeofcharge[docs,test]",
 ]
 optional-dependencies.docs = [
-  "freeofcharge[chain,gvec]",
+  "freeofcharge[chain,coils,gvec]",
   "griffe",
   "plasma-plots[scene,web]>=0.2.3",
   "ipykernel",
@@ -51,12 +51,13 @@ optional-dependencies.chain = [
   "tree-d-3d @ git+https://github.com/max-models/tree-d-3d@devel",
   "wellbalanced>=0.1.0",
 ]
+optional-dependencies.coils = [ "plasma-plots>=0.2.3" ]
 optional-dependencies.cr = [ "opencr" ]
 optional-dependencies.desc = [ "desc-opt>=0.17" ]
 optional-dependencies.gvec = [ "gvec>=1.5" ]
 optional-dependencies.test = [
   "astropy",
-  "freeofcharge[chain,cr,gvec]",
+  "freeofcharge[chain,coils,cr,gvec]",
   "methodcard[symbolic]",
   "pytest",
   "pytest-cov",

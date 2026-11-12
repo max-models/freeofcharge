@@ -1907,6 +1907,9 @@ chain = [
     { name = "tree-d-3d" },
     { name = "wellbalanced" },
 ]
+coils = [
+    { name = "plasma-plots" },
+]
 cr = [
     { name = "opencr" },
 ]
@@ -1959,6 +1962,7 @@ test = [
     { name = "gvec" },
     { name = "methodcard", extra = ["symbolic"] },
     { name = "opencr" },
+    { name = "plasma-plots" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "tree-d-3d" },
@@ -1970,8 +1974,8 @@ requires-dist = [
     { name = "astropy", marker = "extra == 'test'" },
     { name = "cunumpy", git = "https://github.com/max-models/cunumpy?branch=devel" },
     { name = "desc-opt", marker = "extra == 'desc'", specifier = ">=0.17" },
-    { name = "freeofcharge", extras = ["chain", "cr", "gvec"], marker = "extra == 'test'" },
-    { name = "freeofcharge", extras = ["chain", "gvec"], marker = "extra == 'docs'" },
+    { name = "freeofcharge", extras = ["chain", "coils", "cr", "gvec"], marker = "extra == 'test'" },
+    { name = "freeofcharge", extras = ["chain", "coils", "gvec"], marker = "extra == 'docs'" },
     { name = "freeofcharge", extras = ["docs", "test"], marker = "extra == 'dev'" },
     { name = "griffe", marker = "extra == 'docs'" },
     { name = "gvec", marker = "extra == 'gvec'", specifier = ">=1.5" },
@@ -1986,6 +1990,7 @@ requires-dist = [
     { name = "nbformat", marker = "extra == 'docs'", specifier = ">=5.11.1" },
     { name = "numpy" },
     { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=devel" },
+    { name = "plasma-plots", marker = "extra == 'coils'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasma-plots", extras = ["scene", "web"], marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
@@ -2000,7 +2005,7 @@ requires-dist = [
     { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=devel" },
     { name = "xarray" },
 ]
-provides-extras = ["dev", "docs", "chain", "cr", "desc", "gvec", "test"]
+provides-extras = ["dev", "docs", "chain", "coils", "cr", "desc", "gvec", "test"]
 
 [[package]]
 name = "frozenlist"
@@ -5109,7 +5114,7 @@ wheels = [
 [[package]]
 name = "plasma-plots"
 version = "0.2.5"
-source = { git = "https://github.com/max-models/plasma-plots?branch=devel#66c191ac93f6eae053239411a39cc5d118226f97" }
+source = { git = "https://github.com/max-models/plasma-plots?branch=devel#2487f715a15620dcc0d13bcac458cdfe6123a3f4" }
 dependencies = [
     { name = "ipywidgets" },
     { name = "matplotlib" },
