@@ -24,6 +24,7 @@ export default defineDocs({
 			'freeofcharge.deposition': 'Deposition',
 			'freeofcharge.slowing_down': 'Slowing down',
 			'freeofcharge.trapping': 'Orbit-averaged pitch',
+			'freeofcharge.orbits': 'Orbits',
 			'freeofcharge.chain': 'Injector chain',
 		},
 	},

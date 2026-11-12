@@ -20,6 +20,7 @@ from freeofcharge.injectors import (
     SourceDepositions,
     deposit_sources,
 )
+from freeofcharge.orbits import OrbitFollowing, follow_orbits
 from freeofcharge.profiles import IonSpecies, Plasma
 from freeofcharge.slowing_down import SlowingDown, slow_down
 from freeofcharge.stopping import ConstantStopping, StoppingModel, SuzukiStopping
@@ -42,6 +43,7 @@ __all__ = [
     "IonSpecies",
     "MagneticEquilibrium",
     "NeutralBeam",
+    "OrbitFollowing",
     "Plasma",
     "SlowingDown",
     "SourceDepositions",
@@ -49,6 +51,7 @@ __all__ = [
     "SuzukiStopping",
     "deposit",
     "deposit_sources",
+    "follow_orbits",
     "monte_carlo_volumes",
     "rho_coordinate",
     "slow_down",

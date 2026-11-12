@@ -160,6 +160,25 @@ def _interpolation_problem() -> ConvergenceProblem:
     return ConvergenceProblem(error, steps=[1 / 48, 1 / 64, 1 / 96], tolerance=0.3)
 
 
+def _cubic_weights(t: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """The cubic B-spline weights ``(n, 4)`` of the four nodes around ``t`` in [0, 1), and their derivatives."""
+    u = 1.0 - t
+    t2 = t * t
+    weights = np.stack(
+        [
+            u**3 / 6.0,
+            (3.0 * t2 * t - 6.0 * t2 + 4.0) / 6.0,
+            (-3.0 * t2 * t + 3.0 * t2 + 3.0 * t + 1.0) / 6.0,
+            t2 * t / 6.0,
+        ],
+        axis=-1,
+    )
+    derivatives = np.stack(
+        [-0.5 * u * u, 1.5 * t2 - 2.0 * t, -1.5 * t2 + t + 0.5, 0.5 * t2], axis=-1
+    )
+    return weights, derivatives
+
+
 def _fill_non_finite(values: dict, dr: float, dz: float) -> None:
     r"""Fill non-finite samples in place from the nearest finite one in their plane.
 
@@ -541,6 +560,114 @@ class GriddedEquilibrium:
             )
             results.append(value.reshape(shape))
         return results, phi.reshape(shape)
+
+    @property
+    def spline_arrays(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        r"""Return the spline data for compiled kernels (cubic splines only).
+
+        ``(coefficients, grid, shape)``: the padded B-spline coefficients
+        ``(..., 4)`` of $\rho^2$, $B_R$, $B_\varphi$, $B_Z$, the component last (C
+        order, on the host);
+        ``grid`` $(R_0, Z_0, \Delta R, \Delta\varphi, \Delta Z, 2\pi/N_\mathrm{fp}, p)$
+        with the padding $p$; ``shape`` the nodes $(n_R, n_\varphi, n_Z)$ and the
+        padded ones, the coefficients' first three axes. The node $(i, j, k)$ is at
+        the index $(i + p, j + p, k + p)$ of the coefficients.
+        """
+        if self.order != 3:
+            raise ValueError(
+                f"the kernels need cubic splines (order 3), not {self.order}"
+            )
+        coefficients = np.ascontiguousarray(
+            np.stack([xp.to_numpy(c) for c in self._coefficients], axis=-1), dtype=float
+        )
+        grid = np.array(
+            [self._lower[0], self._lower[1], *self._step, self.period, self._pad],
+            dtype=float,
+        )
+        return (
+            coefficients,
+            grid,
+            np.array([*self._shape, *coefficients.shape[:3]], dtype=np.int64),
+        )
+
+    def spline_coefficients(self, values) -> np.ndarray:
+        r"""Return the padded B-spline coefficients of other ``values`` on the grid's nodes.
+
+        ``values`` ``(n_R, n_\varphi, n_Z)`` over the field period (e.g. the distance
+        to a wall); the result is laid out as one component of `spline_arrays`.
+        """
+        values = np.asarray(values, dtype=float)
+        if values.shape != self._shape:
+            raise ValueError(
+                f"values have shape {values.shape}, expected {self._shape}"
+            )
+        return np.ascontiguousarray(self._prefilter(values))
+
+    def field_jacobian_at(self, points):
+        r"""Return $\mathbf{B}$ and $\partial B_i / \partial x_j$ at Cartesian ``points``.
+
+        The exact derivatives of the cubic spline interpolant (``order`` 3),
+        ``(..., 3)`` [T] and ``(..., 3, 3)`` [T/m]; NaN off the grid. From them
+        $\nabla|B| = \hat b_i\,\partial_j B_i$ and $\nabla\times\mathbf{B}$, the
+        drifts of `freeofcharge.orbits`.
+        """
+        coefficients, grid, shape = self.spline_arrays
+        points = np.asarray(xp.to_numpy(xp.asarray(points, dtype=float)), dtype=float)
+        lead = points.shape[:-1]
+        flat = points.reshape(-1, 3)
+        x, y, z = flat.T
+        r = np.hypot(x, y)
+        fi = (r - grid[0]) / grid[2]
+        fk = (z - grid[1]) / grid[4]
+        ok = (fi >= 0.0) & (fi <= shape[0] - 1) & (fk >= 0.0) & (fk <= shape[2] - 1)
+        phi = np.arctan2(y, x)
+        fj = np.mod(phi, grid[5]) / grid[3]
+        fi, fk = np.where(ok, fi, 0.0), np.where(ok, fk, 0.0)
+        index = [np.floor(f).astype(np.int64) for f in (fi, fj, fk)]
+        weights = [
+            _cubic_weights(f - i) for f, i in zip((fi, fj, fk), index, strict=True)
+        ]
+        offsets = np.arange(4)
+        ii, jj, kk = ((i + self._pad - 1)[:, None] + offsets for i in index)
+        block = np.moveaxis(
+            coefficients[
+                ii[:, :, None, None], jj[:, None, :, None], kk[:, None, None, :]
+            ][..., 1:],
+            -1,
+            0,
+        )
+        (wi, di), (wj, dj), (wk, dk) = weights
+        b = np.einsum("na,nb,nc,qnabc->nq", wi, wj, wk, block)
+        derivatives = np.stack(
+            [
+                np.einsum("na,nb,nc,qnabc->nq", di, wj, wk, block) / grid[2],
+                np.einsum("na,nb,nc,qnabc->nq", wi, dj, wk, block) / grid[3],
+                np.einsum("na,nb,nc,qnabc->nq", wi, wj, dk, block) / grid[4],
+            ],
+            axis=-1,
+        )  # (n, component R phi Z, derivative d/dR d/dphi d/dZ)
+        c, s = np.cos(phi), np.sin(phi)
+        # Cartesian components as functions of (R, phi, Z)
+        bx = c * b[:, 0] - s * b[:, 1]
+        by = s * b[:, 0] + c * b[:, 1]
+        d_bx = c[:, None] * derivatives[:, 0] - s[:, None] * derivatives[:, 1]
+        d_by = s[:, None] * derivatives[:, 0] + c[:, None] * derivatives[:, 1]
+        d_bx[:, 1] += -by
+        d_by[:, 1] += bx
+        d_cyl = np.stack([d_bx, d_by, derivatives[:, 2]], axis=1)
+        # chain rule: d/dx = c d/dR - s/R d/dphi, d/dy = s d/dR + c/R d/dphi
+        jacobian = np.stack(
+            [
+                c[:, None] * d_cyl[..., 0] - (s / r)[:, None] * d_cyl[..., 1],
+                s[:, None] * d_cyl[..., 0] + (c / r)[:, None] * d_cyl[..., 1],
+                d_cyl[..., 2],
+            ],
+            axis=-1,
+        )
+        field = np.stack([bx, by, b[:, 2]], axis=-1)
+        field[~ok] = np.nan
+        jacobian[~ok] = np.nan
+        return field.reshape(*lead, 3), jacobian.reshape(*lead, 3, 3)
 
     def rho_at(self, points):
         r"""Return $\rho$ at Cartesian ``points`` ``(..., 3)`` (NaN outside the grid)."""
