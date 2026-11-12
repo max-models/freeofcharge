@@ -6919,11 +6919,12 @@ wheels = [
 
 [[package]]
 name = "simgeometry"
-version = "0.1.1"
-source = { git = "https://github.com/max-models/simgeometry?branch=devel#be397c3b5512e90f0ba10060adf3eb099c3577c6" }
+version = "0.2.1"
+source = { git = "https://github.com/max-models/simgeometry?branch=devel#5ac67477bcaf1a8359c44f0a47001e408d5976d3" }
 dependencies = [
     { name = "cunumpy" },
     { name = "maybempi" },
+    { name = "methodcard" },
     { name = "mpiarray" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
