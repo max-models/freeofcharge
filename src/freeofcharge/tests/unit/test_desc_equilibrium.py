@@ -96,7 +96,7 @@ def test_rho_and_field_at_once_and_symmetry(example):
 def test_gridded(example):
     from freeofcharge import GriddedEquilibrium
 
-    # coarse, to keep the sampling (about 2800 inversions) short: errors of a few 1e-2
+    # coarse, a test of the sampling and the symmetry: errors of a few 1e-2
     gridded = GriddedEquilibrium(example, (16, 20, 16), r_range=(4.64, 6.21))
     assert gridded.nfp == 5 and gridded.stellarator_symmetric
     nodes, points, field = _points(example, n=40, seed=2)
