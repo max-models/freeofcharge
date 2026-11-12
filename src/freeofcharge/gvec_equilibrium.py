@@ -242,10 +242,14 @@ class GVECEquilibrium:
 
         Points outside the last closed surface get the field on it.
         """
+        return self.rho_and_field_at(points)[1]
+
+    def rho_and_field_at(self, points):
+        r"""Return $\rho$ and $\mathbf{B}$ [T] at Cartesian ``points``, one inversion for both."""
         rho, theta, zeta = (c.ravel() for c in self.flux_coordinates(points))
-        rho = np.minimum(rho, 1.0)
-        field = self._field(rho, theta, zeta)
-        return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
+        field = self._field(np.minimum(rho, 1.0), theta, zeta)
+        shape = xp.asarray(points).shape[:-1]
+        return xp.asarray(rho.reshape(shape)), xp.asarray(field.reshape(*shape, 3))
 
     def _shape(self, rho, theta, zeta):
         r"""Return the surface shape and the field at flux coordinates.
