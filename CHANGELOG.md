@@ -46,7 +46,7 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with the published energy (55 keV, H), power per source (1.8 MW) and layout, and a
   stand-in geometry, power shares and divergence (not W7-X data).
 - The radial coordinate: equilibria say in `radial_coordinate` which flux $\rho$ is the root
-  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC and PolarFEEC
+  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC, PolarFEEC and Struphy (DESC, GVEC)
   adapters, kept by `GriddedEquilibrium`), and `FluxSurfaces`, `Deposition` and `SlowingDown`
   carry it into their datasets (`rho_coordinate`: label and definition). `Plasma` takes an
   optional `radial_coordinate`, checked against the equilibrium's by `deposit` and
@@ -78,6 +78,16 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   At $\beta = 0$ inside the CoilStellaration sample's boundary, the coils' Biot–Savart field
   (currents scaled to the equilibrium) matches VMEC's to 0.2 % on average, the level of the
   coils' field error; the tutorial "Stellarator coils" shows the comparison.
+- `StruphyEquilibrium` (`freeofcharge.struphy_equilibrium`, the new extra `struphy`): a
+  Struphy MHD equilibrium on its mapped domain as a `MagneticEquilibrium`, Struphy's DESC
+  and GVEC stellarator equilibria as well as its analytic ones. `rho_at` inverts Struphy's
+  map by a damped Newton iteration with its Jacobian (compiled kernels, 0.02–0.07 ms per
+  point), seeded from a cached grid, across the field periods and into the hole around the
+  axis; `field_at` pushes Struphy's contravariant field forward. Against DESC on its W7-X
+  example the spline map of Struphy's default resolution is good to 3.0e-3 in $\rho$ and
+  0.8 % in $|B|$ (1.5e-4 and 0.03 % at twice the resolution), against the GVEC adapter to
+  8.1e-5 in $\rho$; Struphy 3.6.1 evaluates GVEC's field at the wrong toroidal angle for
+  more than one field period. A CI job compiles Struphy and runs its tests.
 - Stellarator coils (`freeofcharge.coils`): `CoilSet` holds closed filaments with their
   currents, read from a CoilStellaration coilset (`CoilSet.from_coilset`, through
   plasma-plots, the new extra `coils`), from plasma-plots' coil Dataset or built as planar
