@@ -4,6 +4,7 @@ from freeofcharge.beam import NeutralBeam, tangential_injection
 from freeofcharge.coils import CoilField, CoilSet
 from freeofcharge.deposition import Deposition, deposit
 from freeofcharge.equilibrium import Equilibrium, FluxSurfaces, MagneticEquilibrium
+from freeofcharge.gridded_equilibrium import GriddedEquilibrium
 from freeofcharge.profiles import IonSpecies, Plasma
 from freeofcharge.slowing_down import SlowingDown, slow_down
 from freeofcharge.stopping import ConstantStopping, StoppingModel, SuzukiStopping
@@ -17,6 +18,7 @@ __all__ = [
     "Deposition",
     "Equilibrium",
     "FluxSurfaces",
+    "GriddedEquilibrium",
     "IonSpecies",
     "MagneticEquilibrium",
     "NeutralBeam",

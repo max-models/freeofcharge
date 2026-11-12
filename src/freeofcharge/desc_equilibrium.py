@@ -93,6 +93,11 @@ class DESCEquilibrium:
         """Return a box holding the last closed surface [m]."""
         return self._bounds
 
+    @property
+    def stellarator_symmetric(self) -> bool:
+        """Return whether the equilibrium is stellarator symmetric (DESC's ``sym``)."""
+        return bool(self.equilibrium.sym)
+
     def flux_coordinates(self, points):
         r"""Return $(\rho, \theta, \zeta)$ of Cartesian ``points`` ``(..., 3)``.
 
@@ -151,6 +156,10 @@ class DESCEquilibrium:
 
         Points outside the last closed surface get the field on it.
         """
+        return self.rho_and_field_at(points)[1]
+
+    def rho_and_field_at(self, points):
+        r"""Return $\rho$ and $\mathbf{B}$ [T] at Cartesian ``points``, one inversion for both."""
         rho, theta, zeta = (c.ravel() for c in self.flux_coordinates(points))
         b = self._compute(["B"], np.minimum(rho, 1.0), theta, zeta)["B"]
         cos_p, sin_p = np.cos(zeta), np.sin(zeta)
@@ -162,7 +171,8 @@ class DESCEquilibrium:
             ],
             axis=-1,
         )
-        return xp.asarray(field.reshape(*xp.asarray(points).shape[:-1], 3))
+        shape = xp.asarray(points).shape[:-1]
+        return xp.asarray(rho.reshape(shape)), xp.asarray(field.reshape(*shape, 3))
 
     def _shape(self, rho, theta, zeta):
         r"""Return the surface shape and the field at flux coordinates.
