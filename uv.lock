@@ -1358,8 +1358,8 @@ toml = [
 
 [[package]]
 name = "cunumpy"
-version = "0.7.1"
-source = { git = "https://github.com/max-models/cunumpy?branch=devel#5986211654bec895ee226a6d0fdc5c8b7d41a7fd" }
+version = "0.7.2"
+source = { git = "https://github.com/max-models/cunumpy?branch=devel#159a7128ba625500d5a1b750f0c7fea30a539202" }
 dependencies = [
     { name = "array-api-compat" },
     { name = "maybempi" },
@@ -1939,6 +1939,7 @@ dependencies = [
     { name = "plasmacoll" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scope-profiler" },
     { name = "simgeometry" },
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1974,6 +1975,7 @@ dev = [
     { name = "opencr" },
     { name = "plasma-plots", extra = ["scene", "web"] },
     { name = "pre-commit" },
+    { name = "pyccel" },
     { name = "pyproject-fmt" },
     { name = "pyright" },
     { name = "pytest" },
@@ -2007,6 +2009,7 @@ test = [
     { name = "methodcard", extra = ["symbolic"] },
     { name = "opencr" },
     { name = "plasma-plots" },
+    { name = "pyccel" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "tree-d-3d" },
@@ -2042,12 +2045,14 @@ requires-dist = [
     { name = "plasma-plots", extras = ["scene", "web"], marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
+    { name = "pyccel", marker = "extra == 'test'", specifier = ">2.0" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "scipy" },
+    { name = "scope-profiler", specifier = ">=0.7.5" },
     { name = "simgeometry", git = "https://github.com/max-models/simgeometry?branch=devel" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
     { name = "vmecpp", marker = "extra == 'vmec'", specifier = ">=0.9" },
