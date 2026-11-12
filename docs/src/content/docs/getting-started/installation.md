@@ -52,6 +52,7 @@ summed over the ranks once.
 | `test` | `pytest` and `pytest-cov`                                        |
 | `docs` | the notebook runner, griffe, matplotlib and plasma-plots          |
 | `dev`  | ruff, pyright, pre-commit and JupyterLab, plus `test` and `docs` |
+| `struphy` | Struphy, for `StruphyEquilibrium`; compile its kernels once with `struphy compile` (needs `gfortran`) |
 
 ```bash
 pip install -e ".[docs]"   # to run the tutorials and examples

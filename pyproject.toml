@@ -55,6 +55,7 @@ optional-dependencies.coils = [ "plasma-plots>=0.2.3" ]
 optional-dependencies.cr = [ "opencr" ]
 optional-dependencies.desc = [ "desc-opt>=0.17" ]
 optional-dependencies.gvec = [ "gvec>=1.5" ]
+optional-dependencies.struphy = [ "struphy>=3.6" ]
 optional-dependencies.test = [
   "astropy",
   "freeofcharge[chain,coils,cr,gvec]",
@@ -67,6 +68,16 @@ urls.Source = "https://github.com/max-models/freeofcharge"
 [tool.setuptools]
 package-data."*" = [ "py.typed" ]
 packages.find.where = [ "src" ]
+
+[tool.uv]
+# struphy 3.6.1 caps cunumpy at 0.7.0 and scope-profiler at 0.7.3, below what the
+# max-models packages need; lifted until a struphy release relaxes them
+override-dependencies = [ "cunumpy>=0.7", "scope-profiler>=0.7.5" ]
+# and pins much of its environment (ruff, pytest, trame, vtk): resolved on its own
+conflicts = [
+  [ { extra = "struphy" }, { extra = "dev" } ],
+  [ { extra = "struphy" }, { extra = "docs" } ],
+]
 
 [tool.uv.sources]
 # one entry per max-models package in [project], spelled exactly like this in every repo:
