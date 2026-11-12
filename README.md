@@ -44,8 +44,8 @@ accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
 - **Orbits** (`follow_orbits`): the births followed as guiding centres
   (a compiled RK4 kernel on the gridded field, in tokamaks and
   stellarators) with Monte Carlo Coulomb collisions that use the slowing
-  down’s drags, until they thermalise or cross the wall: the same moments
-  with finite orbit width, the losses and the wall loads.
+  down’s drags, until they thermalise or cross the wall: the same
+  moments with finite orbit width, the losses and the wall loads.
 - **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
   stages before the plasma, from the other max-models codes: a
   wellbalanced global model of the D- source, tree-d-3d slit optics
