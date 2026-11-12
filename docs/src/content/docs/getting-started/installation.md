@@ -63,6 +63,7 @@ CuPy arrays the CUDA version.
 | `test` | `pytest`, `pytest-cov` and Pyccel                                |
 | `docs` | the notebook runner, griffe, matplotlib and plasma-plots          |
 | `dev`  | ruff, pyright, pre-commit and JupyterLab, plus `test` and `docs` |
+| `struphy` | Struphy, for `StruphyEquilibrium`; compile its kernels once with `struphy compile` (needs `gfortran`) |
 
 ```bash
 pip install -e ".[docs]"   # to run the tutorials and examples

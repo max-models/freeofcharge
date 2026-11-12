@@ -80,3 +80,39 @@ jobs:
           files: coverage.xml
           flags: desc
           fail_ci_if_error: false
+
+  struphy:
+    # Struphy only here: its kernels compile for minutes (pyccel, gfortran), and its pins
+    # stay out of the main jobs.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up uv and Python 3.12
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install the GVEC and Struphy build dependencies (gfortran for both)
+        run: sudo apt-get update && sudo apt-get install -y gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
+
+      - name: Install project
+        run: uv sync --extra test --extra struphy --extra desc
+
+      - name: Compile Struphy's kernels
+        run: |
+          uv run struphy compile -y
+          uv run struphy compile --status
+
+      - name: Run the Struphy tests with coverage
+        run: uv run pytest --cov --cov-report=xml --cov-report=term src/freeofcharge/tests/unit/test_struphy_equilibrium.py
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: struphy
+          fail_ci_if_error: false
