@@ -52,6 +52,14 @@ MPI ranks. A run is `deposit`, then `slow_down` on the flux shells of the equili
    ions carry no current and passing ones their transit-averaged pitch; the scattering averaged
    over the orbit decays in modes, found by finite volumes in $\lambda$.
 
+8. **[Orbits](/freeofcharge/numerics/orbits/):** instead of the local slowing down, the births
+   followed as guiding centres in physical space (RK4 on the cubic-spline field of a gridded
+   equilibrium, in a compiled kernel), with Monte Carlo Coulomb collisions that use the drags of
+   the slowing down, until they thermalise or cross the wall; the time integrals along the orbits
+   give the same moments, and the losses give the wall loads:
+
+<MethodCard name="freeofcharge.orbits.follow_orbits" headingLevel={3} />
+
 The **[injector chain](/freeofcharge/numerics/chain/)** adds closed forms for the stages before
 the plasma (the source, the extraction, the neutralizer and the duct), for an end-to-end scan
 of an injector.
@@ -67,14 +75,17 @@ their COCOS signs.
 
 - No Grad-Shafranov solve: the equilibrium is given.
 - No fast-ion distribution function: only its moments along the slowing-down trajectories.
-- Zero orbit width: the ions stay on their birth surface; no guiding-centre orbits, no prompt
-  or orbit losses, no wall loads from fast ions.
+- Zero orbit width in `slow_down`: the ions stay on their birth surface. `follow_orbits`
+  follows guiding-centre orbits with prompt and orbit losses and wall loads, without an electric
+  field and without finite-Larmor-radius effects beyond an optional Larmor-circle wall test.
 - No charge-exchange losses, no radial transport, no anomalous diffusion of the fast ions.
-- No energy diffusion: the energy loss is the mean drag only.
+- No energy diffusion in `slow_down`: the energy loss is the mean drag only (`follow_orbits`
+  adds it).
 - Stix's drag assumes $v_{Ti} \ll v \ll v_{Te}$; the ions join the thermal ions when they
   reach the end energy.
 - Deposition only inside the last closed surface; the wall crossing is resolved to one step.
-- No first wall for 3D equilibria.
+- No first wall for the deposition in 3D equilibria; the orbits take any closed triangulated
+  wall (simgeometry's `TriangleMesh` or `FourierSurface`) that repeats with the field period.
 - The chain's source has no model of the negative-ion surface production and uses illustrative
   rates.
 

@@ -7,6 +7,37 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Guiding-centre orbits of the fast ions with Monte Carlo Coulomb collisions
+  (`freeofcharge.orbits`, `follow_orbits`, `OrbitFollowing`): confinement, losses and wall
+  loads. The guiding-centre equations with $\mathbf{B}^*$ (parallel motion, mirror force,
+  $\nabla B$ and curvature drifts; $\mu$ invariant, energy conserved by the flow) pushed by RK4
+  in physical space on the cubic-spline field of a `GriddedEquilibrium` (any other
+  equilibrium, `CoilField` included, is sampled first: `orbit_field`), in a compiled Pyccel
+  kernel (`kernels/guiding_centre_push`, about 1.1 µs per step on one core, 0.35 µs on four;
+  a NumPy version without Pyccel). Collisions (`collide`) with the drags, Coulomb
+  logarithms and deflection of `slow_down` (`collision_coefficients`): the drag exactly over
+  the step, energy diffusion (an Ornstein-Uhlenbeck kick for the electrons, keeping a
+  Maxwellian stationary) and Lorentz pitch-angle scattering; markers thermalise at
+  `slow_down`'s end energy. Losses when a step crosses the wall (`first_hit` of a simgeometry
+  triangle mesh or Fourier surface, optionally with the Larmor circle; `revolved_wall` for a
+  tokamak) or $\rho$ = `rho_limit` without a wall; the kernel steps without wall tests while
+  the wall's distance, interpolated on the field's grid (`wall_distance`, `wall_clearance`),
+  exceeds `clearance`. Moments as time integrals along the orbits (`to_dataset`, as
+  `SlowingDown`'s), the power balance $P_e + P_i + P_\mathrm{th} + P_\mathrm{lost} =
+  P_\mathrm{birth} + P_\mathrm{num}$ to roundoff, the lost markers (`losses`) and the wall
+  loads per face and on a $(\theta, \varphi)$ map (`wall_loads`); `trace_orbits` returns
+  collisionless orbits in plasma-plots' layout. Checks: energy to $4\times10^{-7}$ over 2 ms
+  at 20 cm steps and $p_\varphi$ to $10^{-7}$ in a Solov'ev tokamak; the width of a passing
+  orbit equal to the $p_\varphi$ prediction to $10^{-4}$ and to $2q\rho_\parallel$ within 11%;
+  against `slow_down` at 10 T (narrow orbits, no energy diffusion): heating split and
+  thermalised power within 0.3% of the birth power, fast-ion energy within 1.3%.
+- `GriddedEquilibrium.spline_arrays` (the spline coefficients for kernels),
+  `field_jacobian_at` (exact derivatives of the interpolated field) and
+  `spline_coefficients` (other values on the same grid).
+- Docs example "Fast-ion orbits": orbits and invariants in a tokamak, the width of a passing
+  orbit, the orbits against the local slowing down, and the stand-in W7-X births followed to
+  a W7-X-like wall (prompt losses, slowing down with losses, wall-load map).
+
 - The local slowing down on 3D shells as a supported path. `FluxSurfaces.axisymmetric` (False
   for `from_flux_coordinates`) marks 3D shells; on them `slow_down` refuses the orbit
   average (the axisymmetric bounce averages of `freeofcharge.trapping`; use
