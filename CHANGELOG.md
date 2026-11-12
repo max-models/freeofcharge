@@ -17,6 +17,19 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   within about two cells of $\rho = 1$; NaN outside the grid; `save` and `load` keep the
   samples in a netCDF file. The DESC, GVEC and PolarFEEC adapters get `rho_and_field_at`
   (one inversion for both, used when sampling) and DESC `stellarator_symmetric`.
+- VMEC equilibria (`freeofcharge.vmec_equilibrium`, the new extra `vmec` with VMEC++):
+  `VMECEquilibrium` is a `MagneticEquilibrium` from a `vmecpp` run, its `wout` or any
+  `wout_*.nc` file (`from_wout`; also DESC's export), and runs VMEC++ itself from an input
+  (`from_input`) or, with zero pressure and current, from a ConStellaration boundary
+  (`from_boundary`, `vacuum_input`). $\rho = \sqrt{s}$ as for GVEC and DESC; the inverse map
+  is a Newton iteration per point on the Fourier series of $R$, $Z$ (radial cubic splines,
+  odd $m$ divided by $\rho$), $\mathbf{B}$ is VMEC's $B^u$, $B^v$ from the half mesh. Checked
+  against DESC's W7-X (its wout export read back: $\rho$ to $3\cdot10^{-6}$, $\mathbf{B}$ to
+  0.03 %; a VMEC++ run of its input: $\rho$ within $2\cdot10^{-3}$ on average, $\mathbf{B}$
+  0.05 %, the difference of the two equilibria) and a Solov'ev tokamak ($\mathbf{B}$ 0.04 %).
+  At $\beta = 0$ inside the CoilStellaration sample's boundary, the coils' Biot–Savart field
+  (currents scaled to the equilibrium) matches VMEC's to 0.2 % on average, the level of the
+  coils' field error; the tutorial "Stellarator coils" shows the comparison.
 - `StruphyEquilibrium` (`freeofcharge.struphy_equilibrium`, the new extra `struphy`): a
   Struphy MHD equilibrium on its mapped domain as a `MagneticEquilibrium`, Struphy's DESC
   and GVEC stellarator equilibria as well as its analytic ones. `rho_at` inverts Struphy's
