@@ -61,6 +61,19 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- `CoilSet.field_at` and `CoilSet.distance_at` run as compiled kernels
+  (`freeofcharge.kernels`: `biot_savart_polylines` and `segment_distance`, each with a Pyccel,
+  a NumPy and a CUDA version, built with cunumpy's `KernelPackage`). The Pyccel version is
+  compiled on its first call and cached in `~/.cache/freeofcharge/kernels`
+  (`FREEOFCHARGE_KERNEL_CACHE`); without Pyccel the NumPy version runs, on CuPy arrays the
+  CUDA version. The same equations and results (to 1e-13 of the largest value); on the
+  CoilStellaration sample (3840 segments, one core) the field takes about 21 µs per point
+  instead of 840 µs and the distance 15 µs instead of 400 µs; the field kernel computes the
+  distance to each node once, as the end of one segment is the start of the next. Pyccel
+  joins the `test` extra.
+- Profiling regions `freeofcharge.coil_field` and `freeofcharge.coil_distance` with
+  scope-profiler (the opt-in tag `freeofcharge`, off by default: `scope-profiler run
+  --enable-tag freeofcharge`); adds the `scope-profiler` dependency.
 - `slow_down`: each species has its own Coulomb logarithm (`coulomb_logarithms`, as ASCOT5
   evaluates it), so the ion drag and the pitch-angle scattering grow by about a third
   against the shared electron logarithm; the slowing down is integrated numerically in speed

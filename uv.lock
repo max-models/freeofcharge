@@ -1375,8 +1375,8 @@ toml = [
 
 [[package]]
 name = "cunumpy"
-version = "0.7.1"
-source = { git = "https://github.com/max-models/cunumpy?branch=devel#5986211654bec895ee226a6d0fdc5c8b7d41a7fd" }
+version = "0.7.2"
+source = { git = "https://github.com/max-models/cunumpy?branch=devel#159a7128ba625500d5a1b750f0c7fea30a539202" }
 dependencies = [
     { name = "array-api-compat" },
     { name = "maybempi" },
@@ -1936,6 +1936,7 @@ dependencies = [
     { name = "plasmacoll" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scope-profiler" },
     { name = "simgeometry" },
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
@@ -1971,6 +1972,7 @@ dev = [
     { name = "opencr" },
     { name = "plasma-plots", extra = ["scene", "web"], marker = "extra == 'extra-12-freeofcharge-dev' or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pre-commit" },
+    { name = "pyccel" },
     { name = "pyproject-fmt" },
     { name = "pyright" },
     { name = "pytest", version = "9.2.0", source = { registry = "https://pypi.org/simple" } },
@@ -2005,6 +2007,7 @@ test = [
     { name = "methodcard", extra = ["symbolic"] },
     { name = "opencr" },
     { name = "plasma-plots" },
+    { name = "pyccel" },
     { name = "pytest", version = "9.1.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-struphy'" },
     { name = "pytest", version = "9.2.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "pytest-cov" },
@@ -2037,12 +2040,14 @@ requires-dist = [
     { name = "plasma-plots", extras = ["scene", "web"], marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
+    { name = "pyccel", marker = "extra == 'test'", specifier = ">2.0" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "scipy" },
+    { name = "scope-profiler", specifier = ">=0.7.5" },
     { name = "simgeometry", git = "https://github.com/max-models/simgeometry?branch=devel" },
     { name = "struphy", marker = "extra == 'struphy'", specifier = ">=3.6" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
