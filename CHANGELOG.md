@@ -7,6 +7,22 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- The local slowing down on 3D shells as a supported path. `FluxSurfaces.axisymmetric` (False
+  for `from_flux_coordinates`) marks 3D shells; on them `slow_down` refuses the orbit
+  average (the axisymmetric bounce averages of `freeofcharge.trapping`; use
+  `orbit_average=False`) and, without an explicit `trapped_electron_correction` (now None
+  by default: Sauter's on axisymmetric shells), leaves the driven current NaN with a
+  warning, since the Sauter and Start-Cordey fits are tokamak results. Heating of electrons
+  and ions, fast-ion density and pressure carry over unchanged, with the shell volumes from
+  the 3D Jacobian. `SlowingDown.birth_power` and `power_balance`
+  ($P_e + P_i + P_\mathrm{th} = P_\mathrm{birth}$, to roundoff); `monte_carlo_volumes`, shell
+  volumes from random points in physical space, a check of the Jacobian volumes and of
+  volume integrals (W7-X: 27.96 ± 0.04 m³ against 27.85 m³; the deposited power density
+  integrated over them gives the absorbed power to 0.4 %). The 3D flux-surface average
+  matches DESC's $\langle B^2\rangle$ to $10^{-4}$ and its trapped fraction to 2 %. The
+  helical test field of `GriddedEquilibrium` gets closed-form flux surfaces.
+- Docs example "W7-X deposition": a section on the slowing down of the OP1.2b births on the
+  3D shells (heating, fast-ion density and pressure, power balance, volume integrals).
 - Deposition in 3D at production size. `deposit` evaluates only the steps of each line that
   can lie in the plasma (a window from the equilibrium's box, when there is no wall) and
   takes $\rho$ and `inside_at` from one evaluation where the equilibrium offers
@@ -30,7 +46,7 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with the published energy (55 keV, H), power per source (1.8 MW) and layout, and a
   stand-in geometry, power shares and divergence (not W7-X data).
 - The radial coordinate: equilibria say in `radial_coordinate` which flux $\rho$ is the root
-  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC and PolarFEEC
+  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC, PolarFEEC and Struphy (DESC, GVEC)
   adapters, kept by `GriddedEquilibrium`), and `FluxSurfaces`, `Deposition` and `SlowingDown`
   carry it into their datasets (`rho_coordinate`: label and definition). `Plasma` takes an
   optional `radial_coordinate`, checked against the equilibrium's by `deposit` and

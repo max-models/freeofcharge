@@ -34,6 +34,7 @@ def _torus_points(r, theta, phi):
 def test_is_a_magnetic_equilibrium(torus):
     assert isinstance(torus, MagneticEquilibrium)
     assert not torus.has_wall
+    assert torus.radial_coordinate == "unspecified"
     assert torus.nfp == 3
     # HollowTorus winds clockwise: y = -R sin(2 pi eta3 / 3)
     np.testing.assert_allclose(torus.period, -2 * np.pi / 3)
@@ -146,6 +147,7 @@ def test_desc_w7x_against_desc(w7x):
     interpolation error of the map.
     """
     assert (w7x.nfp, w7x.rho_inner) == (5, 0.01)
+    assert w7x.radial_coordinate == "toroidal"
     np.testing.assert_allclose(w7x.period, 2 * np.pi / 5)
     nodes, points, field = _desc_points(w7x.equilibrium.eq)
     rho = w7x.rho_at(points)

@@ -44,7 +44,13 @@ from simgeometry.objects.polygon import Polygon
 
 from freeofcharge import geqdsk
 
-__all__ = ["Equilibrium", "FluxSurfaces", "MagneticEquilibrium", "rho_coordinate"]
+__all__ = [
+    "Equilibrium",
+    "FluxSurfaces",
+    "MagneticEquilibrium",
+    "monte_carlo_volumes",
+    "rho_coordinate",
+]
 
 _RADIAL_COORDINATES = {
     "poloidal": (
@@ -137,6 +143,7 @@ class FluxSurfaces:
     safety_factor: np.ndarray | None = None
     major_radius: np.ndarray | None = None
     radial_coordinate: str = "poloidal"
+    axisymmetric: bool = True
     r"""Shell edges in $\rho$, increasing from 0 to 1."""
     r"""Volume of each shell [$\mathrm{m^3}$]."""
     r"""Poloidal cross-section area of each shell [$\mathrm{m^2}$]."""
@@ -151,6 +158,9 @@ class FluxSurfaces:
     $q = \frac{F}{2\pi} \oint \frac{dl_p}{R^2 B_p}$."""
     r"""$(R_\mathrm{max} + R_\mathrm{min}) / 2$ of the surface at each shell centre [m]."""
     r"""The flux $\rho$ is the root of: ``"poloidal"`` or ``"toroidal"`` (`rho_coordinate`)."""
+    """Whether the shells are axisymmetric; False for those of a 3D equilibrium, where
+    the orbit average and the trapped-electron correction of the slowing down do not
+    hold."""
 
     @property
     def rho(self) -> np.ndarray:
@@ -243,6 +253,7 @@ class FluxSurfaces:
             safety_factor=1.0 / iota,
             major_radius=major,
             radial_coordinate=radial_coordinate,
+            axisymmetric=False,
         )
 
     @property
@@ -303,6 +314,7 @@ class FluxSurfaces:
             attrs={
                 "rho_edges": self.rho_edges,
                 "radial_coordinate": self.radial_coordinate,
+                "axisymmetric": int(self.axisymmetric),
             },
         )
 
@@ -866,3 +878,51 @@ class Equilibrium:
             safety_factor=q,
             major_radius=major,
         )
+
+
+@method(
+    equations={
+        "volume": r"V_k \approx V_\mathrm{box} \frac{N_k}{N}, \qquad \sigma_k = V_\mathrm{box} \sqrt{\frac{p_k (1 - p_k)}{N}}, \quad p_k = \frac{N_k}{N}",
+    },
+    assumptions=(
+        r"$N$ points uniform in the equilibrium's box; $N_k$ of them inside with $\rho$ in shell $k$",
+        r"independent of flux coordinates: a check of the shell volumes from the Jacobian in physical space",
+    ),
+)
+def monte_carlo_volumes(
+    equilibrium: MagneticEquilibrium,
+    rho_edges,
+    *,
+    samples: int = 1_000_000,
+    seed: int | None = None,
+    chunk: int = 1_000_000,
+) -> tuple[np.ndarray, np.ndarray]:
+    r"""Return the shell volumes [$\mathrm{m^3}$] by Monte Carlo, and their standard errors.
+
+    Random points in the equilibrium's box, counted by shell of `rho_at` where
+    `inside_at`: a check of `FluxSurfaces.volume` (in 3D from the Jacobian of
+    the flux coordinates) and of volume integrals of profiles, in physical
+    space. Use a fast equilibrium (`GriddedEquilibrium`).
+    """
+    rho_edges = np.asarray(rho_edges, dtype=float)
+    lower, upper = (np.asarray(b, dtype=float) for b in equilibrium.bounds)
+    rng = np.random.default_rng(seed)
+    shells = FluxSurfaces(rho_edges, np.zeros(0), np.zeros(0), np.zeros(0))
+    n_shells = len(rho_edges) - 1
+    counts = np.zeros(n_shells)
+    both = getattr(equilibrium, "rho_and_inside_at", None)
+    for start in range(0, samples, chunk):
+        n = min(chunk, samples - start)
+        points = lower + (upper - lower) * rng.random((n, 3))
+        if both is None:
+            inside = xp.to_numpy(equilibrium.inside_at(points)).astype(bool)
+            rho = xp.to_numpy(equilibrium.rho_at(points[inside]))
+        else:
+            rho_all, inside = (xp.to_numpy(a) for a in both(points))
+            inside = inside.astype(bool)
+            rho = rho_all[inside]
+        index = xp.to_numpy(shells.shell_index(rho))
+        counts += np.bincount(index[index >= 0], minlength=n_shells)
+    box = float(np.prod(upper - lower))
+    share = counts / samples
+    return box * share, box * np.sqrt(share * (1.0 - share) / samples)

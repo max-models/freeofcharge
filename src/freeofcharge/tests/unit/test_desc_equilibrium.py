@@ -157,6 +157,22 @@ def test_gridded_deposition_matches_the_direct_one(example):
     assert on_grid.to_dataset().rho.attrs["long_name"] == r"$\rho_\mathrm{tor}$"
 
 
+def test_surface_averages_match_desc(example):
+    from desc.grid import LinearGrid
+
+    surfaces = example.flux_surfaces(np.linspace(0.1, 0.9, 5), field_points=(32, 32))
+    assert not surfaces.axisymmetric
+    eq = example.equilibrium
+    grid = LinearGrid(rho=surfaces.rho, M=eq.M_grid, N=eq.N_grid, NFP=eq.NFP)
+    data = eq.compute(["<|B|^2>", "trapped fraction"], grid=grid)
+    b2 = grid.compress(np.asarray(data["<|B|^2>"]))
+    trapped = grid.compress(np.asarray(data["trapped fraction"]))
+    # the Jacobian weights of the 3D flux-surface average
+    average = surfaces.surface_average(surfaces.field_strength**2)
+    np.testing.assert_allclose(average, b2, rtol=1e-4)
+    np.testing.assert_allclose(surfaces.trapped_fraction, trapped, rtol=0.02)
+
+
 def test_vmec_reads_desc_wout(example, tmp_path):
     """DESC's own wout export through the VMEC adapter: the same equilibrium."""
     pytest.importorskip("vmecpp")
