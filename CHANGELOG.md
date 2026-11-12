@@ -30,7 +30,7 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with the published energy (55 keV, H), power per source (1.8 MW) and layout, and a
   stand-in geometry, power shares and divergence (not W7-X data).
 - The radial coordinate: equilibria say in `radial_coordinate` which flux $\rho$ is the root
-  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC and PolarFEEC
+  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC and PolarFEEC
   adapters, kept by `GriddedEquilibrium`), and `FluxSurfaces`, `Deposition` and `SlowingDown`
   carry it into their datasets (`rho_coordinate`: label and definition). `Plasma` takes an
   optional `radial_coordinate`, checked against the equilibrium's by `deposit` and
