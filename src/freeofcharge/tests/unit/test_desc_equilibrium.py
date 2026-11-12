@@ -107,3 +107,48 @@ def test_gridded(example):
     np.testing.assert_allclose(rho[plasma] ** 2, nodes[plasma, 0] ** 2, atol=0.03)
     error = np.linalg.norm(np.asarray(gridded.field_at(points)) - field, axis=-1)
     assert np.all(error[plasma] < 3e-2 * np.linalg.norm(field[plasma], axis=-1))
+
+
+def test_rho_and_field_in_planes(example):
+    nodes, points, field = _points(example, n=30, seed=3)
+    nodes[0, 0] = 0.0  # on the axis
+    phi = np.mod(nodes[:, 2], 2 * np.pi)
+    data = example.equilibrium.compute(["R", "Z", "B"], grid=Grid(nodes, sort=False))
+    r, z = np.asarray(data["R"]), np.asarray(data["Z"])
+    rho, b = example.rho_and_field_in_planes(phi, r[:, None], z[:, None])
+    # rho**2: rho has a cone on the axis
+    np.testing.assert_allclose(rho[:, 0] ** 2, nodes[:, 0] ** 2, atol=1e-5)
+    np.testing.assert_allclose(b[:, 0], np.asarray(data["B"]), rtol=1e-4, atol=1e-6)
+    # outside: 1 + residual / a, as the inverse map gives it
+    _, upper = example.bounds
+    outside = np.array([[upper[0] + 0.2, 1.0]])
+    rho, b = example.rho_and_field_in_planes([0.3], outside, [[0, 0]])
+    cartesian = np.stack([outside * np.cos(0.3), outside * np.sin(0.3), [[0, 0]]], -1)
+    np.testing.assert_allclose(rho, example.rho_at(cartesian), rtol=0.05)
+    assert np.all(rho > 1.0) and np.all(np.isfinite(b))
+    assert example.radial_coordinate == "toroidal"
+
+
+def test_gridded_deposition_matches_the_direct_one(example):
+    import freeofcharge as foc
+    from freeofcharge import GriddedEquilibrium
+    from freeofcharge.injectors import w7x_injectors
+
+    gridded = GriddedEquilibrium(example, (64, 32, 64))
+    assert gridded.radial_coordinate == "toroidal"
+    plasma = foc.Plasma.parabolic(
+        2e19, 2e3, ions={"H": (1, 1, 1.0)}, radial_coordinate="toroidal"
+    )
+    beam = w7x_injectors()[1].sources[0].beams(2, seed=1)["full"]
+    kwargs = {"step": 0.03, "rho_edges": np.linspace(0, 1, 6), "seed": 2}
+    on_grid = foc.deposit(beam, gridded, plasma, **kwargs)
+    direct = foc.deposit(beam, example, plasma, **kwargs)
+    assert 0.05 < direct.shine_through_fraction < 0.5
+    assert on_grid.shine_through_fraction == pytest.approx(
+        direct.shine_through_fraction, abs=5e-3
+    )
+    np.testing.assert_allclose(
+        on_grid.birth_rate, direct.birth_rate, atol=0.05 * direct.birth_rate.max()
+    )
+    np.testing.assert_allclose(on_grid.birth_rho, direct.birth_rho, atol=0.02)
+    assert on_grid.to_dataset().rho.attrs["long_name"] == r"$\rho_\mathrm{tor}$"

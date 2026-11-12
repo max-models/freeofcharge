@@ -36,7 +36,11 @@ import xarray as xr
 from methodcard import method
 from plasmacoll.units import to_unit
 
-from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
+from freeofcharge.equilibrium import (
+    FluxSurfaces,
+    MagneticEquilibrium,
+    radial_coordinate_of,
+)
 
 __all__ = [
     "CoilField",
@@ -453,6 +457,11 @@ class CoilField:
         self.coils = coils
         self.inside = inside
         self.current_scale = float(current_scale)
+
+    @property
+    def radial_coordinate(self) -> str:
+        """Return the equilibrium's radial coordinate."""
+        return radial_coordinate_of(self.equilibrium)
 
     @property
     def has_wall(self) -> bool:
