@@ -102,6 +102,8 @@ def test_gridded(example):
     nodes, points, field = _points(example, n=40, seed=2)
     plasma = nodes[:, 0] < 0.8
     rho = np.asarray(gridded.rho_at(points))
-    np.testing.assert_allclose(rho[plasma], nodes[plasma, 0], atol=0.08)
+    # rho**2 is what is interpolated; rho itself has a cone on the axis, where a small
+    # error in rho**2 is a large one in rho
+    np.testing.assert_allclose(rho[plasma] ** 2, nodes[plasma, 0] ** 2, atol=0.03)
     error = np.linalg.norm(np.asarray(gridded.field_at(points)) - field, axis=-1)
     assert np.all(error[plasma] < 3e-2 * np.linalg.norm(field[plasma], axis=-1))
