@@ -41,6 +41,11 @@ accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
   averaged over the orbit), shielded by the electrons with Sauter’s
   trapped-electron correction. Checked against ASCOT5 on an ASDEX
   Upgrade-sized case.
+- **Orbits** (`follow_orbits`): the births followed as guiding centres
+  (a compiled RK4 kernel on the gridded field, in tokamaks and
+  stellarators) with Monte Carlo Coulomb collisions that use the slowing
+  down’s drags, until they thermalise or cross the wall: the same moments
+  with finite orbit width, the losses and the wall loads.
 - **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
   stages before the plasma, from the other max-models codes: a
   wellbalanced global model of the D- source, tree-d-3d slit optics
@@ -53,8 +58,8 @@ Arrays live on the cunumpy backend (NumPy or CuPy); with MPI (maybempi)
 every rank traces its own markers and the profiles are summed once.
 Results convert to xarray datasets for plasma-plots.
 
-Not modelled: finite orbit width, prompt losses, charge-exchange losses
-of fast ions, anything 3D.
+Not modelled: charge-exchange losses of fast ions, radial electric
+fields, anomalous transport.
 
 Documentation: <https://max-models.github.io/freeofcharge/>
 

@@ -89,6 +89,11 @@ __all__ = [
 
 _E = ELEMENTARY_CHARGE
 
+_RECORD = 64
+"""Steps a marker takes near the wall per call of the kernel, all tested."""
+_CROSSED = 0.005
+"""Interpolated distance beyond the wall [m] at which the kernel stops near it."""
+
 #: What became of a marker: its ``fate`` code is the index.
 FATES = ("alive", "thermalised", "wall", "rho_limit", "grid", "max_time")
 _ALIVE, _THERMALISED, _WALL, _RHO_LIMIT, _GRID, _MAX_TIME = range(6)
@@ -279,8 +284,14 @@ class _Pusher:
         max_step,
         rho2_stop,
         clearance_stop=-np.inf,
+        clearance_high=np.inf,
+        record: int = 1,
     ):
-        """Push the columns of ``state`` ``(4, m)``; return the kernel's outputs."""
+        """Push the columns of ``state`` ``(4, m)``; return the kernel's outputs.
+
+        ``(state, previous, elapsed, status, shell_time, shell_vpar, path, taken)``;
+        ``path`` holds the start of the first ``record`` steps if ``record`` > 1.
+        """
         m = state.shape[1]
         state = _c_order(state)
         previous = np.zeros((3, m))
@@ -289,6 +300,8 @@ class _Pusher:
         n_shells = len(self.rho_edges) - 1
         shell_time = np.zeros((n_shells, m))
         shell_vpar = np.zeros((n_shells, m))
+        path = np.zeros((max(int(record), 1), 3, m))
+        taken = np.zeros(m, dtype=np.int64)
         if m:
             _push(
                 state,
@@ -302,14 +315,17 @@ class _Pusher:
                 float(rho2_stop),
                 self.wall,
                 float(clearance_stop),
+                float(clearance_high),
                 self.rho_edges,
                 previous,
                 elapsed,
                 status,
                 shell_time,
                 shell_vpar,
+                path,
+                taken,
             )
-        return state, previous, elapsed, status, shell_time, shell_vpar
+        return state, previous, elapsed, status, shell_time, shell_vpar, path, taken
 
 
 def trace_orbits(
@@ -346,7 +362,7 @@ def trace_orbits(
     out[0] = state
     alive = np.ones(n, dtype=bool)
     for k in range(1, samples):
-        state, _, _, status, _, _ = pusher.push(
+        state, _, _, status, *_ = pusher.push(
             state, markers.mu, np.where(alive, interval, 0.0), max_step, np.inf
         )
         alive &= status == 0
@@ -1097,6 +1113,37 @@ def follow_orbits(
             face[sel] = spoke_face[pick]
         return hit, point, face
 
+    def path_hits(index, path, taken, ends):
+        """First wall hits on the recorded steps: ``(hit, point, face, step)``.
+
+        ``path`` ``(m, K, 3)`` holds the start of each of the ``taken`` steps of the
+        markers ``index``; the last step ends at ``ends``.
+        """
+        m = len(index)
+        hit = np.zeros(m, dtype=bool)
+        point = np.full((m, 3), np.nan)
+        face = np.full(m, -1, dtype=np.int64)
+        segment = np.zeros(m, dtype=np.int64)
+        count = np.minimum(taken, path.shape[1])
+        if not np.any(count):
+            return hit, point, face, segment
+        owner = np.repeat(np.arange(m), count)
+        step = np.concatenate([np.arange(c) for c in count])
+        starts = path[owner, step]
+        following = np.minimum(step + 1, path.shape[1] - 1)
+        last = step + 1 >= count[owner]
+        stops = np.where(last[:, None], ends[owner], path[owner, following])
+        any_hit, any_point, any_face = wall_test(index[owner], starts, stops)
+        # the earliest step of each marker that hits
+        order = np.lexsort((step, ~any_hit, owner))
+        first = order[np.r_[True, owner[order][1:] != owner[order][:-1]]]
+        first = first[any_hit[first]]
+        hit[owner[first]] = True
+        point[owner[first]] = any_point[first]
+        face[owner[first]] = any_face[first]
+        segment[owner[first]] = step[first]
+        return hit, point, face, segment
+
     with sp.region("freeofcharge.follow_orbits", tags=PROFILE_TAGS):
         while True:
             alive = np.nonzero(fate == _ALIVE)[0]
@@ -1140,7 +1187,7 @@ def follow_orbits(
             todo = np.arange(len(alive))
             while len(todo):
                 index = alive[todo]
-                new, previous, elapsed, status, shell_time, shell_vpar = pusher.push(
+                pushed = pusher.push(
                     state[:, index],
                     mu[index],
                     remaining[todo],
@@ -1148,6 +1195,7 @@ def follow_orbits(
                     rho2_stop,
                     clearance_stop,
                 )
+                new, previous, elapsed, status, shell_time, shell_vpar, *_ = pushed
                 state[:, index] = new
                 round_time[:, todo] += shell_time
                 round_vpar[:, todo] += shell_vpar
@@ -1171,13 +1219,19 @@ def follow_orbits(
                     )
                     todo = np.array([], dtype=np.int64)
                     continue
-                # with a wall: the stopped markers step in NumPy, each step tested
+                # with a wall: near it the kernel records every step of a few
+                # dozen, and each of them is tested against the wall
                 outside = todo[stopped]
-                starts = previous[:, stopped].T
+                path = previous[:, stopped].T[:, None, :]
+                taken = (status[stopped] == 1).astype(np.int64)
+                step_dt = np.zeros(len(outside))
                 back = []
                 while len(outside):
                     index = alive[outside]
-                    hit, point, face = wall_test(index, starts, state[:3, index].T)
+                    ends = state[:3, index].T
+                    hit, point, face, segment = path_hits(index, path, taken, ends)
+                    # the steps after the one that hit are not taken
+                    time[index[hit]] -= (taken[hit] - segment[hit] - 1) * step_dt[hit]
                     finish(index[hit], _WALL, point[hit], face[hit])
                     keep = ~hit
                     outside = outside[keep]
@@ -1202,19 +1256,23 @@ def follow_orbits(
                     if not len(outside):
                         break
                     index = alive[outside]
-                    # one step each, so that the wall test sees the whole step
-                    near_step = np.minimum(
-                        remaining[outside], max_step[outside] * shrink[outside]
+                    near_step = max_step[outside] * shrink[outside]
+                    near_time = np.minimum(remaining[outside], _RECORD * near_step)
+                    step_dt = near_time / np.ceil(near_time / (near_step * (1 + 1e-9)))
+                    pushed = pusher.push(
+                        state[:, index],
+                        mu[index],
+                        near_time,
+                        near_step * (1.0 + 1e-9),
+                        np.inf,
+                        -_CROSSED,
+                        clearance_stop,
+                        record=_RECORD,
                     )
-                    new, previous, elapsed, status, shell_time, shell_vpar = (
-                        pusher.push(
-                            state[:, index],
-                            mu[index],
-                            near_step,
-                            near_step * (1.0 + 1e-9),
-                            np.inf,
-                        )
+                    new, _, elapsed, status, shell_time, shell_vpar, path, taken = (
+                        pushed
                     )
+                    path = np.moveaxis(path, 2, 0)  # (marker, step, xyz)
                     state[:, index] = new
                     round_time[:, outside] += shell_time
                     round_vpar[:, outside] += shell_vpar
@@ -1227,7 +1285,8 @@ def follow_orbits(
                     grid_loss = off_stage & (shrink[outside] < 1e-3)
                     finish(index[grid_loss], _GRID, state[:3, index[grid_loss]].T)
                     outside = outside[~grid_loss]
-                    starts = previous[:, ~grid_loss].T
+                    path, taken = path[~grid_loss], taken[~grid_loss]
+                    step_dt = step_dt[~grid_loss]
                 todo = np.concatenate(back) if back else np.array([], dtype=np.int64)
             # energy after the push: the change is the integration error
             still = fate[alive] == _ALIVE

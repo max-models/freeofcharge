@@ -214,12 +214,15 @@ def push_one(
     rho2_stop: float,
     wall: "float[:]",
     clearance_stop: float,
+    clearance_high: float,
     rho_edges: "float[:]",
     previous: "float[:,:]",
     elapsed: "float[:]",
     status: "int[:]",
     shell_time: "float[:,:]",
     shell_vpar: "float[:,:]",
+    path: "float[:,:,:]",
+    taken: "int[:]",
 ) -> None:
     """Push marker ``k`` (see `guiding_centre_push`)."""
     x = state[0, k]
@@ -232,6 +235,8 @@ def push_one(
     previous[2, k] = z
     elapsed[k] = 0.0
     status[k] = 0
+    taken[k] = 0
+    record = path.shape[0]
     if duration[k] <= 0.0:
         return
     steps = int(ceil(duration[k] / max_step[k]))
@@ -271,6 +276,11 @@ def push_one(
         previous[0, k] = x
         previous[1, k] = y
         previous[2, k] = z
+        if record > 1 and taken[k] < record:
+            path[taken[k], 0, k] = x
+            path[taken[k], 1, k] = y
+            path[taken[k], 2, k] = z
+        taken[k] += 1
         x = x + dt / 6.0 * (x1 + 2.0 * x2 + 2.0 * x3 + x4)
         y = y + dt / 6.0 * (y1 + 2.0 * y2 + 2.0 * y3 + y4)
         z = z + dt / 6.0 * (z1 + 2.0 * z2 + 2.0 * z3 + z4)
@@ -282,7 +292,7 @@ def push_one(
             break
         if wall.shape[0] > 1:
             clearance, ok = scalar_at(wall, 1, 0, grid, shape, x, y, z)
-            if clearance < clearance_stop:
+            if clearance < clearance_stop or clearance > clearance_high:
                 status[k] = 1
                 break
     state[0, k] = x
@@ -304,12 +314,15 @@ def guiding_centre_push(
     rho2_stop: float,
     wall: "float[:]",
     clearance_stop: float,
+    clearance_high: float,
     rho_edges: "float[:]",
     previous: "float[:,:]",
     elapsed: "float[:]",
     status: "int[:]",
     shell_time: "float[:,:]",
     shell_vpar: "float[:,:]",
+    path: "float[:,:,:]",
+    taken: "int[:]",
 ) -> None:
     """Push guiding centres by RK4 for their ``duration``, in equal steps up to ``max_step``.
 
@@ -319,16 +332,21 @@ def guiding_centre_push(
     dphi, dZ, period, pad)``; ``shape`` the nodes ``(n_R, n_phi, n_Z)``
     and the padded ``(n_R', n_phi', n_Z')``; ``qm`` = q/m.
     A marker stops early after a step that ends at ``rho^2 >= rho2_stop``, closer to
-    the wall than ``clearance_stop`` (``wall``: the flattened padded coefficients of
-    the wall clearance on the same grid; one entry: no wall) or off the
+    the wall than ``clearance_stop`` or farther than ``clearance_high`` (``wall``: the
+    flattened padded coefficients of the wall clearance on the same grid; one entry: no
+    wall) or off the
     grid (``status`` 1; ``previous`` holds the start of that step) or when a stage
     leaves the grid (``status`` 2, the state of the step's start); else ``status`` 0.
     ``elapsed`` gets the time pushed; ``shell_time`` and ``shell_vpar``
     ``(n_shells, n)`` add the time and ``v_par`` times the time spent in each shell
-    of ``rho_edges`` (scored at the start of each step).
+    of ``rho_edges`` (scored at the start of each step). ``taken`` gets the number of
+    steps; ``path`` ``(K, 3, n)`` the start of each of the first ``K`` steps (``K`` = 1:
+    not recorded).
     """
     n = state.shape[1]
-    # $ omp parallel for schedule(dynamic, 4)
+    # fmt: off
+    #$ omp parallel for schedule(dynamic, 4)
+    # fmt: on
     for k in range(n):
         push_one(
             k,
@@ -343,10 +361,13 @@ def guiding_centre_push(
             rho2_stop,
             wall,
             clearance_stop,
+            clearance_high,
             rho_edges,
             previous,
             elapsed,
             status,
             shell_time,
             shell_vpar,
+            path,
+            taken,
         )

@@ -120,17 +120,22 @@ def guiding_centre_push(
     rho2_stop: float,
     wall: np.ndarray,
     clearance_stop: float,
+    clearance_high: float,
     rho_edges: np.ndarray,
     previous: np.ndarray,
     elapsed: np.ndarray,
     status: np.ndarray,
     shell_time: np.ndarray,
     shell_vpar: np.ndarray,
+    path: np.ndarray,
+    taken: np.ndarray,
 ) -> None:
     """RK4 guiding-centre push, see ``guiding_centre_push_pyccel.guiding_centre_push``."""
     previous[:] = state[:3]
     elapsed[:] = 0.0
     status[:] = 0
+    taken[:] = 0
+    record = path.shape[0]
     positive = duration > 0.0
     steps = np.where(
         positive, np.ceil(duration / np.where(positive, max_step, 1.0)), 0
@@ -176,6 +181,10 @@ def guiding_centre_push(
             ]
         )
         previous[:, g] = state[:3, g]
+        if record > 1:
+            room = taken[g] < record
+            path[taken[g][room], :, g[room]] = state[:3, g[room]].T
+        taken[g] += 1
         state[:, g] = new
         elapsed[g] += d[good]
         done[g] += 1
@@ -183,7 +192,7 @@ def guiding_centre_push(
         stop = ~on_grid | (rho2_new >= rho2_stop)
         if wall.shape[0] > 1:
             clearance, _ = scalar_at(wall, 1, 0, grid, shape, new[0], new[1], new[2])
-            stop |= clearance < clearance_stop
+            stop |= (clearance < clearance_stop) | (clearance > clearance_high)
         status[g[stop]] = 1
         active[g[stop]] = False
         active[g[done[g] >= steps[g]]] = False

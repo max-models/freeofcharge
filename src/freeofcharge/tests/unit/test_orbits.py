@@ -135,12 +135,15 @@ def _kernel_arguments(field, n, wall=None, seed=0):
         0.5,
         np.zeros(1) if wall is None else wall.reshape(-1).copy(),
         0.02,
+        np.inf,
         edges,
         np.zeros((3, n)),
         np.zeros(n),
         np.zeros(n, dtype=np.int64),
         np.zeros((5, n)),
         np.zeros((5, n)),
+        np.zeros((8, 3, n)),
+        np.zeros(n, dtype=np.int64),
     )
 
 
@@ -156,13 +159,14 @@ def test_compiled_kernel_matches_numpy(tokamak):
     for a, b in zip(compiled, reference, strict=True):
         if isinstance(a, np.ndarray):
             assert np.allclose(a, b, rtol=1e-9, atol=1e-9)
-    status = compiled[14]
+    status = compiled[15]
     # some markers stop at rho^2 = 0.5, the others run their time
     assert set(np.unique(status)) <= {0, 1}
     assert np.any(status == 1) and np.any(status == 0)
-    assert np.allclose(compiled[13][status == 0], 3e-6)
+    assert np.allclose(compiled[14][status == 0], 3e-6)
+    assert np.all(compiled[19][status == 0] >= 100)
     # the shells hold the time pushed
-    assert np.allclose(compiled[15].sum(axis=0), compiled[13])
+    assert np.allclose(compiled[16].sum(axis=0), compiled[14])
 
 
 def test_numpy_kernel_stops_off_the_grid(tokamak):
@@ -173,7 +177,7 @@ def test_numpy_kernel_stops_off_the_grid(tokamak):
     args[0][2] = [0.0, 0.0, 0.0]
     args[8] = np.inf
     guiding_centre_push_numpy.guiding_centre_push(*args)
-    assert args[14][2] == 2
+    assert args[15][2] == 2
 
 
 # ----------------------------------------------------------------------
@@ -559,3 +563,21 @@ def test_traces_have_plasma_plots_layout(tokamak):
     plasma_plots = pytest.importorskip("plasma_plots.plotting")
     subset = plasma_plots.prepare_orbits(traces, required=("x", "y", "z"))
     assert subset.sizes["marker"] == 2
+
+
+def test_pyccel_source_runs_as_python(tokamak):
+    """The Pyccel source, uncompiled, gives the NumPy version's result."""
+    from freeofcharge.kernels.guiding_centre_push import guiding_centre_push_pyccel
+
+    _, field, wall = tokamak
+    clearance = orbits.wall_clearance(wall, field)
+    python = list(_kernel_arguments(field, 3, clearance))
+    reference = list(_kernel_arguments(field, 3, clearance))
+    for args in (python, reference):
+        args[2] = np.full(3, 9e-8)
+    guiding_centre_push_pyccel.guiding_centre_push(*python)
+    guiding_centre_push_numpy.guiding_centre_push(*reference)
+    for a, b in zip(python, reference, strict=True):
+        if isinstance(a, np.ndarray):
+            assert np.allclose(a, b, rtol=1e-9, atol=1e-9)
+    assert np.all(python[19] == 3)
