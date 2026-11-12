@@ -7,6 +7,7 @@ from freeofcharge.equilibrium import (
     Equilibrium,
     FluxSurfaces,
     MagneticEquilibrium,
+    monte_carlo_volumes,
     rho_coordinate,
 )
 from freeofcharge.gridded_equilibrium import GriddedEquilibrium
@@ -42,6 +43,7 @@ __all__ = [
     "SuzukiStopping",
     "deposit",
     "deposit_sources",
+    "monte_carlo_volumes",
     "rho_coordinate",
     "slow_down",
     "tangential_injection",
