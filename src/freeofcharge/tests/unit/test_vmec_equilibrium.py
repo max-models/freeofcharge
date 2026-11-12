@@ -47,6 +47,7 @@ def test_is_a_magnetic_equilibrium(vacuum):
     lower, upper = vacuum.bounds
     assert np.all(lower < upper)
     assert not vacuum.has_wall
+    assert vacuum.radial_coordinate == "toroidal"
     assert vacuum.nfp == 3
     # the sample's device: major radius 1 m, minor radius about 0.16 m
     assert 0.1 < vacuum.minor_radius < 0.2

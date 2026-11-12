@@ -231,3 +231,34 @@ def test_nan_points_are_outside(gridded):
     points = np.array([[np.nan, 0.0, 0.0], [3.0, np.nan, 0.0], [3.0, 0.0, np.nan]])
     assert np.all(np.isnan(gridded.rho_at(points)))
     assert not np.any(gridded.inside_at(points))
+
+
+def test_rho_and_inside_at_once(gridded, helical):
+    _, points = _plasma_points(helical, n=40, seed=9)
+    off = np.array([[100.0, 0.0, 0.0]])
+    rho, inside = gridded.rho_and_inside_at(np.concatenate([points, off]))
+    np.testing.assert_array_equal(rho[:-1], gridded.rho_at(points))
+    assert np.all(inside[:-1]) and not inside[-1] and np.isnan(rho[-1])
+    # no point on the grid at all
+    assert np.all(np.isnan(gridded.field_at(np.repeat(off, 3, axis=0))))
+
+
+def test_cached_samples_once(solovev, tmp_path):
+    path = tmp_path / "cache" / "grid.nc"
+    first = GriddedEquilibrium.cached(path, solovev, (16, 4, 16), symmetric=False)
+    assert path.exists() and first.radial_coordinate == "poloidal"
+    again = GriddedEquilibrium.cached(path, solovev, (16, 4, 16), symmetric=False)
+    np.testing.assert_array_equal(again.samples.rho_squared, first.samples.rho_squared)
+    assert again.equilibrium is solovev
+    other = GriddedEquilibrium.cached(path, solovev, 12, symmetric=False)
+    assert other.samples.rho_squared.shape == (12, 12, 12)
+    # the radial coordinate is kept in the file
+    assert GriddedEquilibrium.load(path).radial_coordinate == "poloidal"
+
+
+def test_radial_coordinate_of_older_files(solovev):
+    gridded = GriddedEquilibrium(solovev, (12, 4, 12), symmetric=False)
+    samples = gridded.samples.copy()
+    del samples.attrs["radial_coordinate"]
+    older = GriddedEquilibrium(solovev, _samples=samples)
+    assert older.radial_coordinate == "poloidal"

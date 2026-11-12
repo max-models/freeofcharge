@@ -69,6 +69,8 @@ class GVECEquilibrium:
     """
 
     has_wall = False
+    radial_coordinate = "toroidal"
+    r"""$\rho = \sqrt{\Phi_n}$, the root of the normalised toroidal flux."""
 
     def __init__(
         self,

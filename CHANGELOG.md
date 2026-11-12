@@ -7,6 +7,38 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Deposition in 3D at production size. `deposit` evaluates only the steps of each line that
+  can lie in the plasma (a window from the equilibrium's box, when there is no wall) and
+  takes $\rho$ and `inside_at` from one evaluation where the equilibrium offers
+  `rho_and_inside_at`; `GriddedEquilibrium` interpolates only the points on its grid. The
+  results are unchanged (bit for bit with the same chunks); on DESC's W7-X grid,
+  $10^4$ markers at 1 cm steps take about 4 s (11 s before), about 0.4 ms per marker.
+- `DESCEquilibrium.rho_and_field_in_planes`: $\rho$ and $\mathbf{B}$ at many points in a few
+  toroidal planes, from one DESC evaluation on a $(\rho, \theta)$ table per plane and Newton
+  on its splines (to about $5 \times 10^{-7}$ in $\rho$), about a thousand times faster than
+  `map_coordinates`. `GriddedEquilibrium` samples through it, so DESC's W7-X at
+  $128 \times 64 \times 128$ nodes takes about 30 s; `GriddedEquilibrium.cached` keeps the
+  samples in a netCDF file. DESC's evaluations on scattered nodes go in chunks, and on
+  tensor nodes (flux shells) through one `LinearGrid`, which keeps `flux_surfaces` within
+  memory.
+- Injectors (`freeofcharge.injectors`): `BeamSource` (position, aim, full energy, neutral
+  power, power shares of the full, half and third energy, width, divergence, isotope) with a
+  `NeutralBeam` per energy component; `InjectorBox.converging` (sources aimed through a
+  crossover point); `deposit_sources` and `SourceDepositions` (shine-through, wall hits and
+  birth profiles per source and component, `total` for the slowing down);
+  `Deposition.combine`. `w7x_injectors` and `W7XInjectors`: W7-X-like boxes NI20 and NI21
+  with the published energy (55 keV, H), power per source (1.8 MW) and layout, and a
+  stand-in geometry, power shares and divergence (not W7-X data).
+- The radial coordinate: equilibria say in `radial_coordinate` which flux $\rho$ is the root
+  of (`"poloidal"` for `Equilibrium`, `"toroidal"` for the GVEC, DESC, VMEC and PolarFEEC
+  adapters, kept by `GriddedEquilibrium`), and `FluxSurfaces`, `Deposition` and `SlowingDown`
+  carry it into their datasets (`rho_coordinate`: label and definition). `Plasma` takes an
+  optional `radial_coordinate`, checked against the equilibrium's by `deposit` and
+  `slow_down`.
+- Docs example "W7-X deposition": DESC's W7-X on a cached grid against DESC, the stand-in
+  injectors, shine-through against density per energy component, birth profiles per source
+  and component, and a beam on the grid against DESC directly (shine-through equal to
+  $10^{-4}$, births within a millimetre).
 - Fast evaluation of 3D equilibria: `GriddedEquilibrium` wraps any `MagneticEquilibrium`,
   samples $\rho^2$ and the cylindrical components of $\mathbf{B}$ once on a grid in
   $(R, \varphi, Z)$ over one field period (half of one with stellarator symmetry, from the

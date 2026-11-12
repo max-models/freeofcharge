@@ -20,7 +20,9 @@ B_R(R, -\varphi, -Z) = -B_R(R, \varphi, Z), \quad
 (B_\varphi, B_Z)(R, -\varphi, -Z) = (B_\varphi, B_Z)(R, \varphi, Z),
 $$
 
-only half a period is sampled and the other half filled in.
+only half a period is sampled and the other half filled in. An adapter with
+``rho_and_field_in_planes`` (DESC's) is sampled plane by plane through it, much
+faster than point by point.
 
 Accuracy: $s$ and $\mathbf{B}$ are smooth inside the plasma, where the error
 falls as $h^4$ with the cell size $h$; $\rho^2$ rather than $\rho$ because
@@ -42,7 +44,11 @@ import xarray as xr
 from methodcard import ConvergenceProblem, method
 from scipy import ndimage
 
-from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
+from freeofcharge.equilibrium import (
+    FluxSurfaces,
+    MagneticEquilibrium,
+    radial_coordinate_of,
+)
 
 __all__ = ["GriddedEquilibrium"]
 
@@ -234,8 +240,18 @@ class GriddedEquilibrium:
             phi = np.linspace(0.0, 2.0 * np.pi / nfp, n_phi, endpoint=False)
             z = np.linspace(z_range[0], z_range[1], n_z)
             rr, pp, zz = np.meshgrid(r, phi, z, indexing="ij")
-            points = np.stack([rr * np.cos(pp), rr * np.sin(pp), zz], axis=-1)
-            inside = xp.to_numpy(equilibrium.inside_at(points)).astype(bool)
+            planes = getattr(equilibrium, "rho_and_field_in_planes", None)
+            if planes is None:
+                points = np.stack([rr * np.cos(pp), rr * np.sin(pp), zz], axis=-1)
+                inside = xp.to_numpy(equilibrium.inside_at(points)).astype(bool)
+            else:
+                rho, _ = planes(
+                    phi,
+                    np.moveaxis(rr, 1, 0).reshape(n_phi, -1),
+                    np.moveaxis(zz, 1, 0).reshape(n_phi, -1),
+                )
+                rho = np.moveaxis(np.asarray(rho).reshape(n_phi, n_r, n_z), 0, 1)
+                inside = np.isfinite(rho) & (rho < 1.0)
             if not inside.any():
                 raise ValueError("the probe found no point inside the plasma")
             r_inside = rr[inside]
@@ -248,6 +264,36 @@ class GriddedEquilibrium:
             float(z_range[0]),
             float(z_range[1]),
         )
+
+    @staticmethod
+    def _sample_points(equilibrium, rr, pp, zz, chunk: int) -> dict:
+        r"""Return $\rho$ and the cylindrical field at the nodes, in chunks of points."""
+        points = np.stack([rr * np.cos(pp), rr * np.sin(pp), zz], axis=-1).reshape(
+            -1, 3
+        )
+        rho = np.empty(points.shape[0])
+        field = np.empty((points.shape[0], 3))
+        # one inversion for both where the adapter offers it
+        both = getattr(equilibrium, "rho_and_field_at", None)
+        for start in range(0, points.shape[0], chunk):
+            part = slice(start, start + chunk)
+            if both is None:
+                sample = (
+                    equilibrium.rho_at(points[part]),
+                    equilibrium.field_at(points[part]),
+                )
+            else:
+                sample = both(points[part])
+            rho[part] = xp.to_numpy(sample[0]).reshape(-1)
+            field[part] = xp.to_numpy(sample[1]).reshape(-1, 3)
+        cos_p, sin_p = np.cos(pp).ravel(), np.sin(pp).ravel()
+        values = {
+            "rho": rho,
+            "b_r": field[:, 0] * cos_p + field[:, 1] * sin_p,
+            "b_phi": -field[:, 0] * sin_p + field[:, 1] * cos_p,
+            "b_z": field[:, 2],
+        }
+        return {k: v.reshape(rr.shape) for k, v in values.items()}
 
     @classmethod
     def _sample(
@@ -282,32 +328,24 @@ class GriddedEquilibrium:
         phi = np.arange(n_phi) * period / n_phi
         sampled = phi[: n_phi // 2 + 1] if symmetric else phi
         rr, pp, zz = np.meshgrid(r, sampled, z, indexing="ij")
-        points = np.stack([rr * np.cos(pp), rr * np.sin(pp), zz], axis=-1).reshape(
-            -1, 3
-        )
-        rho = np.empty(points.shape[0])
-        field = np.empty((points.shape[0], 3))
-        # one inversion for both where the adapter offers it
-        both = getattr(equilibrium, "rho_and_field_at", None)
-        for start in range(0, points.shape[0], chunk):
-            part = slice(start, start + chunk)
-            if both is None:
-                sample = (
-                    equilibrium.rho_at(points[part]),
-                    equilibrium.field_at(points[part]),
-                )
-            else:
-                sample = both(points[part])
-            rho[part] = xp.to_numpy(sample[0]).reshape(-1)
-            field[part] = xp.to_numpy(sample[1]).reshape(-1, 3)
-        cos_p, sin_p = np.cos(pp).ravel(), np.sin(pp).ravel()
-        values = {
-            "rho": rho,
-            "b_r": field[:, 0] * cos_p + field[:, 1] * sin_p,
-            "b_phi": -field[:, 0] * sin_p + field[:, 1] * cos_p,
-            "b_z": field[:, 2],
-        }
-        values = {k: v.reshape(rr.shape) for k, v in values.items()}
+        planes = getattr(equilibrium, "rho_and_field_in_planes", None)
+        if planes is not None:
+            # the adapter's fast path for points in a few planes (DESC)
+            plane_r = np.moveaxis(rr, 1, 0).reshape(len(sampled), -1)
+            plane_z = np.moveaxis(zz, 1, 0).reshape(len(sampled), -1)
+            rho, field = planes(sampled, plane_r, plane_z)
+            values = {
+                "rho": np.asarray(rho),
+                "b_r": np.asarray(field)[..., 0],
+                "b_phi": np.asarray(field)[..., 1],
+                "b_z": np.asarray(field)[..., 2],
+            }
+            values = {
+                k: np.moveaxis(v.reshape(len(sampled), len(r), len(z)), 0, 1)
+                for k, v in values.items()
+            }
+        else:
+            values = cls._sample_points(equilibrium, rr, pp, zz, chunk)
         _fill_non_finite(values, r[1] - r[0], z[1] - z[0])
         if symmetric:
             # (R, -phi, -Z): the planes n_phi - j from the planes j
@@ -328,6 +366,7 @@ class GriddedEquilibrium:
             attrs={
                 "nfp": nfp,
                 "symmetric": int(symmetric),
+                "radial_coordinate": radial_coordinate_of(equilibrium),
                 "bounds_lower": np.asarray(equilibrium.bounds[0], dtype=float),
                 "bounds_upper": np.asarray(equilibrium.bounds[1], dtype=float),
             },
@@ -422,6 +461,34 @@ class GriddedEquilibrium:
             samples = dataset.load()
         return cls(equilibrium, order=order, _samples=samples)
 
+    @classmethod
+    def cached(
+        cls,
+        path: str | Path,
+        equilibrium: MagneticEquilibrium,
+        resolution: int | tuple[int, int, int] = (64, 32, 64),
+        **kwargs,
+    ) -> GriddedEquilibrium:
+        """Return the samples saved in ``path`` if they have ``resolution``, else sample and save.
+
+        A cache: sample a 3D equilibrium once (DESC's W7-X at (128, 64, 128)
+        takes about half a minute), then load it in a second. ``kwargs`` go to
+        the constructor; only the resolution is checked against the file.
+        """
+        path = Path(path)
+        n_r, n_phi, n_z = (
+            (resolution,) * 3 if isinstance(resolution, int) else resolution
+        )
+        shape = (int(n_r), int(n_phi), int(n_z))
+        if path.exists():
+            loaded = cls.load(path, equilibrium, order=kwargs.get("order", 3))
+            if loaded._shape == shape:
+                return loaded
+        gridded = cls(equilibrium, shape, **kwargs)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        gridded.save(path)
+        return gridded
+
     # ------------------------------------------------------------------
     # Evaluation
     # ------------------------------------------------------------------
@@ -440,17 +507,20 @@ class GriddedEquilibrium:
         # written so that NaN coordinates count as outside
         inside = (i >= 0) & (i <= self._shape[0] - 1) & (k >= 0)
         inside &= (k <= self._shape[2] - 1) & xp.isfinite(j)
-        coordinates = xp.where(inside, xp.stack([i + p, j + p, k + p]), float(p))
+        # only the points on the grid: a beam line is mostly off it
+        index = xp.nonzero(inside)[0]
+        coordinates = xp.stack([i[index] + p, j[index] + p, k[index] + p])
         results = []
         for name in names:
-            value = xp.scipy.ndimage.map_coordinates(
+            value = xp.full(flat.shape[0], xp.nan)
+            value[index] = xp.scipy.ndimage.map_coordinates(
                 self._coefficients[_COMPONENTS.index(name)],
                 coordinates,
                 order=self.order,
                 mode="nearest",
                 prefilter=False,
             )
-            results.append(xp.where(inside, value, xp.nan).reshape(shape))
+            results.append(value.reshape(shape))
         return results, phi.reshape(shape)
 
     def rho_at(self, points):
@@ -461,6 +531,11 @@ class GriddedEquilibrium:
     def inside_at(self, points):
         r"""Return whether the interpolated $\rho$ is below 1."""
         return self.rho_at(points) < 1.0
+
+    def rho_and_inside_at(self, points):
+        r"""Return $\rho$ and `inside_at` from one interpolation."""
+        rho = self.rho_at(points)
+        return rho, rho < 1.0
 
     def field_at(self, points):
         r"""Return $\mathbf{B}$ [T] at Cartesian ``points`` ``(..., 3)``, shape ``(..., 3)``."""
@@ -473,6 +548,13 @@ class GriddedEquilibrium:
     # ------------------------------------------------------------------
     # Delegated to the equilibrium
     # ------------------------------------------------------------------
+
+    @property
+    def radial_coordinate(self) -> str:
+        """Return the wrapped equilibrium's radial coordinate (saved with the samples)."""
+        if "radial_coordinate" in self.samples.attrs:
+            return str(self.samples.attrs["radial_coordinate"])
+        return radial_coordinate_of(self.equilibrium)
 
     @property
     def has_wall(self) -> bool:

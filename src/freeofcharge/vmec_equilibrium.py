@@ -208,6 +208,8 @@ class VMECEquilibrium:
     """
 
     has_wall = False
+    radial_coordinate = "toroidal"
+    r"""$\rho = \sqrt{s}$, the root of the normalised toroidal flux."""
 
     def __init__(
         self,

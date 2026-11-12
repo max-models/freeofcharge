@@ -22,6 +22,7 @@ again counts as stopped, not followed.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import cunumpy as xp
@@ -34,7 +35,12 @@ from plasmacoll.constants import ELEMENTARY_CHARGE
 from plasmacoll.units import to_unit
 
 from freeofcharge.beam import NeutralBeam
-from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
+from freeofcharge.equilibrium import (
+    FluxSurfaces,
+    MagneticEquilibrium,
+    radial_coordinate_of,
+    rho_coordinate,
+)
 from freeofcharge.profiles import Plasma
 from freeofcharge.stopping import StoppingModel, SuzukiStopping
 
@@ -61,6 +67,7 @@ class Deposition:
     absorbed_power: float
     shine_through_power: float
     wall_hits: ParticleArrays | None
+    radial_coordinate: str = "poloidal"
     """Birth positions ``(N, 3)``, velocities and weights [ions/s]."""
     r"""$\rho$ of each birth."""
     r"""$v_\parallel / v$ of each birth (positive along $\mathbf{B}$)."""
@@ -69,6 +76,54 @@ class Deposition:
     """Beam power deposited in each shell [W]."""
     """Where the shine-through meets the wall: positions, velocities, weights
     [atoms/s]; None without a wall."""
+    r"""The flux $\rho$ is the root of, the equilibrium's (`freeofcharge.rho_coordinate`)."""
+
+    @classmethod
+    def combine(cls, depositions: Sequence[Deposition]) -> Deposition:
+        """Return the sum of depositions on the same shells, of one isotope.
+
+        For example the energy components and sources of an injector, to be
+        slowed down together: profiles and powers add up, births and wall hits
+        are joined.
+        """
+        if not depositions:
+            raise ValueError("nothing to combine")
+        first = depositions[0]
+        for other in depositions[1:]:
+            if not np.array_equal(other.rho_edges, first.rho_edges):
+                raise ValueError("the depositions have different shells")
+            if other.mass_number != first.mass_number:
+                raise ValueError("the depositions are of different isotopes")
+            if other.radial_coordinate != first.radial_coordinate:
+                raise ValueError("the depositions have different radial coordinates")
+
+        def join(parts: list[ParticleArrays]) -> ParticleArrays:
+            return ParticleArrays(
+                xp.concatenate([p.positions for p in parts]),
+                xp.concatenate([p.velocities for p in parts]),
+                xp.concatenate([p.weights for p in parts]),
+            )
+
+        hits = [d.wall_hits for d in depositions if d.wall_hits is not None]
+        return cls(
+            births=join([d.births for d in depositions]),
+            birth_rho=xp.concatenate([xp.asarray(d.birth_rho) for d in depositions]),
+            birth_pitch=xp.concatenate(
+                [xp.asarray(d.birth_pitch) for d in depositions]
+            ),
+            birth_field=xp.concatenate(
+                [xp.asarray(d.birth_field) for d in depositions]
+            ),
+            mass_number=first.mass_number,
+            rho_edges=first.rho_edges,
+            birth_rate=np.sum([d.birth_rate for d in depositions], axis=0),
+            power=np.sum([d.power for d in depositions], axis=0),
+            injected_power=sum(d.injected_power for d in depositions),
+            absorbed_power=sum(d.absorbed_power for d in depositions),
+            shine_through_power=sum(d.shine_through_power for d in depositions),
+            wall_hits=join(hits) if hits else None,
+            radial_coordinate=first.radial_coordinate,
+        )
 
     @property
     def shine_through_fraction(self) -> float:
@@ -107,8 +162,9 @@ class Deposition:
             )
         return xr.Dataset(
             variables,
-            coords={"rho": ("rho", rho, {"long_name": r"$\rho_\mathrm{pol}$"})},
+            coords={"rho": ("rho", rho, rho_coordinate(self.radial_coordinate))},
             attrs={
+                "radial_coordinate": self.radial_coordinate,
                 "injected_power": self.injected_power,
                 "absorbed_power": self.absorbed_power,
                 "shine_through_power": self.shine_through_power,
@@ -133,6 +189,52 @@ def _path_length(beam: NeutralBeam, equilibrium: MagneticEquilibrium) -> float:
         lower = np.minimum(lower, positions.min(axis=0))
         upper = np.maximum(upper, positions.max(axis=0))
     return float(np.linalg.norm(upper - lower))
+
+
+def _step_window(positions, directions, equilibrium, step: float, n_steps: int):
+    r"""Return per line the first and the end step that can be in the plasma.
+
+    The steps whose midpoints lie in the cylinder $R \le R_\max$,
+    $Z_\min \le Z \le Z_\max$ around the equilibrium's box, padded by 2 % of its
+    size and one step; a line that misses it gets an empty window.
+    """
+    lower, upper = (np.asarray(b, dtype=float) for b in equilibrium.bounds)
+    pad = 0.02 * float(np.max(upper - lower)) + step
+    r_max = float(max(np.abs(lower[:2]).max(), np.abs(upper[:2]).max())) + pad
+    z_lo, z_hi = lower[2] - pad, upper[2] + pad
+    p, d = xp.asarray(positions), xp.asarray(directions)
+    # R(s)^2 <= r_max^2: a s^2 + b s + c <= 0
+    a = d[:, 0] ** 2 + d[:, 1] ** 2
+    b = 2.0 * (p[:, 0] * d[:, 0] + p[:, 1] * d[:, 1])
+    c = p[:, 0] ** 2 + p[:, 1] ** 2 - r_max**2
+    root = xp.sqrt(xp.maximum(b**2 - 4.0 * a * c, 0.0))
+    vertical = a < 1.0e-12
+    safe_a = xp.where(vertical, 1.0, a)
+    s_in = xp.where(
+        vertical, xp.where(c <= 0.0, -xp.inf, xp.inf), (-b - root) / (2.0 * safe_a)
+    )
+    s_out = xp.where(
+        vertical, xp.where(c <= 0.0, xp.inf, -xp.inf), (-b + root) / (2.0 * safe_a)
+    )
+    s_out = xp.where(b**2 - 4.0 * a * c < 0.0, -xp.inf, s_out)
+    # Z_min <= Z(s) <= Z_max
+    flat = xp.abs(d[:, 2]) < 1.0e-12
+    safe_dz = xp.where(flat, 1.0, d[:, 2])
+    t1, t2 = (z_lo - p[:, 2]) / safe_dz, (z_hi - p[:, 2]) / safe_dz
+    within = (p[:, 2] >= z_lo) & (p[:, 2] <= z_hi)
+    z_in = xp.where(flat, xp.where(within, -xp.inf, xp.inf), xp.minimum(t1, t2))
+    z_out = xp.where(flat, xp.where(within, xp.inf, -xp.inf), xp.maximum(t1, t2))
+    s_in, s_out = xp.maximum(s_in, z_in), xp.minimum(s_out, z_out)
+    first = xp.clip(
+        xp.floor(xp.where(xp.isfinite(s_in), s_in, -1.0) / step), 0, n_steps
+    )
+    last = xp.clip(
+        xp.ceil(xp.where(xp.isfinite(s_out), s_out, n_steps * step) / step), 0, n_steps
+    )
+    empty = s_out <= s_in
+    first = xp.where(empty, n_steps, first).astype(int)
+    last = xp.where(empty, 0, last).astype(int)
+    return first, last
 
 
 @method(
@@ -182,6 +284,8 @@ def deposit(
         comm: Communicator over which the markers are split; serial if None.
         chunk_points: Line points held at once (memory).
     """
+    radial_coordinate = radial_coordinate_of(equilibrium)
+    plasma.check_radial_coordinate(radial_coordinate)
     step = to_unit(step, "m", "step")
     max_length = to_unit(max_length, "m", "max_length")
     stopping = SuzukiStopping() if stopping is None else stopping
@@ -192,14 +296,22 @@ def deposit(
     shells = FluxSurfaces(rho_edges, np.zeros(0), np.zeros(0), np.zeros(0))
     length = _path_length(beam, equilibrium) if max_length is None else max_length
     n_steps = int(np.ceil(length / step))
-    chunk = max(1, chunk_points // n_steps)
+    directions = beam.directions
+    # without a wall only the steps near the plasma matter: a window per line
+    window = (
+        None
+        if equilibrium.has_wall
+        else _step_window(
+            beam.markers.positions, directions, equilibrium, step, n_steps
+        )
+    )
+    longest = n_steps if window is None else max(1, int(xp.max(window[1] - window[0])))
+    chunk = max(1, chunk_points // longest)
     rank = 0 if comm is None else comm.Get_rank()
     rng = make_rng(seed, rank)
 
     energies = beam.energies
     energy_per_amu = energies / beam.mass_number
-    directions = beam.directions
-    s_mid = (xp.arange(n_steps) + 0.5) * step
 
     tallies = xp.zeros((n_shells, 2))
     totals = xp.zeros(2)  # absorbed and shine-through power [W]
@@ -211,6 +323,12 @@ def deposit(
         origin = beam.markers.positions[sl]
         direction = directions[sl]
         weight = beam.markers.weights[sl]
+        if window is None:
+            first, last = 0, n_steps
+        else:
+            first = int(xp.min(window[0][sl]))
+            last = max(int(xp.max(window[1][sl])), first + 1)
+        s_mid = (xp.arange(first, last) + 0.5) * step
         points = origin[:, None, :] + s_mid[None, :, None] * direction[:, None, :]
         shape = points.shape[:2]
 
@@ -226,19 +344,26 @@ def deposit(
             has_hit = xp.zeros(shape[0], dtype=bool)
             hit_step = xp.zeros(shape[0], dtype=int)
 
-        in_plasma = equilibrium.inside_at(points) & alive
-        row, col = xp.nonzero(in_plasma)
-        rho = equilibrium.rho_at(points[row, col])
+        both = getattr(equilibrium, "rho_and_inside_at", None)
+        if both is None:
+            row, col = xp.nonzero(equilibrium.inside_at(points) & alive)
+            rho = equilibrium.rho_at(points[row, col])
+        else:
+            # one evaluation for both where the equilibrium offers it
+            rho_all, inside = both(points)
+            row, col = xp.nonzero(inside & alive)
+            rho = rho_all[row, col]
+        ne = plasma.electron_density(rho)
         sigma = stopping(
             energy_per_amu[sl][row],
-            plasma.electron_density(rho),
+            ne,
             plasma.electron_temperature(rho),
             plasma.ion_densities(rho),
             plasma.ion_mass_numbers,
             plasma.ion_charges,
         )
         dtau = xp.zeros(shape)
-        dtau[row, col] = plasma.electron_density(rho) * sigma * step
+        dtau[row, col] = ne * sigma * step
         tau = xp.cumsum(dtau, axis=1)
         tau_before = tau - dtau
         absorbed = weight[:, None] * (xp.exp(-tau_before) - xp.exp(-tau))
@@ -288,7 +413,7 @@ def deposit(
                 k = xp.argmax(tau_a >= target[:, None], axis=1)
                 rows = xp.arange(int(absorbing.shape[0]))
                 fraction = (target - before_a[rows, k]) / dtau_a[rows, k]
-                distance = (k + fraction) * step
+                distance = (first + k + fraction) * step
                 birth_parts.append(
                     (
                         origin[absorbing] + distance[:, None] * direction[absorbing],
@@ -333,4 +458,5 @@ def deposit(
         absorbed_power=float(totals[0]),
         shine_through_power=float(totals[1]),
         wall_hits=join(hit_parts) if equilibrium.has_wall else None,
+        radial_coordinate=radial_coordinate,
     )

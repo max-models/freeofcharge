@@ -19,6 +19,12 @@ right-handed. G-EQDSK files from different codes differ in these signs (the
 COCOS convention); `Equilibrium.from_geqdsk` takes the file as it is.
 Radii are $\rho = \sqrt{\psi_n}$ with
 $\psi_n = (\psi - \psi_\mathrm{axis}) / (\psi_\mathrm{boundary} - \psi_\mathrm{axis})$.
+
+Which flux $\rho$ is the root of differs between equilibria: the axisymmetric
+class uses the poloidal flux, the 3D adapters (GVEC, DESC, PolarFEEC) the
+toroidal flux. An equilibrium says which in ``radial_coordinate``
+(``"poloidal"`` or ``"toroidal"``), and the shells, depositions and slowing-down
+profiles carry it into their datasets (`rho_coordinate`).
 """
 
 from __future__ import annotations
@@ -38,7 +44,39 @@ from simgeometry.objects.polygon import Polygon
 
 from freeofcharge import geqdsk
 
-__all__ = ["Equilibrium", "FluxSurfaces", "MagneticEquilibrium"]
+__all__ = ["Equilibrium", "FluxSurfaces", "MagneticEquilibrium", "rho_coordinate"]
+
+_RADIAL_COORDINATES = {
+    "poloidal": (
+        r"$\rho_\mathrm{pol}$",
+        "square root of the normalised poloidal flux",
+    ),
+    "toroidal": (
+        r"$\rho_\mathrm{tor}$",
+        "square root of the normalised toroidal flux",
+    ),
+}
+
+
+def radial_coordinate_of(equilibrium) -> str:
+    """Return the ``radial_coordinate`` of an equilibrium, "unspecified" without one."""
+    return str(getattr(equilibrium, "radial_coordinate", "unspecified"))
+
+
+def rho_coordinate(radial_coordinate: str) -> dict[str, str]:
+    r"""Return the attributes of a $\rho$ coordinate: label and definition.
+
+    ``radial_coordinate`` is ``"poloidal"`` ($\rho = \sqrt{\psi_n}$),
+    ``"toroidal"`` ($\rho = \sqrt{\Phi_n}$) or anything else (unspecified).
+    """
+    label, definition = _RADIAL_COORDINATES.get(
+        radial_coordinate, (r"$\rho$", "unspecified flux label")
+    )
+    return {
+        "long_name": label,
+        "definition": definition,
+        "radial_coordinate": radial_coordinate,
+    }
 
 
 class _StarShapedPolygon:
@@ -98,6 +136,7 @@ class FluxSurfaces:
     surface_weight: np.ndarray | None = field(default=None, repr=False)
     safety_factor: np.ndarray | None = None
     major_radius: np.ndarray | None = None
+    radial_coordinate: str = "poloidal"
     r"""Shell edges in $\rho$, increasing from 0 to 1."""
     r"""Volume of each shell [$\mathrm{m^3}$]."""
     r"""Poloidal cross-section area of each shell [$\mathrm{m^2}$]."""
@@ -111,6 +150,7 @@ class FluxSurfaces:
     r"""$q = 1 / \iota$ at each shell centre; in 2D
     $q = \frac{F}{2\pi} \oint \frac{dl_p}{R^2 B_p}$."""
     r"""$(R_\mathrm{max} + R_\mathrm{min}) / 2$ of the surface at each shell centre [m]."""
+    r"""The flux $\rho$ is the root of: ``"poloidal"`` or ``"toroidal"`` (`rho_coordinate`)."""
 
     @property
     def rho(self) -> np.ndarray:
@@ -137,6 +177,7 @@ class FluxSurfaces:
         rho_edges,
         field_points: tuple[int, int] = (32, 32),
         radial_points: int = 8,
+        radial_coordinate: str = "toroidal",
     ) -> FluxSurfaces:
         r"""Return the shells of a 3D equilibrium in flux coordinates.
 
@@ -148,6 +189,8 @@ class FluxSurfaces:
         ``field_points`` $(\theta, \zeta)$ grid over one of the ``nfp`` field
         periods; the field strength and the averaging weights (the Jacobian
         $R\,dA$) from that grid on the surface through each shell centre.
+        $\rho$ is the root of the toroidal flux unless ``radial_coordinate``
+        says otherwise.
         """
         rho_edges = np.asarray(rho_edges, dtype=float)
         n_theta, n_zeta = field_points
@@ -199,6 +242,7 @@ class FluxSurfaces:
             surface_weight=surface_weight,
             safety_factor=1.0 / iota,
             major_radius=major,
+            radial_coordinate=radial_coordinate,
         )
 
     @property
@@ -255,8 +299,11 @@ class FluxSurfaces:
             )
         return xr.Dataset(
             variables,
-            coords={"rho": ("rho", self.rho, {"long_name": r"$\rho_\mathrm{pol}$"})},
-            attrs={"rho_edges": self.rho_edges},
+            coords={"rho": ("rho", self.rho, rho_coordinate(self.radial_coordinate))},
+            attrs={
+                "rho_edges": self.rho_edges,
+                "radial_coordinate": self.radial_coordinate,
+            },
         )
 
     def surface_average(self, values) -> np.ndarray:
@@ -310,10 +357,12 @@ class FluxSurfaces:
 
 @runtime_checkable
 class MagneticEquilibrium(Protocol):
-    """What the beam codes need from an equilibrium, at Cartesian ``points``.
+    r"""What the beam codes need from an equilibrium, at Cartesian ``points``.
 
     ``points`` has shape ``(..., 3)`` [m]; the results have its leading shape
-    (``(..., 3)`` for the field).
+    (``(..., 3)`` for the field). An equilibrium should also say which flux
+    $\rho$ is the root of, in an attribute ``radial_coordinate``
+    (``"poloidal"`` or ``"toroidal"``); it is optional, "unspecified" without it.
     """
 
     @property
@@ -375,6 +424,9 @@ class Equilibrium:
     (``"[1.0, 1.5, 2.0] m"``); the flux is per radian, so a flux in Wb is
     rejected.
     """
+
+    radial_coordinate = "poloidal"
+    r"""$\rho = \sqrt{\psi_n}$, the root of the normalised poloidal flux."""
 
     def __init__(
         self,

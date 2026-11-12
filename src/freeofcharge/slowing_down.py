@@ -82,6 +82,7 @@ from plasmacoll.units import to_unit
 from scipy import constants
 
 from freeofcharge.deposition import allreduce
+from freeofcharge.equilibrium import rho_coordinate
 from freeofcharge.trapping import pitch_modes
 
 if TYPE_CHECKING:
@@ -794,6 +795,7 @@ class SlowingDown:
     stored_energy: float
     thermalised_power: float = 0.0
     trapped_births: float = 0.0
+    radial_coordinate: str = "poloidal"
     """Power to the electrons in each shell [W]."""
     """Power to the ions in each shell, while the ions are fast [W]."""
     r"""[$\mathrm{m^{-3}}$]."""
@@ -806,6 +808,7 @@ class SlowingDown:
     """Fast-ion energy content [J]."""
     """Energy rate the ions still have when they join the thermal ions [W]."""
     """Share of the births on trapped orbits (zero orbit width)."""
+    r"""The flux $\rho$ is the root of, the surfaces' (`freeofcharge.rho_coordinate`)."""
 
     def to_dataset(self, surfaces: FluxSurfaces | None = None) -> xr.Dataset:
         """Return the profiles on the shell centres, with the heating density if ``surfaces``."""
@@ -848,10 +851,11 @@ class SlowingDown:
                 ),
             },
             coords={
-                "rho": ("rho", rho, {"long_name": r"$\rho_\mathrm{pol}$"}),
+                "rho": ("rho", rho, rho_coordinate(self.radial_coordinate)),
                 "species": ["electrons", "ions"],
             },
             attrs={
+                "radial_coordinate": self.radial_coordinate,
                 "driven_current": self.driven_current,
                 "stored_energy": self.stored_energy,
                 "thermalised_power": self.thermalised_power,
@@ -931,6 +935,15 @@ def slow_down(
     minimum_energy = to_unit(minimum_energy, "eV", "minimum_energy")
     if not np.array_equal(surfaces.rho_edges, deposition.rho_edges):
         raise ValueError("the surfaces and the deposition have different shells")
+    if "unspecified" not in (
+        surfaces.radial_coordinate,
+        deposition.radial_coordinate,
+    ) and (surfaces.radial_coordinate != deposition.radial_coordinate):
+        raise ValueError(
+            f"the surfaces' rho is {surfaces.radial_coordinate}, "
+            f"the deposition's {deposition.radial_coordinate}"
+        )
+    plasma.check_radial_coordinate(surfaces.radial_coordinate)
     n_shells = len(surfaces.rho_edges) - 1
     mass = deposition.mass_number * ATOMIC_MASS
     births = deposition.births
@@ -1030,4 +1043,5 @@ def slow_down(
         trapped_births=float(np.sum(sums[:, 6])) / total_births
         if total_births > 0.0
         else 0.0,
+        radial_coordinate=surfaces.radial_coordinate,
     )

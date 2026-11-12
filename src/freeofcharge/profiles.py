@@ -1,4 +1,8 @@
-r"""Plasma profiles as functions of the normalised poloidal flux radius.
+r"""Plasma profiles as functions of a flux radius $\rho$ from 0 to 1.
+
+$\rho$ is the root of the normalised poloidal flux in the axisymmetric
+`freeofcharge.Equilibrium` and of the toroidal flux in the 3D adapters;
+`Plasma.radial_coordinate` says which the profiles are given in (unset: any).
 
 The densities and temperatures take astropy Quantities (``1e20 * u.m**-3``,
 ``20 * u.keV``, also arrays), strings such as ``"20 keV"`` or plain numbers in
@@ -43,7 +47,7 @@ class IonSpecies:
 
 @dataclass(frozen=True)
 class Plasma:
-    r"""Electron and ion profiles on a grid of $\rho = \sqrt{\psi_n}$.
+    r"""Electron and ion profiles on a grid of a flux radius $\rho$.
 
     Between the grid points the profiles are linear; outside the last closed
     flux surface ($\rho > 1$) every density is zero. ``ne``, ``te`` and ``ti``
@@ -55,11 +59,15 @@ class Plasma:
     te: np.ndarray
     ti: np.ndarray
     ions: Mapping[str, IonSpecies] = field(default_factory=dict)
+    radial_coordinate: str | None = None
     """Increasing radius grid, from 0 to 1."""
     r"""Electron density [$\mathrm{m^{-3}}$]."""
     """Electron temperature [eV]."""
     """Ion temperature [eV]."""
     """Ion species by name."""
+    r"""The flux $\rho$ is the root of (``"poloidal"`` or ``"toroidal"``); None
+    for profiles that are used with either. `freeofcharge.deposit` checks it
+    against the equilibrium's."""
 
     def __post_init__(self) -> None:
         """Convert the quantities; check the shapes and quasi-neutrality (to 1%)."""
@@ -105,6 +113,7 @@ class Plasma:
         alpha_t: float = 1.5,
         edge_fraction: float = 0.05,
         points: int = 101,
+        radial_coordinate: str | None = None,
     ) -> Plasma:
         r"""Return profiles $x_0\,[(1 - f)(1 - \rho^2)^\alpha + f]$.
 
@@ -121,6 +130,7 @@ class Plasma:
             alpha_t: Peaking exponent of the temperatures.
             edge_fraction: Value at $\rho = 1$ relative to the centre.
             points: Number of grid points.
+            radial_coordinate: The flux $\rho$ is the root of, see `Plasma`.
         """
         ne0 = to_unit(ne0, "m^-3", "ne0")
         te0 = to_unit(te0, "eV", "te0")
@@ -140,7 +150,20 @@ class Plasma:
                 name: IonSpecies(mass_number, charge, share * ne)
                 for name, (mass_number, charge, share) in ions.items()
             },
+            radial_coordinate=radial_coordinate,
         )
+
+    def check_radial_coordinate(self, radial_coordinate: str) -> None:
+        """Raise if the profiles are given in another radial coordinate."""
+        if (
+            self.radial_coordinate is not None
+            and radial_coordinate != "unspecified"
+            and self.radial_coordinate != radial_coordinate
+        ):
+            raise ValueError(
+                f"the profiles are given in the {self.radial_coordinate} flux, "
+                f"the equilibrium's rho is the root of the {radial_coordinate} flux"
+            )
 
     def _interp(self, values: np.ndarray, rho):
         rho = xp.asarray(rho, dtype=float)

@@ -38,7 +38,11 @@ from methodcard import method
 from plasmacoll.units import to_unit
 
 from freeofcharge._profiling import PROFILE_TAGS
-from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
+from freeofcharge.equilibrium import (
+    FluxSurfaces,
+    MagneticEquilibrium,
+    radial_coordinate_of,
+)
 from freeofcharge.kernels.biot_savart_polylines import kernel as biot_savart_polylines
 from freeofcharge.kernels.segment_distance import kernel as segment_distance
 
@@ -447,6 +451,11 @@ class CoilField:
         self.coils = coils
         self.inside = inside
         self.current_scale = float(current_scale)
+
+    @property
+    def radial_coordinate(self) -> str:
+        """Return the equilibrium's radial coordinate."""
+        return radial_coordinate_of(self.equilibrium)
 
     @property
     def has_wall(self) -> bool:
