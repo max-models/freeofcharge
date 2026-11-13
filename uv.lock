@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -58,8 +58,8 @@ dependencies = [
     { name = "async-timeout", marker = "python_full_version < '3.11'" },
     { name = "attrs" },
     { name = "frozenlist" },
-    { name = "multidict", version = "7.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "multidict", version = "7.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "multidict", version = "7.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "multidict", version = "7.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "propcache" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "yarl" },
@@ -384,11 +384,11 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "astropy-iers-data", version = "0.2026.10.19.0.52.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pyerfa" },
-    { name = "pyyaml" },
+    { name = "astropy-iers-data", version = "0.2026.10.19.0.52.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyerfa", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyyaml", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8a/f8/9c6675ab4c646b95aae2762d108f6be4504033d91bd50da21daa62cab5ce/astropy-6.1.7.tar.gz", hash = "sha256:a405ac186306b6cb152e6df2f7444ab8bd764e4127d7519da1b3ae4dd65357ef", size = 7063411, upload-time = "2024-11-22T21:22:34.373Z" }
 wheels = [
@@ -441,11 +441,11 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "astropy-iers-data", version = "0.2026.11.2.0.34.55", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pyerfa" },
-    { name = "pyyaml" },
+    { name = "astropy-iers-data", version = "0.2026.11.2.0.34.55", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyerfa", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyyaml", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/95/57/02089e6da0fc00846d309034ad74e13ebcadc67b1c5cef397ae0597473fa/astropy-8.0.2.tar.gz", hash = "sha256:e6af35823099ad6a40b57dbe5ff845f577374ea131925c9fa4b49eeab06c5310", size = 7178167, upload-time = "2026-10-15T21:44:45.383Z" }
 wheels = [
@@ -708,7 +708,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/65/dc/470ffebac2eb8c54151eb893055024fe81b1606e7c6ff8449a588e9cd17f/cftime-1.6.5.tar.gz", hash = "sha256:8225fed6b9b43fb87683ebab52130450fc1730011150d3092096a90e54d1e81e", size = 326605, upload-time = "2025-10-13T18:56:26.352Z" }
 wheels = [
@@ -773,7 +773,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4f/bb/64c8afb966ca9482ef7961b606bfe8615f7948e7ea70e737159f9a940064/cftime-1.6.6.1.tar.gz", hash = "sha256:3eff428a229169c2632c093b554e36dd5277dacc0f7aae8ad73ce6a93304d58d", size = 381552, upload-time = "2026-10-14T18:50:47.589Z" }
 wheels = [
@@ -1000,7 +1000,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/54/eb9bfc647b19f2009dd5c7f5ec51c4e6ca831725f1aea7a993034f483147/contourpy-1.3.2.tar.gz", hash = "sha256:b6945942715a034c671b7fc54f9588126b0b8bf23db2696e3ca8328f3ff0ab54", size = 13466130, upload-time = "2025-04-15T17:47:53.79Z" }
 wheels = [
@@ -1072,7 +1072,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -1165,7 +1165,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/83/5a/a55177dd22553a277388e8a1b3220e92de91bacb28356cdc73caa240121d/contourpy-1.4.0.tar.gz", hash = "sha256:20156f5a1ac4f8ce02656e39a61e82164a3d359796dc8026f75b062783d500e1", size = 13323726, upload-time = "2026-09-11T19:05:05.808Z" }
 wheels = [
@@ -1370,7 +1370,7 @@ wheels = [
 
 [package.optional-dependencies]
 toml = [
-    { name = "tomli", marker = "python_full_version <= '3.11'" },
+    { name = "tomli", marker = "python_full_version <= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [[package]]
@@ -1380,8 +1380,8 @@ source = { git = "https://github.com/max-models/cunumpy?branch=devel#159a7128ba6
 dependencies = [
     { name = "array-api-compat" },
     { name = "maybempi" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
 ]
 
@@ -1402,12 +1402,12 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "attrs" },
-    { name = "docstring-parser" },
-    { name = "rich" },
-    { name = "rich-rst" },
-    { name = "tomli" },
-    { name = "typing-extensions" },
+    { name = "attrs", marker = "python_full_version < '3.11'" },
+    { name = "docstring-parser", marker = "python_full_version < '3.11'" },
+    { name = "rich", marker = "python_full_version < '3.11'" },
+    { name = "rich-rst", marker = "python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c1/08/a444f3cca86cb27bc256831fc8c42b578390f4087bf6631cccb5334bd9ed/cyclopts-4.25.3.tar.gz", hash = "sha256:7d3a067bc7699a1a65fe2ea0b092a925855bb711a05adc1e65c5b9ba307acea4", size = 202814, upload-time = "2026-09-17T16:25:16.892Z" }
 wheels = [
@@ -1433,10 +1433,10 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "attrs" },
-    { name = "docstring-parser" },
-    { name = "rich" },
-    { name = "rich-rst" },
+    { name = "attrs", marker = "python_full_version >= '3.11'" },
+    { name = "docstring-parser", marker = "python_full_version >= '3.11'" },
+    { name = "rich", marker = "python_full_version >= '3.11'" },
+    { name = "rich-rst", marker = "python_full_version >= '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fe/43/65f29e6cd5356f4a7910a80fce5df317b3edf1a6594525ec4c3a388c22cd/cyclopts-5.3.2.tar.gz", hash = "sha256:0b5c0975361c5eb8a65a98de358b10349a88fab74f8bd9f0c966ae6cf41a8c82", size = 254163, upload-time = "2026-10-27T14:28:41.694Z" }
 wheels = [
@@ -1505,7 +1505,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "wrapt" },
+    { name = "wrapt", marker = "python_full_version < '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/49/85/12f0a49a7c4ffb70572b6c2ef13c90c88fd190debda93b23f026b25f9634/deprecated-1.3.1.tar.gz", hash = "sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223", size = 2932523, upload-time = "2025-10-30T08:19:02.757Z" }
 wheels = [
@@ -1528,7 +1528,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "wrapt" },
+    { name = "wrapt", marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/46/f6958cdfa8a801fc845e981a8a958dba2e74a386b026a8fd5cae58423f1f/deprecated-3.0.1.tar.gz", hash = "sha256:2f5a9fecc9961e26462846cf1e57f73a612b1d0b79c27dceeed8de647beadcee", size = 1074378, upload-time = "2026-10-30T11:15:39.954Z" }
 wheels = [
@@ -1541,34 +1541,34 @@ version = "0.17.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama" },
-    { name = "diffrax", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "diffrax", version = "0.7.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "diffrax", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "diffrax", version = "0.7.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "equinox" },
     { name = "h5py" },
-    { name = "interpax", version = "0.3.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "interpax", version = "0.3.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "interpax", version = "0.3.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "interpax", version = "0.3.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "interpax-fft" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jax-finufft", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax-finufft", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax-finufft", version = "1.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax-finufft", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "matplotlib" },
     { name = "mpmath" },
     { name = "netcdf4" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "nvidia-ml-py" },
     { name = "optax" },
-    { name = "orthax", version = "0.2.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "orthax", version = "0.2.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "orthax", version = "0.2.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "orthax", version = "0.2.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "plotly" },
     { name = "psutil" },
     { name = "pylatexenc" },
     { name = "quadax" },
-    { name = "scikit-image", version = "0.25.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scikit-image", version = "0.26.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scikit-image", version = "0.25.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scikit-image", version = "0.26.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "sympy" },
     { name = "termcolor" },
 ]
@@ -1585,13 +1585,13 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" } },
-    { name = "lineax" },
-    { name = "optimistix", version = "0.0.11", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
-    { name = "wadler-lindig" },
+    { name = "equinox", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lineax", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "optimistix", version = "0.0.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "wadler-lindig", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c9/9e/d6081a1daf7a7b70f53ddac637bd2e6cd6fa91042ffd7b204741c0ce6d44/diffrax-0.7.0.tar.gz", hash = "sha256:f3bcc578cd92a9ca86fc6f5a54c1de76c1ba62f74de69b56002624bf205316f1", size = 151595, upload-time = "2025-03-14T03:52:22.422Z" }
 wheels = [
@@ -1617,13 +1617,13 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" } },
-    { name = "lineax" },
-    { name = "optimistix", version = "0.1.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions" },
-    { name = "wadler-lindig" },
+    { name = "equinox", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lineax", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "optimistix", version = "0.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "wadler-lindig", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5a/ea/a22853377a840d70d1d174d43183f12990c66eecf34ba7e76eec781249d0/diffrax-0.7.2.tar.gz", hash = "sha256:9adc70fe90dba83f7dd839845839b2531a3dd736a3944fe1aa26598507cfb48e", size = 155159, upload-time = "2026-02-18T01:14:04.964Z" }
 wheels = [
@@ -1653,10 +1653,10 @@ name = "equinox"
 version = "0.13.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "typing-extensions" },
     { name = "wadler-lindig" },
 ]
@@ -1670,7 +1670,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -1701,8 +1701,8 @@ name = "f90wrap"
 version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "packaging" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7f/97/13c692bec83025e3ba04141d5d7d27056350e6dba2676ac90674c7685776/f90wrap-0.3.0.tar.gz", hash = "sha256:9c9f08768fe7e9d60de9e913e30909fa1bdc67828f49dffd7149089703d74836", size = 3033431, upload-time = "2025-12-18T20:01:41.299Z" }
@@ -1972,15 +1972,15 @@ dependencies = [
     { name = "cunumpy" },
     { name = "maybempi" },
     { name = "methodcard" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "plasmacoll" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
     { name = "simgeometry" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [package.optional-dependencies]
@@ -2026,8 +2026,8 @@ dev = [
 docs = [
     { name = "griffe" },
     { name = "gvec" },
-    { name = "ipykernel", version = "7.3.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "ipykernel", version = "7.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipykernel", version = "7.3.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipykernel", version = "7.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "kaleido" },
     { name = "matplotlib" },
     { name = "nbclient" },
@@ -2044,8 +2044,8 @@ struphy = [
     { name = "struphy" },
 ]
 test = [
-    { name = "astropy", version = "6.1.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "astropy", version = "8.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "astropy", version = "6.1.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "astropy", version = "8.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "gvec" },
     { name = "methodcard", extra = ["symbolic"] },
     { name = "opencr" },
@@ -2269,19 +2269,19 @@ dependencies = [
     { name = "f90wrap" },
     { name = "matplotlib" },
     { name = "netcdf4" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pyevtk" },
     { name = "pyyaml" },
     { name = "requests" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "tabulate" },
     { name = "tomlkit" },
     { name = "tqdm", version = "4.70.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-struphy'" },
     { name = "tqdm", version = "4.70.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/01/bb/0fe8dbc3ce9ec7ec258589f8fe61efc70c5fcb5089fe22d74513d00f35d7/gvec-1.5.1.tar.gz", hash = "sha256:16fb9401387aed1b4c2ed7e13686ef33ee794072b8f3c0b0836c0db47ab5c36c", size = 449651, upload-time = "2026-10-21T14:01:00.934Z" }
 
@@ -2313,8 +2313,8 @@ name = "h5py"
 version = "3.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/db/33/acd0ce6863b6c0d7735007df01815403f5589a21ff8c2e1ee2587a38f548/h5py-3.16.0.tar.gz", hash = "sha256:a0dbaad796840ccaa67a4c144a0d0c8080073c34c76d5a6941d6818678ef2738", size = 446526, upload-time = "2026-03-06T13:49:08.07Z" }
 wheels = [
@@ -2421,8 +2421,8 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "pillow" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pillow", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/81/c8/2b56274457e4fadcfa86bf7c0fb93f19e124ab8f38f4bfa4372423052046/imageio-2.38.0.tar.gz", hash = "sha256:fe1d406862f6bc2930e8ec662d7bc40d4370cb76e3390dcd33819560d2708531", size = 403333, upload-time = "2026-09-28T07:44:08.101Z" }
 wheels = [
@@ -2448,8 +2448,8 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "pillow" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pillow", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f3/cd/69e4ac55b6dafdd2b5f32075236841a3945dea7323d0232d80f28c37cea8/imageio-2.38.1.tar.gz", hash = "sha256:6769f1f01c4dd46448307863a787c9a22fa4dbe11c0c88f525c6e410fdfd7983", size = 403667, upload-time = "2026-10-08T14:35:32.961Z" }
 wheels = [
@@ -2482,11 +2482,11 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" } },
-    { name = "lineax" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "equinox", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lineax", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/24/d786845b363853ac59a13d9483389fc73cd9d4a455d8edceb99645ad8b4e/interpax-0.3.15.tar.gz", hash = "sha256:d2a4f44dd8de351dcc97db23620948585b2afcc577708f49c4d1dbaa682570b9", size = 46987, upload-time = "2026-09-16T09:21:55.615Z" }
 wheels = [
@@ -2512,11 +2512,11 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxkd" },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "equinox", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxkd", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c7/09/bba97be44a8e0d6b8df8d721c0494d78076973d9266962c25e7ba8683480/interpax-0.3.16.tar.gz", hash = "sha256:b543e20ae292e13faa6eb16323d891018047dd7e06746fb71c0054d2d8139a2a", size = 66621, upload-time = "2026-10-22T21:56:53.575Z" }
 wheels = [
@@ -2529,12 +2529,12 @@ version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "packaging" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/23/bc/c23c282496cc86bdf641ebf4bcecd26465be5d1597df97cd044b254c6f37/interpax_fft-0.1.0.tar.gz", hash = "sha256:8f6815df84d1c20b5806e3b5450db942dda8a6226fdd54ca77ea6fc0ce5c82c8", size = 46856, upload-time = "2026-06-22T22:11:23.365Z" }
@@ -2614,17 +2614,17 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "decorator" },
-    { name = "exceptiongroup" },
-    { name = "jedi" },
-    { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
-    { name = "prompt-toolkit" },
-    { name = "pygments" },
-    { name = "stack-data" },
-    { name = "traitlets" },
-    { name = "typing-extensions" },
+    { name = "colorama", marker = "(python_full_version < '3.11' and sys_platform == 'win32') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "decorator", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jedi", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "matplotlib-inline", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pexpect", marker = "(python_full_version < '3.11' and sys_platform != 'emscripten' and sys_platform != 'win32') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "prompt-toolkit", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pygments", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "stack-data", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "traitlets", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/40/18/f8598d287006885e7136451fdea0755af4ebcbfe342836f24deefaed1164/ipython-8.39.0.tar.gz", hash = "sha256:4110ae96012c379b8b6db898a07e186c40a2a1ef5d57a7fa83166047d9da7624", size = 5513971, upload-time = "2026-03-27T10:02:13.94Z" }
 wheels = [
@@ -2650,17 +2650,17 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "ipython-pygments-lexers" },
-    { name = "jedi" },
-    { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
-    { name = "prompt-toolkit" },
-    { name = "psutil", marker = "sys_platform != 'cygwin' and sys_platform != 'emscripten'" },
-    { name = "pygments" },
-    { name = "stack-data" },
-    { name = "traitlets" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "colorama", marker = "(python_full_version >= '3.11' and sys_platform == 'win32') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipython-pygments-lexers", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jedi", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "matplotlib-inline", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pexpect", marker = "(python_full_version >= '3.11' and sys_platform != 'emscripten' and sys_platform != 'win32') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "prompt-toolkit", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "psutil", marker = "(python_full_version >= '3.11' and sys_platform != 'cygwin' and sys_platform != 'emscripten') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'cygwin' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'cygwin' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pygments", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "stack-data", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "traitlets", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/32/99451b1283ec5d92ad77073f12e1c667dc10775384d8f15c2914207149dd/ipython-9.17.1.tar.gz", hash = "sha256:8919be8c27f20a6f4423145028063f6637b42a03ce57665bb12015ee1f073529", size = 4539289, upload-time = "2026-09-01T08:29:32.6Z" }
 wheels = [
@@ -2672,7 +2672,7 @@ name = "ipython-pygments-lexers"
 version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pygments" },
+    { name = "pygments", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ef/4c/5dd1d8af08107f88c7f741ead7a40854b8ac24ddf9ae850afbcf698aa552/ipython_pygments_lexers-1.1.1.tar.gz", hash = "sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81", size = 8393, upload-time = "2025-01-17T11:24:34.505Z" }
 wheels = [
@@ -2732,8 +2732,8 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "comm", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
-    { name = "ipython", version = "8.39.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "ipython", version = "9.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipython", version = "8.39.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipython", version = "9.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "jupyterlab-widgets", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "traitlets", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "widgetsnbextension", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
@@ -2763,11 +2763,11 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "ml-dtypes" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "opt-einsum" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" } },
+    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ml-dtypes", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "opt-einsum", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cf/1e/267f59c8fb7f143c3f778c76cb7ef1389db3fd7e4540f04b9f42ca90764d/jax-0.6.2.tar.gz", hash = "sha256:a437d29038cbc8300334119692744704ca7941490867b9665406b7f90665cd96", size = 2334091, upload-time = "2025-06-17T23:10:27.186Z" }
 wheels = [
@@ -2793,11 +2793,11 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "ml-dtypes" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "opt-einsum" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ml-dtypes", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "opt-einsum", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/92/4c/5aca25abd45fa38dd136e5ae2010376518c67950e1f9408e0c5c93fcf77d/jax-0.9.2.tar.gz", hash = "sha256:42b28017b3e6b57a44b0274cc15f5153239c4873959030399ac1afc009c22365", size = 2662784, upload-time = "2026-03-18T23:28:10.471Z" }
 wheels = [
@@ -2812,9 +2812,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "pydantic" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pydantic", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5f/a0/4aebbfdd9c40a579c109f20a61fa0b30538b89fdf522b6091e59019aa5f3/jax_finufft-1.2.0.tar.gz", hash = "sha256:e85fc8c56a3ec3977db3e0348b9ba28128227a4a4e2096ec6261fce2af42b65b", size = 4431078, upload-time = "2025-11-05T21:44:47.645Z" }
 wheels = [
@@ -2853,9 +2853,9 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "pydantic" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pydantic", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a9/d1/899fde8e105e1086091789d00f20c56403436a55ec3a4007685fa14a6978/jax_finufft-1.3.1.tar.gz", hash = "sha256:821d981bf180916ba8c5076bd6e267a4d0e1cb0b01ea60c029859f78db5a55f1", size = 4665839, upload-time = "2026-03-26T21:39:44.556Z" }
 wheels = [
@@ -2884,7 +2884,7 @@ name = "jaxkd"
 version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fc/6b/40de65a682f0212ff13facf0c2a9b1a07e1b0f719906c11b39a9855275b3/jaxkd-0.1.2.tar.gz", hash = "sha256:842e7837450feec39fa03bb6f5369fa4123ec526339dc359bfba7157884b77ec", size = 9414, upload-time = "2025-07-15T11:45:09.193Z" }
 wheels = [
@@ -2899,9 +2899,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "ml-dtypes" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" } },
+    { name = "ml-dtypes", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/15/c5/41598634c99cbebba46e6777286fb76abc449d33d50aeae5d36128ca8803/jaxlib-0.6.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:da4601b2b5dc8c23d6afb293eacfb9aec4e1d1871cb2f29c5a151d103e73b0f8", size = 54298019, upload-time = "2025-06-17T23:10:36.916Z" },
@@ -2943,9 +2943,9 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "ml-dtypes" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "ml-dtypes", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/2c/0ba08670ab04f6094f0cda4cdc89818946007d0d1dfefa636eab6c7d5392/jaxlib-0.9.2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:785f177c3eb78cb7dc797c55ed5c4b6312141845c9a686957e484bacbfce5e88", size = 58762159, upload-time = "2026-03-18T23:26:55.405Z" },
@@ -2980,7 +2980,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "wadler-lindig" },
+    { name = "wadler-lindig", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/38/40/a2ea3ce0e3e5f540eb970de7792c90fa58fef1b27d34c83f9fa94fea4729/jaxtyping-0.3.7.tar.gz", hash = "sha256:3bd7d9beb7d3cb01a89f93f90581c6f4fff3e5c5dc3c9307e8f8687a040d10c4", size = 45721, upload-time = "2026-01-30T14:18:47.409Z" }
 wheels = [
@@ -3006,7 +3006,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "wadler-lindig" },
+    { name = "wadler-lindig", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/91/c1/091b8852bd7cbf50bd655543c8506033cf4029300c67f8c176c1286879a9/jaxtyping-0.3.11.tar.gz", hash = "sha256:b09c14acf6686feb9e0df5b0d8c6e7c5b6f8d36bf059ee54cd522a186c2ef050", size = 46489, upload-time = "2026-06-13T18:35:23.167Z" }
 wheels = [
@@ -3063,8 +3063,8 @@ dependencies = [
     { name = "attrs" },
     { name = "jsonschema-specifications" },
     { name = "referencing" },
-    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "rpds-py", version = "2026.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "rpds-py", version = "2026.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b3/fc/e067678238fa451312d4c62bf6e6cf5ec56375422aee02f9cb5f909b3047/jsonschema-4.26.0.tar.gz", hash = "sha256:0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326", size = 366583, upload-time = "2026-01-07T13:41:07.246Z" }
 wheels = [
@@ -3221,8 +3221,8 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "async-lru" },
     { name = "httpx" },
-    { name = "ipykernel", version = "7.3.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "ipykernel", version = "7.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipykernel", version = "7.3.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ipykernel", version = "7.4.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "jinja2" },
     { name = "jupyter-builder" },
     { name = "jupyter-core" },
@@ -3522,10 +3522,10 @@ version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/35/d6/4e28416a6fe58dd6bc7565b1ffa330f4d0ba7d74212642b1b734c511299e/lineax-0.1.0.tar.gz", hash = "sha256:5f1a8f060142af2cdbf7d66b99e8d3071c3aa734b677df6339df4b4c4c0554d2", size = 50209, upload-time = "2026-01-27T21:17:26.652Z" }
@@ -3715,15 +3715,15 @@ name = "matplotlib"
 version = "3.10.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "contourpy", version = "1.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
-    { name = "contourpy", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "contourpy", version = "1.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "contourpy", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "cycler" },
-    { name = "fonttools", version = "4.65.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "fonttools", version = "4.66.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "fonttools", version = "4.65.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "fonttools", version = "4.66.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "kiwisolver" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyparsing" },
@@ -3805,9 +3805,9 @@ version = "0.3.0"
 source = { git = "https://github.com/max-models/maxplotlib?branch=devel#d632a5cca10922b06bb8ec34830b2d342193e770" }
 dependencies = [
     { name = "matplotlib" },
-    { name = "pint", version = "0.24.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "pint", version = "0.25.3", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version == '3.11.*' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "pint", version = "0.26.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pint", version = "0.24.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pint", version = "0.25.3", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version == '3.11.*' and extra == 'extra-12-freeofcharge-dev') or (python_full_version == '3.11.*' and extra == 'extra-12-freeofcharge-docs') or (python_full_version == '3.11.*' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pint", version = "0.26.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.12' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.12' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "plotext" },
     { name = "plotly" },
     { name = "tikzfigure", extra = ["vis"], marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
@@ -3842,8 +3842,8 @@ version = "0.1.0"
 source = { git = "https://github.com/max-models/methodcard?branch=devel#54f22a9bca2f214c6097987bab07a4bb16bd096f" }
 dependencies = [
     { name = "griffe" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
 ]
 
@@ -3869,8 +3869,8 @@ name = "ml-dtypes"
 version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/12/72/307d7c4bd0600601c7133fba5cb78af7db968152951c1cd473abb1cda782/ml_dtypes-0.6.0.tar.gz", hash = "sha256:5e60251d32ced5598972e4d5e06a2f044341f9291402551a3f6f0ec44f9299b0", size = 3032327, upload-time = "2026-08-13T14:14:40.215Z" }
 wheels = [
@@ -3923,8 +3923,8 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "ruamel-yaml" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ruamel-yaml", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/89/54/a1b2b4c9b16ebc5ea72cf22b1a6bb7ceaa79187fbf22a404c9677c8f90dd/monty-2025.3.3.tar.gz", hash = "sha256:16c1eb54b2372e765c2f3f14cff01cc76ab55c3cc12b27d49962fb8072310ae0", size = 85592, upload-time = "2025-03-03T21:12:44.541Z" }
 wheels = [
@@ -3950,8 +3950,8 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "ruamel-yaml" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "ruamel-yaml", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2c/f1/4de1afef798eb51c5de7e7628670de462e556f90e4339c16d29b2d1a3f48/monty-2026.10.21.tar.gz", hash = "sha256:9580d17c63a45d02105d9f3ab19c463a08a768a844ef09a61e6fa92cad6eedd5", size = 257947, upload-time = "2026-10-20T23:57:35.241Z" }
 wheels = [
@@ -4000,8 +4000,8 @@ source = { git = "https://github.com/max-models/mpiarray?branch=devel#4ffc729dfd
 dependencies = [
     { name = "cunumpy" },
     { name = "maybempi" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
 ]
 
@@ -4120,7 +4120,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f9/79/84ddb5ba16c4eb2c69c71db76ae3c579fe546e511f7170c7e27eedbab7c1/multidict-7.1.0.tar.gz", hash = "sha256:61a4e5d81b8d4e4ad61964b230129e7a2b914793d96289029078fc9009f074ec", size = 362341, upload-time = "2026-10-09T20:31:38.279Z" }
 wheels = [
@@ -4586,10 +4586,10 @@ version = "1.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
-    { name = "cftime", version = "1.6.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "cftime", version = "1.6.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "cftime", version = "1.6.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "cftime", version = "1.6.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0e/76/7bc801796dee752c1ce9cd6935564a6ee79d5c9d9ef9192f57b156495a35/netcdf4-1.7.3.tar.gz", hash = "sha256:83f122fc3415e92b1d4904fd6a0898468b5404c09432c34beb6b16c533884673", size = 836095, upload-time = "2025-10-13T18:38:00.76Z" }
 wheels = [
@@ -4907,14 +4907,14 @@ name = "opencr"
 version = "0.1.0"
 source = { git = "https://github.com/max-models/opencr?branch=devel#bb5431d486c228f57ecda0aabedbdbc208786df9" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "plasmacoll" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [[package]]
@@ -4932,12 +4932,12 @@ version = "0.2.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "absl-py" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8c/f9/e3d11ae6f298ee941a0690e353a323d158ba5dedc436e75621c310845c5c/optax-0.2.8.tar.gz", hash = "sha256:5b225b35066fc3eebaa4d798f1b4173b4d57d1a480610908981f8343b50af0b0", size = 301193, upload-time = "2026-03-20T23:30:05.465Z" }
 wheels = [
@@ -4952,11 +4952,11 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" } },
-    { name = "lineax" },
-    { name = "typing-extensions" },
+    { name = "equinox", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lineax", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/35/10/0d2318a80016a42e2dbcae0be1bea3f51fce0ff5bd919afe532e1e03f0ed/optimistix-0.0.11.tar.gz", hash = "sha256:cfce0de98e7e9fdbcc2ce6d49a9f82cd3166fd0eee29c0c7a1983f8aefd37757", size = 66648, upload-time = "2025-10-17T20:53:28.148Z" }
 wheels = [
@@ -4982,11 +4982,11 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" } },
-    { name = "lineax" },
-    { name = "typing-extensions" },
+    { name = "equinox", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lineax", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5c/0b/3bdc0e698cb0d264e5dca0b5bb171342a950a43fa6e046d8c57189298422/optimistix-0.1.0.tar.gz", hash = "sha256:f05c9104748e87e1dc10a0b4a2be94e427f98c3eab0b1d41ea24a593d76be03d", size = 70164, upload-time = "2026-02-16T13:35:43.991Z" }
 wheels = [
@@ -5001,9 +5001,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "equinox", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/60/c8/55a3a3e4f6c79ee8dd3fbad91588b312d94a2a681a05d093917da5c7cde3/orthax-0.2.10.tar.gz", hash = "sha256:71079de617d1a13040e1bf68666f8f5ba4c9a35f515b811e7b6a051a53580f8e", size = 119568, upload-time = "2026-09-16T09:17:03.361Z" }
 wheels = [
@@ -5029,9 +5029,9 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "equinox" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "equinox", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0c/e0/53e75e2db4eedc35349feaac76c4c4cdd0ae9dae82c6bc674c5b6d983e1f/orthax-0.2.11.tar.gz", hash = "sha256:dcbb33b3908afed59575f205893d436ae5ac7fae23165fb14d8b988ec4531e08", size = 119768, upload-time = "2026-10-21T14:46:53.326Z" }
 wheels = [
@@ -5064,10 +5064,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "python-dateutil" },
-    { name = "pytz" },
-    { name = "tzdata" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "python-dateutil", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pytz", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tzdata", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/01/d40b85317f86cf08d853a4f495195c73815fdf205eef3993821720274518/pandas-2.3.3.tar.gz", hash = "sha256:e05e1af93b977f7eafa636d043f9f94c7ee3ac81af99c13508215942e64c993b", size = 4495223, upload-time = "2025-09-29T23:34:51.853Z" }
 wheels = [
@@ -5139,9 +5139,9 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "python-dateutil" },
-    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "python-dateutil", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tzdata", marker = "(python_full_version >= '3.11' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and sys_platform == 'win32') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e2/17/d7b106e05bfa642e8694451e7d3d759c6a241c5386a5d962e4f66c047e06/pandas-3.0.6.tar.gz", hash = "sha256:66b07ef7315a31bfe1089cd3d71a7de781c9dca986762d0b4fe7c0ef17465d10", size = 4667686, upload-time = "2026-09-17T23:23:18.345Z" }
 wheels = [
@@ -5227,7 +5227,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "(python_full_version < '3.11' and sys_platform == 'emscripten') or (python_full_version < '3.11' and sys_platform == 'win32') or (sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'emscripten' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -5400,10 +5400,10 @@ dependencies = [
     { name = "ipywidgets", version = "8.1.8", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-struphy'" },
     { name = "ipywidgets", version = "8.1.9", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "matplotlib" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [package.optional-dependencies]
@@ -5420,12 +5420,12 @@ web = [
 [[package]]
 name = "plasmacoll"
 version = "0.5.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=devel#5bb8606089002fe172e8334bf2e7b7a250aa46e9" }
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#528dd4553971cd32459783e5c877ba6bfebc241d" }
 dependencies = [
     { name = "cunumpy" },
     { name = "methodcard" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
 ]
 
@@ -5739,8 +5739,8 @@ dependencies = [
     { name = "immutabledict" },
     { name = "meson" },
     { name = "ninja" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "packaging" },
     { name = "sympy" },
     { name = "termcolor" },
@@ -5928,8 +5928,8 @@ name = "pyerfa"
 version = "2.0.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/71/39/63cc8291b0cf324ae710df41527faf7d331bce573899199d926b3e492260/pyerfa-2.0.1.5.tar.gz", hash = "sha256:17d6b24fe4846c65d5e7d8c362dcb08199dc63b30a236aedd73875cc83e1f6c0", size = 818430, upload-time = "2024-11-11T15:22:30.852Z" }
 wheels = [
@@ -5947,8 +5947,8 @@ name = "pyevtk"
 version = "1.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7d/18/2bc8ae16ac487d25a5d020b81a849ee1f3ac3b4e3636648c26baa71ab9aa/pyevtk-1.7.0.tar.gz", hash = "sha256:21ad3b1905b06bf288166629f0002d13a9c664eb42bcbed624d2032d7b8bcf52", size = 42708, upload-time = "2026-05-28T08:00:38.061Z" }
 wheels = [
@@ -6013,8 +6013,8 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version == '3.11.*' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version == '3.11.*' and extra == 'extra-12-freeofcharge-dev') or (python_full_version == '3.11.*' and extra == 'extra-12-freeofcharge-docs') or (python_full_version == '3.11.*' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.12' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.12' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "onnxruntime", marker = "python_full_version >= '3.11'" },
     { name = "psutil", marker = "python_full_version >= '3.11'" },
@@ -6105,7 +6105,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "pyobjc-core", version = "12.2.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "pyobjc-core", version = "12.2.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/75/76/49c6da2c6a831020b4854ba20079d5a1030474bffc776b7b73c2eeff8c15/pyobjc_framework_cocoa-12.2.2.tar.gz", hash = "sha256:c96c0ef69a71afbbb0e6a7d594b455c5fe47d62e0db376ee7a2b4b828c16ace9", size = 3132831, upload-time = "2026-08-11T19:44:02.288Z" }
 wheels = [
@@ -6131,7 +6131,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "pyobjc-core", version = "13.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "pyobjc-core", version = "13.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/30/50/55a8779d35f1f86d795264cbd6fe62e35b2cf4fb8343fc888e99268c988a/pyobjc_framework_cocoa-13.0.tar.gz", hash = "sha256:bb7a23941fc8d7866578dbc84e56140efd343a1d28510f530dd1dbf80807daf4", size = 3135308, upload-time = "2026-10-30T10:46:03.982Z" }
 wheels = [
@@ -6256,13 +6256,13 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "colorama", marker = "(sys_platform == 'win32' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "exceptiongroup", marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "colorama", marker = "(sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs') or (sys_platform == 'win32' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "exceptiongroup", marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "iniconfig", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "packaging", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "pluggy", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "pygments", marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
-    { name = "tomli", marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tomli", marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/79/42/bb4641652e58dedeac2ec51abc1f8cae4fee4ec63899a0999016229a0f2a/pytest-9.2.0.tar.gz", hash = "sha256:97c4f3b1f3c7414aa36465e09b8220f1d03627993bd51b1282e193753c80557b", size = 1797555, upload-time = "2026-10-27T21:30:20.728Z" }
 wheels = [
@@ -6378,8 +6378,8 @@ dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pillow" },
     { name = "pooch" },
-    { name = "pyobjc-framework-cocoa", version = "12.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "pyobjc-framework-cocoa", version = "13.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyobjc-framework-cocoa", version = "12.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyobjc-framework-cocoa", version = "13.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pyvista-validation" },
     { name = "scooby" },
     { name = "typing-extensions" },
@@ -6410,15 +6410,15 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "cyclopts", version = "4.25.3", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "cyclopts", version = "5.3.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "cyclopts", version = "4.25.3", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "cyclopts", version = "5.3.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "matplotlib" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pillow" },
     { name = "pooch" },
-    { name = "pyobjc-framework-cocoa", version = "12.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and sys_platform == 'darwin' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "pyobjc-framework-cocoa", version = "13.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and sys_platform == 'darwin' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyobjc-framework-cocoa", version = "12.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and sys_platform == 'darwin' and extra != 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pyobjc-framework-cocoa", version = "13.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and sys_platform == 'darwin' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and sys_platform == 'darwin' and extra != 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (sys_platform != 'darwin' and extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pyvista-validation" },
     { name = "scooby" },
     { name = "typing-extensions" },
@@ -6434,8 +6434,8 @@ name = "pyvista-validation"
 version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b5/c5/d800d91bae144a71fbae31fcb6b3279c55179acf93639e3443ae87373782/pyvista_validation-0.2.2.tar.gz", hash = "sha256:af234130a3b34b3e1af49584d75b41fafc694752b2958b36e9dbfd9f188e6a0c", size = 554920, upload-time = "2026-09-06T08:42:14.076Z" }
@@ -6622,10 +6622,10 @@ version = "0.2.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "equinox" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/11/59/d45759a97e8acb0266444a3452c98139d4a75ada6ccf4020d62a09f4ac03/quadax-0.2.13.tar.gz", hash = "sha256:136359729026d42f8566dbdbfa361dab78ac906ffb8363705434fc5d4957354b", size = 36353, upload-time = "2026-04-18T00:36:04.701Z" }
 wheels = [
@@ -6638,8 +6638,8 @@ version = "0.37.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
-    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "rpds-py", version = "2026.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "rpds-py", version = "0.30.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "rpds-py", version = "2026.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
@@ -7092,14 +7092,14 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "imageio", version = "2.38.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "lazy-loader" },
-    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pillow" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" } },
-    { name = "tifffile", version = "2025.5.10", source = { registry = "https://pypi.org/simple" } },
+    { name = "imageio", version = "2.38.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lazy-loader", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pillow", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tifffile", version = "2025.5.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c7/a8/3c0f256012b93dd2cb6fda9245e9f4bff7dc0486880b248005f15ea2255e/scikit_image-0.25.2.tar.gz", hash = "sha256:e5a37e6cd4d0c018a7a55b9d601357e3382826d3888c10d0213fc63bff977dde", size = 22693594, upload-time = "2025-02-18T18:05:24.538Z" }
 wheels = [
@@ -7145,16 +7145,16 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "imageio", version = "2.38.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "lazy-loader" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pillow" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "tifffile", version = "2026.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "tifffile", version = "2026.10.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "imageio", version = "2.38.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "lazy-loader", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pillow", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tifffile", version = "2026.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "tifffile", version = "2026.10.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a1/b4/2528bb43c67d48053a7a649a9666432dc307d66ba02e3a6d5c40f46655df/scikit_image-0.26.0.tar.gz", hash = "sha256:f5f970ab04efad85c24714321fcc91613fcb64ef2a892a13167df2f3e59199fa", size = 22729739, upload-time = "2025-12-20T17:12:21.824Z" }
 wheels = [
@@ -7216,7 +7216,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0f/37/6964b830433e654ec7485e45a00fc9a27cf868d622838f6b6d9c5ec0d532/scipy-1.15.3.tar.gz", hash = "sha256:eae3cf522bc7df64b42cad3925c876e1b0b6c35c1337c93e12c0f366f55b0eaf", size = 59419214, upload-time = "2025-05-08T16:13:05.955Z" }
 wheels = [
@@ -7286,7 +7286,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0", size = 30573822, upload-time = "2026-02-23T00:26:24.851Z" }
 wheels = [
@@ -7367,10 +7367,10 @@ version = "0.7.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "h5py" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "tabulate" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/94/c489b8cb5c4f5b21e20b299af8f5bd68a2830ccca0e5708809ae135d440a/scope_profiler-0.7.5.tar.gz", hash = "sha256:977dd69f6b81ff3e316c714fb1d0361d0d2492654dfab517310d6a924a7b4f24", size = 670290, upload-time = "2026-10-22T05:53:58.039Z" }
 wheels = [
@@ -7395,8 +7395,8 @@ dependencies = [
     { name = "maybempi" },
     { name = "methodcard" },
     { name = "mpiarray" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
 ]
 
@@ -7521,22 +7521,22 @@ name = "simsopt"
 version = "1.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "deprecated", version = "3.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "deprecated", version = "3.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "f90nml" },
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxlib", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxlib", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "matplotlib" },
-    { name = "monty", version = "2025.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "monty", version = "2026.10.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "monty", version = "2025.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "monty", version = "2026.10.21", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pyevtk" },
     { name = "ruamel-yaml" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "sympy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5b/1d/477478e110b8aedec5a694bf871efad1b6b5e2a0762473f695db5ff89a2f/simsopt-1.11.1.tar.gz", hash = "sha256:33a39375a73223043ab5ce0f814574474da1842749036c7ad39a6f3ccc295089", size = 29830075, upload-time = "2026-08-25T17:59:10.592Z" }
@@ -7705,7 +7705,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/44/d0/18fed0fc0916578a4463f775b0fbd9c5fed2392152d039df2fb533bfdd5d/tifffile-2025.5.10.tar.gz", hash = "sha256:018335d34283aa3fd8c263bae5c3c2b661ebc45548fde31504016fcae7bf1103", size = 365290, upload-time = "2025-05-10T19:22:34.386Z" }
 wheels = [
@@ -7722,7 +7722,7 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c5/cb/2f6d79c7576e22c116352a801f4c3c8ace5957e9aced862012430b62e14f/tifffile-2026.3.3.tar.gz", hash = "sha256:d9a1266bed6f2ee1dd0abde2018a38b4f8b2935cb843df381d70ac4eac5458b7", size = 388745, upload-time = "2026-03-03T19:14:38.134Z" }
 wheels = [
@@ -7745,7 +7745,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fd/87/a982ca5b892579397c2b155275cc0119b51feb1701eaefa18acb0245f0a4/tifffile-2026.10.15.tar.gz", hash = "sha256:a5ee666dbd6d62e059830a3450825a2521a981b3f45c07a80ab009484aef56f0", size = 454150, upload-time = "2026-10-16T00:32:10.511Z" }
 wheels = [
@@ -7768,8 +7768,8 @@ wheels = [
 vis = [
     { name = "jupyterlab" },
     { name = "matplotlib" },
-    { name = "pymupdf", version = "1.28.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "pymupdf", version = "2.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pymupdf", version = "1.28.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pymupdf", version = "2.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "requests" },
 ]
 
@@ -7912,7 +7912,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "colorama", marker = "(sys_platform == 'win32' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "colorama", marker = "(sys_platform == 'win32' and extra == 'extra-12-freeofcharge-dev') or (sys_platform == 'win32' and extra == 'extra-12-freeofcharge-docs') or (sys_platform == 'win32' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
 wheels = [
@@ -8006,8 +8006,8 @@ name = "trame-rca"
 version = "2.11.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version < '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version < '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-dev') or (python_full_version >= '3.11' and extra == 'extra-12-freeofcharge-docs') or (python_full_version >= '3.11' and extra != 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "trame-client" },
@@ -8024,8 +8024,8 @@ name = "trame-server"
 version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "more-itertools", version = "11.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "more-itertools", version = "11.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "more-itertools", version = "11.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "more-itertools", version = "11.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "trame-common" },
     { name = "wslink" },
 ]
@@ -8120,11 +8120,11 @@ version = "0.1.0"
 source = { git = "https://github.com/max-models/tree-d-3d?rev=devel#8067e85aa1b631d85c26d8eb6f348ead292e0a8b" }
 dependencies = [
     { name = "cunumpy" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pyccel" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
     { name = "simgeometry" },
 ]
@@ -8199,16 +8199,16 @@ name = "vmecpp"
 version = "0.9.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jax", version = "0.9.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "jaxtyping", version = "0.3.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "netcdf4" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pydantic" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "simsopt" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fb/9f/0a58e640e2f75449fa8f22ba9e761e3596264f8f6562828ffde645c5f71e/vmecpp-0.9.3.tar.gz", hash = "sha256:8e56fe6abcd3ffec83036c00a1fd9876644335bdbd23bce9c0a514911ed0f734", size = 740617, upload-time = "2026-11-06T13:59:07.232Z" }
@@ -8418,14 +8418,14 @@ name = "wellbalanced"
 version = "0.1.0"
 source = { git = "https://github.com/max-models/wellbalanced?branch=devel#d1c67f625e0be7133066eba6c2b8083eaf68a602" }
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "plasmacoll" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [[package]]
@@ -8564,9 +8564,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/19/ec/e50d833518f10b0c24feb184b209bb6856f25b919ba8c1f89678b930b1cd/xarray-2025.6.1.tar.gz", hash = "sha256:a84f3f07544634a130d7dc615ae44175419f4c77957a7255161ed99c69c7c8b0", size = 3003185, upload-time = "2025-06-12T03:04:09.099Z" }
 wheels = [
@@ -8592,9 +8592,9 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
-    { name = "packaging" },
-    { name = "pandas", version = "3.0.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "packaging", marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "pandas", version = "3.0.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ff/f5/781c70b234f54e0401f4f7c4427a7486da38d50dbb138c7d7c55144b3d86/xarray-2026.9.0.tar.gz", hash = "sha256:6abc69694c22fa1f0fb2f357ff4e41d88beb4477ed71091f944b7dbf67ed54fe", size = 3176922, upload-time = "2026-09-29T23:06:25.807Z" }
 wheels = [
@@ -8607,8 +8607,8 @@ version = "1.25.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "multidict", version = "7.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "multidict", version = "7.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "multidict", version = "7.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "multidict", version = "7.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "propcache" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/75/16/e8be8e2fb175bbf41a0680381a319f1199fae256588241a2ac8677eafb49/yarl-1.25.1.tar.gz", hash = "sha256:03dd38de09bc213e9a8b29761eec33ee1d5318dac0e49d8af36e4d27830e23a7", size = 246245, upload-time = "2026-09-15T19:35:02.264Z" }
