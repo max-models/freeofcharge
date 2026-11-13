@@ -79,9 +79,8 @@ packages.find.where = [ "src" ]
 
 [tool.uv]
 # struphy 3.6.1 caps cunumpy at 0.7.0 and scope-profiler at 0.7.3, below what the
-# max-models packages need; lifted until a struphy release relaxes them. plasmacoll:
-# wellbalanced asks for its devel branch, this branch develops against a feature branch
-override-dependencies = [ "cunumpy>=0.7", "scope-profiler>=0.7.5", "plasmacoll>=0.5.0" ]
+# max-models packages need; lifted until a struphy release relaxes them
+override-dependencies = [ "cunumpy>=0.7", "scope-profiler>=0.7.5" ]
 # and pins much of its environment (ruff, pytest, trame, vtk): resolved on its own
 conflicts = [
   [ { extra = "struphy" }, { extra = "dev" } ],
@@ -95,7 +94,7 @@ cunumpy = { git = "https://github.com/max-models/cunumpy", branch = "devel" }
 maybempi = { git = "https://github.com/max-models/maybempi", branch = "devel" }
 methodcard = { git = "https://github.com/max-models/methodcard", branch = "devel" }
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
-plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "claude/foc-cx-losses" }
+plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "devel" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
 wellbalanced = { git = "https://github.com/max-models/wellbalanced", branch = "devel" }
 
