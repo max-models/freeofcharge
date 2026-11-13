@@ -69,6 +69,8 @@ from freeofcharge.kernels.guiding_centre_push import kernel as _push
 from freeofcharge.slowing_down import collision_coefficients
 
 if TYPE_CHECKING:
+    from maybempi import MPI
+
     from freeofcharge.deposition import Deposition
     from freeofcharge.equilibrium import FluxSurfaces, MagneticEquilibrium
     from freeofcharge.profiles import Plasma
@@ -78,8 +80,10 @@ __all__ = [
     "GuidingCentres",
     "OrbitFollowing",
     "collide",
+    "face_loads",
     "follow_orbits",
     "guiding_centres",
+    "load_map",
     "orbit_field",
     "revolved_wall",
     "trace_orbits",
@@ -490,6 +494,97 @@ def collide(
     return v_new, np.clip(xi_new, -1.0, 1.0), to_electrons, to_ions
 
 
+def load_map(coordinate, phi, area, power, edges, phi_edges) -> np.ndarray:
+    r"""Return the power per area in bins of (``coordinate``, $\varphi$) [W/m^2].
+
+    Faces are binned by their centres: ``coordinate``, ``phi``, ``area`` and
+    ``power`` per face, the bin ``edges`` of each axis; NaN where no face falls.
+    """
+    area_map, _, _ = np.histogram2d(coordinate, phi, [edges, phi_edges], weights=area)
+    power_map, _, _ = np.histogram2d(coordinate, phi, [edges, phi_edges], weights=power)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return np.where(area_map > 0, power_map / area_map, np.nan)
+
+
+def face_loads(
+    wall,
+    face,
+    power,
+    *,
+    theta_bins: int = 64,
+    phi_bins: int = 180,
+    comm: MPI.Comm | None = None,
+) -> xr.Dataset:
+    r"""Return the power ``power`` [W] of hits on faces ``face`` of ``wall``, per face.
+
+    The tally of `OrbitFollowing.wall_loads`, for any hits on a triangulated wall
+    (a `TriangleMesh`, or a surface with a ``mesh``). Dataset over ``face``:
+    ``power`` [W], ``area`` [m^2], ``wall_load`` $q_f = P_f / A_f$ [W/m^2],
+    ``markers`` (hits), the face centres ``X``, ``Y``, ``Z``, and ``vertices``
+    and ``faces`` of the mesh. On a wall with angles (a `FourierSurface`), also
+    ``wall_load_map`` over ``(theta, phi)`` bins (`load_map`). Attributes: the
+    ``wall_power`` and the ``peak_wall_load``. The hits are this rank's; the
+    tallies are summed over the ranks of ``comm``.
+    """
+    from freeofcharge.deposition import allreduce
+
+    mesh = getattr(wall, "mesh", wall)
+    areas = np.asarray(mesh.face_areas, dtype=float)
+    faces = np.asarray(mesh.faces)
+    vertices = np.asarray(mesh.vertices)
+    face = np.asarray(face, dtype=np.int64)
+    power = np.asarray(power, dtype=float)
+    per_face = allreduce(np.bincount(face, weights=power, minlength=len(areas)), comm)
+    counts = allreduce(np.bincount(face, minlength=len(areas)), comm)
+    centres = vertices[faces].mean(axis=1)
+    data = {
+        "power": ("face", per_face, {"long_name": "power", "units": "W"}),
+        "area": ("face", areas, {"long_name": "area", "units": "m^2"}),
+        "wall_load": (
+            "face",
+            per_face / areas,
+            {"long_name": "wall load", "units": "W/m^2"},
+        ),
+        "markers": ("face", counts, {"long_name": "markers"}),
+        "X": ("face", centres[:, 0], {"units": "m"}),
+        "Y": ("face", centres[:, 1], {"units": "m"}),
+        "Z": ("face", centres[:, 2], {"units": "m"}),
+        "vertices": (("vertex", "xyz"), vertices, {"units": "m"}),
+        "faces": (("face", "corner"), faces),
+    }
+    coords: dict[str, Any] = {"xyz": ["x", "y", "z"]}
+    triangulate = getattr(wall, "triangulate", None)
+    if triangulate is not None:
+        _, angles = triangulate(*wall.resolution)
+        theta_f = np.mod(np.asarray(angles)[:, :, 0].mean(axis=1), 2 * np.pi)
+        phi_f = np.mod(np.asarray(angles)[:, :, 1].mean(axis=1), 2 * np.pi)
+        t_edges = np.linspace(0.0, 2 * np.pi, theta_bins + 1)
+        p_edges = np.linspace(0.0, 2 * np.pi, phi_bins + 1)
+        data["wall_load_map"] = (
+            ("theta", "phi"),
+            load_map(theta_f, phi_f, areas, per_face, t_edges, p_edges),
+            {"long_name": "wall load", "units": "W/m^2"},
+        )
+        coords["theta"] = (
+            "theta",
+            0.5 * (t_edges[1:] + t_edges[:-1]),
+            {"long_name": r"$\theta$", "units": "rad"},
+        )
+        coords["phi"] = (
+            "phi",
+            0.5 * (p_edges[1:] + p_edges[:-1]),
+            {"long_name": r"$\varphi$", "units": "rad"},
+        )
+    return xr.Dataset(
+        data,
+        coords=coords,
+        attrs={
+            "wall_power": float(np.sum(per_face)),
+            "peak_wall_load": float(np.max(per_face / areas)) if len(areas) else 0.0,
+        },
+    )
+
+
 @dataclass
 class OrbitFollowing:
     """The result of `follow_orbits`: the markers' fates and the steady-state moments.
@@ -648,78 +743,20 @@ class OrbitFollowing:
         ``Y``, ``Z``; ``vertices`` and ``faces`` of the mesh (for a 3D surface
         plot). On a wall with angles (simgeometry's `FourierSurface`), also
         ``wall_load_map`` over ``(theta, phi)`` bins: the power in each bin over its
-        area.
+        area (`face_loads`).
         """
         if self.wall is None:
             raise ValueError("no wall: the losses are at rho_limit (see losses())")
-        mesh = getattr(self.wall, "mesh", self.wall)
-        areas = np.asarray(mesh.face_areas, dtype=float)
-        faces = np.asarray(mesh.faces)
-        vertices = np.asarray(mesh.vertices)
         hit = self.markers.fate.values == _WALL
         face = self.markers.face.values[hit].astype(np.int64)
         power = (
             self.markers.weight.values[hit] * self.markers.end_energy.values[hit] * _E
         )
-        per_face = np.bincount(face, weights=power, minlength=len(areas))
-        counts = np.bincount(face, minlength=len(areas))
-        centres = vertices[faces].mean(axis=1)
-        data = {
-            "power": ("face", per_face, {"long_name": "power", "units": "W"}),
-            "area": ("face", areas, {"long_name": "area", "units": "m^2"}),
-            "wall_load": (
-                "face",
-                per_face / areas,
-                {"long_name": "wall load", "units": "W/m^2"},
-            ),
-            "markers": ("face", counts, {"long_name": "markers"}),
-            "X": ("face", centres[:, 0], {"units": "m"}),
-            "Y": ("face", centres[:, 1], {"units": "m"}),
-            "Z": ("face", centres[:, 2], {"units": "m"}),
-            "vertices": (("vertex", "xyz"), vertices, {"units": "m"}),
-            "faces": (("face", "corner"), faces),
-        }
-        coords: dict[str, Any] = {"xyz": ["x", "y", "z"]}
-        triangulate = getattr(self.wall, "triangulate", None)
-        if triangulate is not None:
-            _, angles = triangulate(*self.wall.resolution)
-            theta_f = np.mod(np.asarray(angles)[:, :, 0].mean(axis=1), 2 * np.pi)
-            phi_f = np.mod(np.asarray(angles)[:, :, 1].mean(axis=1), 2 * np.pi)
-            t_edges = np.linspace(0.0, 2 * np.pi, theta_bins + 1)
-            p_edges = np.linspace(0.0, 2 * np.pi, phi_bins + 1)
-            area_map, _, _ = np.histogram2d(
-                theta_f, phi_f, [t_edges, p_edges], weights=areas
-            )
-            power_map, _, _ = np.histogram2d(
-                theta_f, phi_f, [t_edges, p_edges], weights=per_face
-            )
-            with np.errstate(invalid="ignore", divide="ignore"):
-                load_map = np.where(area_map > 0, power_map / area_map, np.nan)
-            data["wall_load_map"] = (
-                ("theta", "phi"),
-                load_map,
-                {"long_name": "wall load", "units": "W/m^2"},
-            )
-            coords["theta"] = (
-                "theta",
-                0.5 * (t_edges[1:] + t_edges[:-1]),
-                {"long_name": r"$\theta$", "units": "rad"},
-            )
-            coords["phi"] = (
-                "phi",
-                0.5 * (p_edges[1:] + p_edges[:-1]),
-                {"long_name": r"$\varphi$", "units": "rad"},
-            )
-        return xr.Dataset(
-            data,
-            coords=coords,
-            attrs={
-                "lost_power": float(np.sum(power)),
-                "peak_wall_load": float(np.max(per_face / areas))
-                if len(areas)
-                else 0.0,
-            },
+        loads = face_loads(
+            self.wall, face, power, theta_bins=theta_bins, phi_bins=phi_bins
         )
+        loads.attrs["lost_power"] = loads.attrs.pop("wall_power")
+        return loads
 
 
 def _closest_on_triangles(p, a, b, c) -> np.ndarray:
