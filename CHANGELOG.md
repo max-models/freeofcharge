@@ -7,6 +7,9 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `Equilibrium.plasma_current` (Ampère's law around the boundary), and `Equilibrium.to_geqdsk`
+  now writes $q$, the axis field and radius and the plasma current, so that codes that check the
+  COCOS convention from the signs (TORAX) read the files; used by slowcooker's tokamak geometry.
 - Transport geometry (`freeofcharge.transport_geometry`, `surface_geometry`,
   `GVECEquilibrium.transport_geometry`): the flux-surface averages a 1.5D transport code needs
   ($V'$, $\langle|\nabla\rho|\rangle$, $\langle|\nabla\rho|^2\rangle$, $\langle|\nabla\rho|^2/R^2\rangle$,

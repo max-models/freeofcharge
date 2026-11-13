@@ -661,10 +661,46 @@ class Equilibrium:
             **kwargs,
         )
 
+    def plasma_current(self) -> float:
+        r"""Return the toroidal plasma current [A] from Ampère's law around the boundary.
+
+        $\mu_0 I_p = \oint \mathbf{B}_p \cdot d\mathbf{l}$ along the last closed
+        surface, by the midpoint rule on its vertices; the sign follows $\psi$.
+        """
+        vertices = np.asarray(self.boundary.vertices, dtype=float)
+        closed = np.vstack([vertices, vertices[:1]])
+        middle = 0.5 * (closed[1:] + closed[:-1])
+        step = np.diff(closed, axis=0)
+        b_r, b_z, _ = (
+            np.asarray(b) for b in self.magnetic_field(middle[:, 0], middle[:, 1])
+        )
+        circulation = float(np.sum(b_r * step[:, 0] + b_z * step[:, 1]))
+        return circulation / (4.0e-7 * np.pi)
+
     def to_geqdsk(self, path: str | Path, *, description: str = "freeofcharge") -> None:
-        """Write the equilibrium as a G-EQDSK file (pressure and $q$ left zero)."""
+        """Write the equilibrium as a G-EQDSK file (pressure left zero).
+
+        $q$ comes from `flux_surfaces` on 64 shells, extended linearly to the
+        axis and the boundary; the reference radius and field are those on the
+        axis, and the plasma current is `plasma_current`. Codes that check the
+        COCOS convention from the signs (e.g. TORAX) need $q$ and the current.
+        """
         n_r = len(self.r)
         psi_n = np.linspace(0.0, 1.0, n_r)
+        shells = self.flux_surfaces(np.linspace(0.0, 1.0, 65))
+        centres = shells.rho**2
+        q = np.asarray(shells.safety_factor, dtype=float)
+        slope_in = (q[1] - q[0]) / (centres[1] - centres[0])
+        slope_out = (q[-1] - q[-2]) / (centres[-1] - centres[-2])
+        q_grid = np.interp(psi_n, centres, q)
+        q_grid = np.where(
+            psi_n < centres[0], q[0] + slope_in * (psi_n - centres[0]), q_grid
+        )
+        q_grid = np.where(
+            psi_n > centres[-1], q[-1] + slope_out * (psi_n - centres[-1]), q_grid
+        )
+        r_axis = float(self.axis[0])
+        f_axis = float(self.f[0])
         geqdsk.write(
             path,
             geqdsk.GEqdsk(
@@ -678,6 +714,10 @@ class Equilibrium:
                 boundary=self.boundary.vertices,
                 limiter=np.zeros((0, 2)) if self.wall is None else self.wall.vertices,
                 description=description,
+                b_centre=f_axis / r_axis,
+                r_centre=r_axis,
+                current=self.plasma_current(),
+                q=q_grid,
             ),
         )
 
