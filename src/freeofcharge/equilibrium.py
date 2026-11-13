@@ -332,7 +332,7 @@ class FluxSurfaces:
         },
         assumptions=(
             r"64-point Gauss-Legendre in $s$, which resolves the square-root end point",
-            r"$B_\max$ the largest $|B|$ of the field points; on 3D surfaces the averages over the $(\theta, \zeta)$ grid with the Jacobian weights: the effective trapped fraction",
+            r"$B_{\max}$ the largest $|B|$ of the field points; on 3D surfaces the averages over the $(\theta, \zeta)$ grid with the Jacobian weights: the effective trapped fraction",
         ),
         references=(
             "[Lin-Liu and Miller, Phys. Plasmas 2, 1666 (1995)](https://doi.org/10.1063/1.871315)",
@@ -368,7 +368,7 @@ class FluxSurfaces:
 
     @property
     def field_epsilon(self) -> np.ndarray:
-        r"""Return $(B_\max - B_\min) / (B_\max + B_\min)$ on each surface centre.
+        r"""Return $(B_{\max} - B_{\min}) / (B_{\max} + B_{\min})$ on each surface centre.
 
         The inverse aspect ratio $\epsilon$ where $|B| \propto 1/R$, and the
         $\epsilon$ that Landreman, Buller and Drevlak (Phys. Plasmas, 2022,

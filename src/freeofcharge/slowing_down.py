@@ -77,13 +77,13 @@ holds in any geometry (`SlowingDown.power_balance`).
 
 For the current in 3D, ``trapped_electron_correction="sauter"`` takes Sauter's
 $L_{31}$ with the effective trapped fraction of the 3D surface,
-$f_t = 1 - \frac{3}{4}\langle B^2\rangle \int_0^{1/B_\max}
+$f_t = 1 - \frac{3}{4}\langle B^2\rangle \int_0^{1/B_{\max}}
 \lambda\,d\lambda / \langle\sqrt{1 - \lambda B}\rangle$ with the 3D flux-surface
 averages (`FluxSurfaces.trapped_fraction`, the definition DESC computes and
 Landreman, Buller and Drevlak, Phys. Plasmas, 2022, doi:10.1063/5.0098166,
 use for the bootstrap current of quasisymmetric stellarators),
 and in the collisionality $q = 1/|\iota|$, $R$ toroidally averaged and
-$\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$ (`FluxSurfaces.field_epsilon`).
+$\epsilon = (B_{\max} - B_{\min})/(B_{\max} + B_{\min})$ (`FluxSurfaces.field_epsilon`).
 This is an approximation: $L_{31}(f_t)$ is the axisymmetric coefficient. In a
 stellarator the collisionless response of the trapped electrons, like the
 bootstrap current, carries a further geometric factor that depends on the
@@ -773,7 +773,7 @@ def electron_collisionality(ne, te, zeff, safety_factor, major_radius, epsilon):
     },
     assumptions=(
         r"$f_t$, $q$, $R$, $\epsilon$ of the shell's centre surface",
-        r"on 3D shells: $f_t$ the effective trapped fraction of the 3D surface, $R$ averaged over the toroidal angle and $\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$ in $\nu_e^*$; the axisymmetric $L_{31}(f_t)$ without the stellarator geometric factor of the trapped-electron response",
+        r"on 3D shells: $f_t$ the effective trapped fraction of the 3D surface, $R$ averaged over the toroidal angle and $\epsilon = (B_{\max} - B_{\min})/(B_{\max} + B_{\min})$ in $\nu_e^*$; the axisymmetric $L_{31}(f_t)$ without the stellarator geometric factor of the trapped-electron response",
     ),
     references=(
         "[Lin-Liu and Hinton, Phys. Plasmas 4, 4179 (1997)](https://doi.org/10.1063/1.872543)",
@@ -792,7 +792,7 @@ def sauter_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
     plasma at the shell centres. On the shells of a 3D equilibrium the trapped
     fraction is the effective one of the 3D surface (`FluxSurfaces.trapped_fraction`),
     $q = 1 / |\iota|$ (the sign of $\iota$ is a convention) and the collisionality
-    takes $\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$
+    takes $\epsilon = (B_{\max} - B_{\min})/(B_{\max} + B_{\min})$
     (`FluxSurfaces.field_epsilon`, as Landreman, Buller and Drevlak, 2022) instead of
     the geometric inverse aspect ratio, which vanishes on the axis while the
     mirror field still traps electrons there; $L_{31}(f_t)$ is then an
