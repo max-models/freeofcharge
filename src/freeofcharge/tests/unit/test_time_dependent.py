@@ -147,14 +147,14 @@ def test_energy_is_conserved_through_a_blip(response):
         return np.where((t >= 0.1) & (t < 0.11), power, 0.0)
 
     data = response.evolve(time, blip)
-    injected = np.sum(data.birth_power.values) * dt
+    injected = np.sum(data.power.values) * dt
     assert injected == pytest.approx(0.01 * power, rel=1e-9)
     out = data.total_heating.sum("species") + data.thermalised_power.sum("rho")
     assert float(out.sum()) * dt == pytest.approx(injected, rel=1e-6)
     assert float(data.stored_energy[-1]) == pytest.approx(0.0, abs=1e-9 * injected)
     # and at every time: W(t) = int (P_birth - P_e - P_i - P_th) dt, to the
     # trapezoidal rule of the heating over the 1 ms steps at the blip edges
-    given = np.cumsum(data.birth_power.values) * dt
+    given = np.cumsum(data.power.values) * dt
     lost = np.concatenate([[0.0], np.cumsum(0.5 * (out.values[1:] + out.values[:-1]))])
     balance = np.concatenate([[0.0], given[:-1]]) - lost * dt
     assert np.max(np.abs(data.stored_energy.values - balance)) < 3e-3 * injected

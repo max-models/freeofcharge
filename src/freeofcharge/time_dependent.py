@@ -201,7 +201,7 @@ class SlowingDownResponse:
             energy, pressure, current density and driven current density, the
             power that joins the thermal ions, and the whole-plasma
             ``stored_energy``, ``driven_current``, ``total_heating`` and the
-            ``birth_power`` over ``time``.
+            source ``power`` (on the step from each time) over ``time``.
         """
         time = np.asarray(time, dtype=float)
         if time.ndim != 1 or time.size < 2:
@@ -233,10 +233,10 @@ class SlowingDownResponse:
         dims = ("time", "rho")
         return xr.Dataset(
             {
-                "birth_power": (
+                "power": (
                     "time",
                     source,
-                    {"long_name": "birth power", "units": "W"},
+                    {"long_name": "beam power", "units": "W"},
                 ),
                 "heating": (
                     ("species", *dims),
