@@ -68,6 +68,7 @@ class Deposition:
     shine_through_power: float
     wall_hits: ParticleArrays | None
     radial_coordinate: str = "poloidal"
+    transmission: object = None
     """Birth positions ``(N, 3)``, velocities and weights [ions/s]."""
     r"""$\rho$ of each birth."""
     r"""$v_\parallel / v$ of each birth (positive along $\mathbf{B}$)."""
@@ -77,6 +78,8 @@ class Deposition:
     """Where the shine-through meets the wall: positions, velocities, weights
     [atoms/s]; None without a wall."""
     r"""The flux $\rho$ is the root of, the equilibrium's (`freeofcharge.rho_coordinate`)."""
+    r"""$e^{-\tau_\mathrm{total}}$ of each of this rank's markers, in the beam's order:
+    the share of its stream that shines through (`freeofcharge.shine_through`)."""
 
     @classmethod
     def combine(cls, depositions: Sequence[Deposition]) -> Deposition:
@@ -105,6 +108,7 @@ class Deposition:
             )
 
         hits = [d.wall_hits for d in depositions if d.wall_hits is not None]
+        transmissions = [d.transmission for d in depositions]
         return cls(
             births=join([d.births for d in depositions]),
             birth_rho=xp.concatenate([xp.asarray(d.birth_rho) for d in depositions]),
@@ -123,6 +127,9 @@ class Deposition:
             shine_through_power=sum(d.shine_through_power for d in depositions),
             wall_hits=join(hits) if hits else None,
             radial_coordinate=first.radial_coordinate,
+            transmission=None
+            if any(t is None for t in transmissions)
+            else xp.concatenate([xp.asarray(t) for t in transmissions]),
         )
 
     @property
@@ -317,6 +324,7 @@ def deposit(
     totals = xp.zeros(2)  # absorbed and shine-through power [W]
     birth_parts: list[tuple] = []
     hit_parts: list[tuple] = []
+    transmission_parts: list = []
 
     for start in range(0, beam.size, chunk):
         sl = slice(start, min(start + chunk, beam.size))
@@ -380,6 +388,7 @@ def deposit(
         )
         tau_total = tau[:, -1]
         stopped = 1.0 - xp.exp(-tau_total)
+        transmission_parts.append(1.0 - stopped)
         totals += (
             xp.stack(
                 [
@@ -459,4 +468,7 @@ def deposit(
         shine_through_power=float(totals[1]),
         wall_hits=join(hit_parts) if equilibrium.has_wall else None,
         radial_coordinate=radial_coordinate,
+        transmission=xp.concatenate(transmission_parts)
+        if transmission_parts
+        else xp.zeros(0),
     )
