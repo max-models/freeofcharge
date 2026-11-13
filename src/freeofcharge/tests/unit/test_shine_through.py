@@ -143,6 +143,22 @@ def test_an_open_panel_misses_part_of_the_beam():
 # ----------------------------------------------------------------------
 
 
+def test_lines_through_the_edges_of_an_open_plate_hit_it():
+    """Lines aimed exactly at the plate's edges and vertices are traced again, not lost."""
+    side, m, power, energy = 0.6, 600, 1e6, 1e5
+    pitch = side / m
+    grid = (np.arange(m) + 1.0) * pitch - side / 2
+    x, y = np.meshgrid(grid, grid, indexing="ij")
+    xy = np.column_stack([x.ravel(), y.ravel()]) + [20.0, 0.0]
+    weights = np.full(len(xy), power / (energy * E) / len(xy))
+    beam = _downward(xy, weights, energy)
+    loads = shine_through_loads(
+        beam, _unattenuated(beam), _plate(10, 2.0, 0.0, (20, 0, 0))
+    )
+    assert loads.attrs["wall_power"] == pytest.approx(power, rel=1e-12)
+    assert loads.attrs["missed_power"] == 0.0
+
+
 @pytest.mark.parametrize("alpha_deg", [0.0, 30.0, 60.0])
 def test_a_uniform_beam_on_a_tilted_plate(alpha_deg):
     alpha = np.radians(alpha_deg)

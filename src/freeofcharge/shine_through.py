@@ -167,7 +167,9 @@ def _wall_hits(surface, starts, directions, length, rng, *, tries: int = 4):
     On a closed wall the inside must lie just before a hit, and a line inside
     the wall must hit it; a line that passed through an edge or a vertex
     without a hit (the triangle tests round off there) fails this and is traced
-    again with its direction turned by about $10^{-9}$ rad.
+    again with its direction turned by about $10^{-9}$ rad. On an open wall
+    every line that misses is traced again that way, since a line through an
+    edge can slip between two faces; one that passes beside the wall misses again.
     """
     mesh = getattr(surface, "mesh", surface)
     closed = bool(getattr(mesh, "closed", False))
@@ -176,6 +178,24 @@ def _wall_hits(surface, starts, directions, length, rng, *, tries: int = 4):
         surface, starts, starts + length[:, None] * directions, closed
     )
     if not closed:
+        # a line through an edge or vertex can slip between two faces: retrace the
+        # misses turned slightly; a line that really passes beside the wall misses again
+        lines = np.nonzero(~hit)[0]
+        for _ in range(tries):
+            if not len(lines):
+                break
+            turned = directions[lines] + 1e-9 * rng.standard_normal((len(lines), 3))
+            turned /= np.linalg.norm(turned, axis=1)[:, None]
+            ends = starts[lines] + length[lines, None] * turned
+            found = _crossing(surface, starts[lines], ends, closed)
+            now = np.asarray(found[0], dtype=bool)
+            caught = lines[now]
+            directions[caught] = turned[now]
+            for array, value in zip(
+                (hit, point, normal, face, entered), found, strict=True
+            ):
+                array[caught] = np.asarray(value)[now]
+            lines = lines[~now]
         return hit, point, normal, face, directions
     lines = np.arange(len(starts))
     for _ in range(tries):
