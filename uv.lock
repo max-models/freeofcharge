@@ -27,7 +27,6 @@ conflicts = [[
 [manifest]
 overrides = [
     { name = "cunumpy", git = "https://github.com/max-models/cunumpy?branch=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=claude%2Ffoc-neutrons" },
     { name = "scope-profiler", specifier = ">=0.7.5" },
 ]
 
@@ -2087,7 +2086,7 @@ requires-dist = [
     { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=devel" },
     { name = "plasma-plots", marker = "extra == 'coils'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasma-plots", extras = ["scene", "web"], marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
-    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=claude%2Ffoc-neutrons" },
+    { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pyccel", marker = "extra == 'test'", specifier = ">2.0" },
     { name = "pyproject-fmt", marker = "extra == 'dev'" },
@@ -5423,7 +5422,7 @@ web = [
 [[package]]
 name = "plasmacoll"
 version = "0.5.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=claude%2Ffoc-neutrons#350cfdf387026ee91f387485ca1135626eca4276" }
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#528dd4553971cd32459783e5c877ba6bfebc241d" }
 dependencies = [
     { name = "cunumpy" },
     { name = "methodcard" },
