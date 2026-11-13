@@ -5420,7 +5420,7 @@ web = [
 [[package]]
 name = "plasmacoll"
 version = "0.5.0"
-source = { git = "https://github.com/max-models/plasmacoll?branch=devel#dbf992a916c9c8c2322e5144f23336c181af304c" }
+source = { git = "https://github.com/max-models/plasmacoll?branch=devel#528dd4553971cd32459783e5c877ba6bfebc241d" }
 dependencies = [
     { name = "cunumpy" },
     { name = "methodcard" },
