@@ -28,6 +28,7 @@ dependencies = [
   "scipy",
   "scope-profiler>=0.7.5",
   "simgeometry>=0.1.0",
+  "tomli>=1.1; python_version<'3.11'",
   "xarray",
 ]
 optional-dependencies.dev = [
@@ -67,6 +68,7 @@ optional-dependencies.test = [
   "pytest-cov",
 ]
 urls.Source = "https://github.com/max-models/freeofcharge"
+scripts.freeofcharge = "freeofcharge.run:main"
 
 [project.entry-points."scope_profiler.opt_in_tags"]
 freeofcharge = "freeofcharge"

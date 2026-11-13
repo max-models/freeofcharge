@@ -1980,6 +1980,7 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "scope-profiler" },
     { name = "simgeometry" },
+    { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
@@ -2098,6 +2099,7 @@ requires-dist = [
     { name = "scope-profiler", specifier = ">=0.7.5" },
     { name = "simgeometry", git = "https://github.com/max-models/simgeometry?branch=devel" },
     { name = "struphy", marker = "extra == 'struphy'", specifier = ">=3.6" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=1.1" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
     { name = "vmecpp", marker = "extra == 'vmec'", specifier = ">=0.9" },
     { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=devel" },
