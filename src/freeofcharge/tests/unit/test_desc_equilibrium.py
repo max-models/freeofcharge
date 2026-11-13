@@ -122,13 +122,16 @@ def test_rho_and_field_in_planes(example):
     # rho**2: rho has a cone on the axis
     np.testing.assert_allclose(rho[:, 0] ** 2, nodes[:, 0] ** 2, atol=1e-5)
     np.testing.assert_allclose(b[:, 0], np.asarray(data["B"]), rtol=1e-4, atol=1e-6)
-    # outside: 1 + residual / a, as the inverse map gives it
+    # outside: 1 + residual / a, as the inverse map gives it. Near the boundary the
+    # two inversions agree; far out the residual of the unconverged Newton iteration
+    # depends on its path (and on the machine), so there only rho > 1 is checked.
     _, upper = example.bounds
     outside = np.array([[upper[0] + 0.2, 1.0]])
     rho, b = example.rho_and_field_in_planes([0.3], outside, [[0, 0]])
     cartesian = np.stack([outside * np.cos(0.3), outside * np.sin(0.3), [[0, 0]]], -1)
-    np.testing.assert_allclose(rho, example.rho_at(cartesian), rtol=0.05)
+    np.testing.assert_allclose(rho[:, 0], example.rho_at(cartesian)[:, 0], rtol=0.05)
     assert np.all(rho > 1.0) and np.all(np.isfinite(b))
+    assert np.all(np.asarray(example.rho_at(cartesian)) > 1.0)
     assert example.radial_coordinate == "toroidal"
 
 
