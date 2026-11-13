@@ -195,3 +195,93 @@ def test_flux_surfaces_convert_to_a_dataset(solovev):
         "area",
         "inverse_aspect_ratio",
     }
+
+
+def _polar_flux_coordinates(equilibrium, step=1e-4):
+    r"""The flux coordinates $(\rho, \theta)$ of an axisymmetric equilibrium.
+
+    $\theta$ the geometric angle about the axis; the radius along each ray by
+    bisection of $\psi_n = \rho^2$, the derivatives by central differences.
+    """
+    r0, z0 = equilibrium.axis
+    lower = np.asarray(equilibrium.grid.lower_bound)
+    upper = np.asarray(equilibrium.grid.upper_bound)
+
+    def surface(rho, theta):
+        cos_t, sin_t = np.cos(theta), np.sin(theta)
+        with np.errstate(divide="ignore"):
+            reach = np.min(
+                np.abs(
+                    [
+                        np.where(cos_t > 0, upper[0] - r0, lower[0] - r0) / cos_t,
+                        np.where(sin_t > 0, upper[1] - z0, lower[1] - z0) / sin_t,
+                    ]
+                ),
+                axis=0,
+            )
+        low, high = np.zeros_like(rho), 0.999 * reach
+        for _ in range(60):
+            mid = 0.5 * (low + high)
+            above = (
+                np.asarray(
+                    equilibrium.psi_normalized(r0 + mid * cos_t, z0 + mid * sin_t)
+                )
+                >= rho**2
+            )
+            high, low = np.where(above, mid, high), np.where(above, low, mid)
+        distance = 0.5 * (low + high)
+        return r0 + distance * cos_t, z0 + distance * sin_t
+
+    def shape(rho, theta, zeta):
+        r, z = surface(rho, theta)
+        r_up, z_up = surface(rho + step, theta)
+        r_down, z_down = surface(rho - step, theta)
+        r_right, z_right = surface(rho, theta + step)
+        r_left, z_left = surface(rho, theta - step)
+        b_r, b_z, b_phi = (np.asarray(b) for b in equilibrium.magnetic_field(r, z))
+        return (
+            r,
+            (r_up - r_down) / (2 * step),
+            (r_right - r_left) / (2 * step),
+            (z_up - z_down) / (2 * step),
+            (z_right - z_left) / (2 * step),
+            np.sqrt(b_r**2 + b_z**2 + b_phi**2),
+            np.ones_like(r),
+        )
+
+    return shape
+
+
+def test_trapped_fraction_of_the_3d_path_is_the_axisymmetric_one():
+    """Solov'ev through `FluxSurfaces.from_flux_coordinates`: the Jacobian weights
+    of the 3D average are the 2D ones, dl / B_p."""
+    solovev = Equilibrium.solovev(3.0, 1.0, elongation=1.5, toroidal_field=2.0)
+    edges = np.linspace(0.0, 1.0, 6)
+    flat = FluxSurfaces.from_flux_coordinates(
+        _polar_flux_coordinates(solovev),
+        1,
+        edges,
+        field_points=(256, 1),
+        radial_points=2,
+        radial_coordinate="poloidal",
+    )
+    surfaces = solovev.flux_surfaces(edges)
+    assert not flat.axisymmetric
+    assert np.all(surfaces.trapped_fraction > 0.25)
+    # 5e-6 at most
+    np.testing.assert_allclose(
+        flat.trapped_fraction, surfaces.trapped_fraction, atol=1e-4
+    )
+    np.testing.assert_allclose(flat.volume, surfaces.volume, rtol=1e-3)
+
+
+def test_field_epsilon_is_the_inverse_aspect_ratio_where_b_goes_as_one_over_r():
+    solovev = Equilibrium.solovev(10.0, 1.0, toroidal_field=2.0, q_axis=3.0)
+    surfaces = solovev.flux_surfaces(np.linspace(0.0, 1.0, 6), resolution=50)
+    # B_phi = F / R dominates at large aspect ratio and q
+    np.testing.assert_allclose(
+        surfaces.field_epsilon, surfaces.inverse_aspect_ratio, rtol=0.02
+    )
+    bare = FluxSurfaces(np.linspace(0.0, 1.0, 3), np.zeros(2), np.zeros(2), np.zeros(2))
+    with pytest.raises(ValueError, match="no field points"):
+        _ = bare.field_epsilon

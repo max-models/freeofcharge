@@ -1,5 +1,7 @@
 """The local slowing down on the shells of a 3D equilibrium."""
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 
@@ -13,7 +15,12 @@ from freeofcharge import (
     slow_down,
 )
 from freeofcharge.gridded_equilibrium import _HelicalTestField
-from freeofcharge.slowing_down import start_cordey_trapped_electron_correction
+from freeofcharge.slowing_down import (
+    electron_collisionality,
+    l31_coefficient,
+    sauter_trapped_electron_correction,
+    start_cordey_trapped_electron_correction,
+)
 
 EDGES = np.linspace(0.0, 1.0, 6)
 
@@ -36,6 +43,12 @@ def surfaces(helical):
 @pytest.fixture(scope="module")
 def plasma():
     return Plasma.parabolic(5e19, 3e3, ions={"H": (1, 1, 1.0)})
+
+
+@pytest.fixture(scope="module")
+def impure():
+    """Z_eff = 1.3, so that the shielding leaves a current."""
+    return Plasma.parabolic(5e19, 3e3, ions={"H": (1, 1, 0.94), "C": (12, 6, 0.01)})
 
 
 @pytest.fixture(scope="module")
@@ -123,16 +136,107 @@ def test_thermalised_power_closes_the_balance(deposition, plasma, surfaces):
     assert abs(steady.power_balance) < 1e-10
 
 
-def test_an_explicit_correction_gives_a_current(deposition, plasma, surfaces):
+def test_sauter_with_the_effective_trapped_fraction_in_3d(deposition, impure, surfaces):
     import warnings
 
+    assert np.all((surfaces.trapped_fraction > 0) & (surfaces.trapped_fraction < 1))
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         steady = slow_down(
             deposition,
-            plasma,
+            impure,
+            surfaces,
+            orbit_average=False,
+            trapped_electron_correction="sauter",
+        )
+        by_function = slow_down(
+            deposition,
+            impure,
+            surfaces,
+            orbit_average=False,
+            trapped_electron_correction=sauter_trapped_electron_correction,
+        )
+    assert np.isfinite(steady.driven_current)
+    assert steady.driven_current == by_function.driven_current
+    # G = L31(f_t, nu*) of the 3D surfaces, with q = 1/|iota|
+    g = sauter_trapped_electron_correction(surfaces, impure)
+    assert np.all((g > 0) & (g < 1))
+    zeff = impure.zeff(surfaces.rho)
+    np.testing.assert_allclose(
+        steady.current_density,
+        steady.fast_ion_current_density * (1 - (1 - g) / zeff),
+        rtol=1e-12,
+    )
+    # the collisionality with the mirror epsilon of |B|, not the geometric one
+    ne = impure.electron_density(surfaces.rho)
+    te = impure.electron_temperature(surfaces.rho)
+    nu = electron_collisionality(
+        ne,
+        te,
+        zeff,
+        np.abs(surfaces.safety_factor),
+        surfaces.major_radius,
+        surfaces.field_epsilon,
+    )
+    np.testing.assert_allclose(
+        g, l31_coefficient(zeff, surfaces.trapped_fraction, nu), rtol=1e-12
+    )
+    flipped = replace(surfaces, safety_factor=-surfaces.safety_factor)
+    np.testing.assert_allclose(sauter_trapped_electron_correction(flipped, impure), g)
+
+
+@pytest.mark.filterwarnings("ignore:divide by zero:RuntimeWarning")
+def test_no_trapped_fraction_is_no_correction(deposition, impure, surfaces):
+    """|B| uniform on the surfaces: f_t = 0, so G = 0 and j = j_f (1 - 1/Z_eff).
+
+    The mirror epsilon is zero too, so the collisionality is infinite (a warning).
+    """
+    uniform = replace(surfaces, field_strength=np.ones_like(surfaces.field_strength))
+    np.testing.assert_allclose(uniform.trapped_fraction, 0.0, atol=1e-13)
+    kwargs = {"orbit_average": False}
+    sauter = slow_down(
+        deposition, impure, uniform, trapped_electron_correction="sauter", **kwargs
+    )
+    none = slow_down(
+        deposition, impure, uniform, trapped_electron_correction="none", **kwargs
+    )
+    np.testing.assert_allclose(sauter.current_density, none.current_density, rtol=1e-12)
+    zeff = impure.zeff(surfaces.rho)
+    np.testing.assert_allclose(
+        none.current_density, none.fast_ion_current_density * (1 - 1 / zeff)
+    )
+    # trapped electrons reduce the shielding, so the corrected current is larger
+    corrected = slow_down(
+        deposition, impure, surfaces, trapped_electron_correction="sauter", **kwargs
+    )
+    np.testing.assert_allclose(zeff, 1.3)
+    assert abs(corrected.driven_current) > abs(none.driven_current) > 0
+
+
+def test_start_cordey_warns_in_3d(deposition, impure, surfaces):
+    with pytest.warns(UserWarning, match="Start-Cordey"):
+        steady = slow_down(
+            deposition,
+            impure,
             surfaces,
             orbit_average=False,
             trapped_electron_correction=start_cordey_trapped_electron_correction,
         )
     assert np.isfinite(steady.driven_current)
+
+
+def test_unknown_correction_is_refused(deposition, impure, surfaces):
+    with pytest.raises(ValueError, match="unknown trapped_electron_correction"):
+        slow_down(
+            deposition,
+            impure,
+            surfaces,
+            orbit_average=False,
+            trapped_electron_correction="redl",
+        )
+
+
+def test_sauter_needs_the_safety_factor(impure, surfaces):
+    bare = replace(surfaces, safety_factor=None)
+    with pytest.raises(ValueError, match="no safety factor"):
+        sauter_trapped_electron_correction(bare, impure)
