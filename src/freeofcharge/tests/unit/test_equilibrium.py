@@ -285,3 +285,22 @@ def test_field_epsilon_is_the_inverse_aspect_ratio_where_b_goes_as_one_over_r():
     bare = FluxSurfaces(np.linspace(0.0, 1.0, 3), np.zeros(2), np.zeros(2), np.zeros(2))
     with pytest.raises(ValueError, match="no field points"):
         _ = bare.field_epsilon
+
+
+def test_plasma_current_and_q_of_the_written_geqdsk(tmp_path):
+    from freeofcharge.geqdsk import read
+
+    major, minor, kappa, field, q0 = 1.65, 0.5, 1.6, 2.5, 1.2
+    eq = Equilibrium.solovev(major, minor, kappa, field, q_axis=q0, wall_psi_n=1.3)
+    # Solov'ev: mu0 j_phi R = -Delta* psi = -2c(1 + kappa^2) R^2, so
+    # |I_p| = 2c(1 + kappa^2) V / (2 pi mu0) with c = B0 / (2 R0^2 kappa q0)
+    c = field / (2 * major**2 * kappa * q0)
+    volume = eq.flux_surfaces(np.linspace(0.0, 1.0, 81)).volume.sum()
+    expected = 2 * c * (1 + kappa**2) * volume / (2 * np.pi * 4e-7 * np.pi)
+    np.testing.assert_allclose(abs(eq.plasma_current()), expected, rtol=1e-2)
+    eq.to_geqdsk(tmp_path / "g")
+    data = read(tmp_path / "g")
+    np.testing.assert_allclose(data.q[0], q0, rtol=2e-2)
+    assert np.all(np.diff(data.q) > 0)
+    assert data.current == pytest.approx(eq.plasma_current())
+    assert data.b_centre == pytest.approx(field, rel=1e-6)
