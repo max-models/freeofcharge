@@ -514,6 +514,8 @@ class OrbitFollowing:
     radial_coordinate: str = "unspecified"
     traces: xr.Dataset | None = None
     wall: Any = field(default=None, repr=False)
+    histogram: np.ndarray | None = field(default=None, repr=False)
+    histogram_edges: tuple[np.ndarray, np.ndarray] | None = None
     """Per marker (dimension ``marker``): birth and end positions, energies,
     pitches, times, the ``fate`` (index into `FATES`) and the wall face hit."""
     """Shell edges."""
@@ -528,6 +530,9 @@ class OrbitFollowing:
     """Energy rate of the markers when lost (wall, rho limit, grid) [W]."""
     """Energy change of the markers in the orbit integration (an error) [W]."""
     """Energy rate still carried by markers stopped at ``max_time`` [W]."""
+    r"""With ``histogram``: $\sum w \int dt$ per shell, energy and pitch bin, the
+    steady-state number of fast ions (`freeofcharge.distribution.orbit_distribution`)."""
+    """The energy [eV] and pitch edges of ``histogram``."""
 
     @property
     def power_balance(self) -> float:
@@ -873,6 +878,29 @@ def _perpendicular_basis(b_unit: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return e1, np.cross(b_unit, e1)
 
 
+def _histogram_round(counts, energy_edges, pitch_edges, time, energies, pitch) -> None:
+    """Add ``time`` ``(shells, m)`` to ``counts`` at ``pitch``, spread over ``energies`` [J].
+
+    The time of each marker goes to the energy bins between its start and end
+    energies in proportion to their overlap (linear in time), all to one bin if
+    they are equal; outside the edges it is left out.
+    """
+    lo = np.minimum(*energies)[:, None] / _E
+    hi = np.maximum(*energies)[:, None] / _E
+    left, right = energy_edges[None, :-1], energy_edges[None, 1:]
+    width = hi - lo
+    with np.errstate(invalid="ignore", divide="ignore"):
+        share = np.clip(np.minimum(hi, right) - np.maximum(lo, left), 0.0, None) / width
+    point = (left <= lo) & (lo < right)
+    share = np.where(width > 0.0, share, point.astype(float))
+    share = np.where(np.isfinite(share), share, 0.0)
+    bins = np.searchsorted(pitch_edges, pitch, side="right") - 1
+    bins = np.where(pitch == pitch_edges[-1], len(pitch_edges) - 2, bins)
+    for k in np.unique(bins[(bins >= 0) & (bins < len(pitch_edges) - 1)]):
+        here = bins == k
+        counts[:, :, k] += time[:, here] @ share[here]
+
+
 def _finish_at_limit(finish, index, starts, ends, field, rho_limit) -> None:
     """Record the markers ``index`` lost where the step ``starts -> ends`` reaches ``rho_limit``."""
     if len(index) == 0:
@@ -950,6 +978,7 @@ def follow_orbits(
     larmor_points: int = 0,
     seed: int | None = None,
     markers: GuidingCentres | None = None,
+    histogram: tuple | None = None,
 ) -> OrbitFollowing:
     r"""Follow the births of ``deposition`` as guiding centres until thermalised or lost.
 
@@ -991,6 +1020,8 @@ def follow_orbits(
         seed: Seed of the collisions' random numbers.
         markers: Guiding centres to follow instead of those of the births (same
             order and weights).
+        histogram: ``(energy_edges, pitch_edges)`` [eV, -]: also record the time
+            integrals per shell, energy and pitch bin (``OrbitFollowing.histogram``).
     """
     minimum_energy = to_unit(minimum_energy, "eV", "minimum_energy")
     field = orbit_field(field)
@@ -1040,6 +1071,11 @@ def follow_orbits(
         for name in ("electrons", "ions", "particles", "energy", "flow")
     }
     powers = {"thermalised": 0.0, "lost": 0.0, "numerical": 0.0, "alive": 0.0}
+    counts = None
+    h_energy = h_pitch = np.zeros(1)
+    if histogram is not None:
+        h_energy, h_pitch = (np.asarray(e, dtype=float) for e in histogram)
+        counts = np.zeros((n_shells, len(h_energy) - 1, len(h_pitch) - 1))
     if not (np.all(np.isfinite(birth_rho)) and np.all(np.isfinite(energy))):
         raise ValueError("births off the field's grid: sample the field over them")
 
@@ -1066,12 +1102,16 @@ def follow_orbits(
         if face is not None:
             end["face"][index] = face
 
-    def score(index, round_time, round_vpar, factor, mean_energy):
+    def score(index, round_time, round_vpar, factor, energies, pitch):
         """Add one round's time integrals of the markers ``index``."""
         weight = w[index] * factor
         tallies["particles"] += round_time @ weight
-        tallies["energy"] += round_time @ (weight * mean_energy)
+        tallies["energy"] += round_time @ (weight * 0.5 * (energies[0] + energies[1]))
         tallies["flow"] += round_vpar @ weight
+        if counts is not None:
+            _histogram_round(
+                counts, h_energy, h_pitch, round_time * weight, energies, pitch
+            )
 
     mesh = None if wall is None else getattr(wall, "mesh", wall)
 
@@ -1295,6 +1335,10 @@ def follow_orbits(
             e_new = mass * (0.5 * state[3, idx] ** 2 + mu[idx] * b_new)
             powers["numerical"] += float(np.sum(w[idx] * (e_new - energy[idx])))
             energy[idx] = e_new
+            # the pitch at the end of the push: a random phase of the orbit
+            end_pitch = np.clip(
+                state[3, alive] / np.sqrt(2.0 * energy[alive] / mass), -1.0, 1.0
+            )
             # the time integrals: the mean energy over the round, and only the time
             # down to the end energy for the thermalised
             factor = np.ones(len(alive))
@@ -1349,7 +1393,8 @@ def follow_orbits(
                 round_time,
                 round_vpar,
                 factor,
-                0.5 * (start_energy + end_of_round),
+                (start_energy, end_of_round),
+                end_pitch,
             )
             late = np.nonzero((fate == _ALIVE) & (time >= max_time * (1.0 - 1e-12)))[0]
             finish(late, _MAX_TIME, state[:3, late].T)
@@ -1418,4 +1463,6 @@ def follow_orbits(
         alive_power=powers["alive"],
         radial_coordinate=field.radial_coordinate,
         wall=wall,
+        histogram=counts,
+        histogram_edges=None if counts is None else (h_energy, h_pitch),
     )
