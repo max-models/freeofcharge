@@ -74,6 +74,23 @@ trapped-electron correction of the current (Sauter's and Start and Cordey's fits
 are tokamak results; without an explicit correction the driven current is NaN
 in 3D, with a warning). The power balance $P_e + P_i + P_\mathrm{th} = P_\mathrm{birth}$
 holds in any geometry (`SlowingDown.power_balance`).
+
+For the current in 3D, ``trapped_electron_correction="sauter"`` takes Sauter's
+$L_{31}$ with the effective trapped fraction of the 3D surface,
+$f_t = 1 - \frac{3}{4}\langle B^2\rangle \int_0^{1/B_\max}
+\lambda\,d\lambda / \langle\sqrt{1 - \lambda B}\rangle$ with the 3D flux-surface
+averages (`FluxSurfaces.trapped_fraction`, the definition DESC computes and
+Landreman, Buller and Drevlak, Phys. Plasmas, 2022, doi:10.1063/5.0098166,
+use for the bootstrap current of quasisymmetric stellarators),
+and in the collisionality $q = 1/|\iota|$, $R$ toroidally averaged and
+$\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$ (`FluxSurfaces.field_epsilon`).
+This is an approximation: $L_{31}(f_t)$ is the axisymmetric coefficient. In a
+stellarator the collisionless response of the trapped electrons, like the
+bootstrap current, carries a further geometric factor that depends on the
+variation of $|B|$ on the surface, not only on $f_t$ (Shaing and Callen,
+Phys. Fluids 26, 3315, 1983); it is not included. The same shielding with
+$G = L_{31}$ is used for W7-X by BEAMS3D (Lazerson et al., Nucl. Fusion 61,
+2021, doi:10.1088/1741-4326/ac0771).
 """
 
 from __future__ import annotations
@@ -109,6 +126,7 @@ __all__ = [
     "critical_velocity",
     "electron_collisionality",
     "ion_heating_fraction",
+    "no_trapped_electron_correction",
     "l31_coefficient",
     "pitch_angle_exponent",
     "pitch_at_speed",
@@ -119,6 +137,7 @@ __all__ = [
     "slow_down",
     "start_cordey_fit",
     "start_cordey_trapped_electron_correction",
+    "TRAPPED_ELECTRON_CORRECTIONS",
 ]
 
 _E = ELEMENTARY_CHARGE
@@ -750,22 +769,37 @@ def electron_collisionality(ne, te, zeff, safety_factor, major_radius, epsilon):
 
 @method(
     equations={
-        "correction": r"G = L_{31}(Z_\mathrm{eff}, f_t, \nu_e^*)",
+        "correction": r"G = L_{31}(Z_\mathrm{eff}, f_t, \nu_e^*), \qquad q = 1 / |\iota|",
     },
-    assumptions=(r"$f_t$, $q$, $R$, $\epsilon$ of the shell's centre surface",),
+    assumptions=(
+        r"$f_t$, $q$, $R$, $\epsilon$ of the shell's centre surface",
+        r"on 3D shells: $f_t$ the effective trapped fraction of the 3D surface, $R$ averaged over the toroidal angle and $\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$ in $\nu_e^*$; the axisymmetric $L_{31}(f_t)$ without the stellarator geometric factor of the trapped-electron response",
+    ),
     references=(
         "[Lin-Liu and Hinton, Phys. Plasmas 4, 4179 (1997)](https://doi.org/10.1063/1.872543)",
         "[Honda et al., Nucl. Fusion 52, 023021 (2012)](https://doi.org/10.1088/0029-5515/52/2/023021)",
         "[Sauter, Angioni and Lin-Liu, Phys. Plasmas 6, 2834 (1999)](https://doi.org/10.1063/1.873240), eqs. 14 and 18",
+        "[Shaing and Callen, Phys. Fluids 26, 3315 (1983)](https://doi.org/10.1063/1.864108), the stellarator geometric factor left out",
+        "[Lazerson et al., Nucl. Fusion 61 (2021)](https://doi.org/10.1088/1741-4326/ac0771), the same correction for W7-X in BEAMS3D",
+        r"[Landreman, Buller and Drevlak, Phys. Plasmas (2022)](https://doi.org/10.1063/5.0098166), $f_t$ and $\epsilon$ from $|B|$ on stellarator surfaces",
     ),
     components=(l31_coefficient, electron_collisionality),
 )
 def sauter_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
-    """Return $G$ of each shell: `l31_coefficient` with collisions.
+    r"""Return $G$ of each shell: `l31_coefficient` with collisions.
 
     The trapped fraction, safety factor and major radius of the surfaces, the
-    plasma at the shell centres.
+    plasma at the shell centres. On the shells of a 3D equilibrium the trapped
+    fraction is the effective one of the 3D surface (`FluxSurfaces.trapped_fraction`),
+    $q = 1 / |\iota|$ (the sign of $\iota$ is a convention) and the collisionality
+    takes $\epsilon = (B_\max - B_\min)/(B_\max + B_\min)$
+    (`FluxSurfaces.field_epsilon`, as Landreman, Buller and Drevlak, 2022) instead of
+    the geometric inverse aspect ratio, which vanishes on the axis while the
+    mirror field still traps electrons there; $L_{31}(f_t)$ is then an
+    approximation, see the module docstring.
     """
+    if surfaces.safety_factor is None or surfaces.major_radius is None:
+        raise ValueError("these surfaces have no safety factor or major radius")
     rho = surfaces.rho
     zeff = xp.to_numpy(plasma.zeff(rho))
     ne = xp.to_numpy(plasma.electron_density(rho))
@@ -774,21 +808,47 @@ def sauter_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
         ne,
         te,
         zeff,
-        surfaces.safety_factor,
+        np.abs(surfaces.safety_factor),
         surfaces.major_radius,
-        surfaces.inverse_aspect_ratio,
+        surfaces.inverse_aspect_ratio
+        if surfaces.axisymmetric
+        else surfaces.field_epsilon,
     )
     return np.asarray(l31_coefficient(zeff, surfaces.trapped_fraction, nu))
 
 
 def start_cordey_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
-    """Return $G$ of each shell from `start_cordey_fit` (no collisions)."""
+    """Return $G$ of each shell from `start_cordey_fit` (no collisions).
+
+    The fit depends on the inverse aspect ratio of circular tokamak surfaces only;
+    on 3D shells it warns and `sauter_trapped_electron_correction` (the effective
+    trapped fraction of the 3D surface) is the better choice.
+    """
+    if not surfaces.axisymmetric:
+        warnings.warn(
+            "3D surfaces: the Start-Cordey fit uses the inverse aspect ratio of "
+            "circular tokamak surfaces; trapped_electron_correction='sauter' uses "
+            "the effective trapped fraction of the 3D surfaces",
+            stacklevel=2,
+        )
     zeff = xp.to_numpy(plasma.zeff(surfaces.rho))
     return np.asarray(start_cordey_fit(zeff, surfaces.inverse_aspect_ratio))
 
 
+def no_trapped_electron_correction(surfaces: FluxSurfaces, plasma: Plasma):
+    r"""Return $G = 0$ for each shell: the shielding of a uniform field, $j = j_f (1 - Z_b / Z_\mathrm{eff})$."""
+    return np.zeros(len(surfaces.rho_edges) - 1)
+
+
 #: The signature of a trapped-electron correction: ``G`` per shell.
 TrappedElectronCorrection = Callable[["FluxSurfaces", "Plasma"], np.ndarray]
+
+#: The corrections `slow_down` takes by name.
+TRAPPED_ELECTRON_CORRECTIONS: dict[str, TrappedElectronCorrection] = {
+    "sauter": sauter_trapped_electron_correction,
+    "start_cordey": start_cordey_trapped_electron_correction,
+    "none": no_trapped_electron_correction,
+}
 
 
 @dataclass(frozen=True)
@@ -899,7 +959,7 @@ class SlowingDown:
         r"$v_{Ti} \ll v \ll v_{Te}$ (not checked)",
         r"zero orbit width: slowing down on the birth surface; no losses, no charge exchange, no energy diffusion",
         r"$Z_b = 1$; $p_f$ an isotropic estimate; births with $\rho > 1$ take the plasma at $\rho = 1$",
-        r"on 3D shells: the local pitch only (no orbit average), and no trapped-electron correction unless one is given",
+        r"on 3D shells: the local pitch only (no orbit average), and no trapped-electron correction unless one is given; ``\"sauter\"`` there takes $L_{31}$ with the effective trapped fraction of the 3D surface",
     ),
     references=(
         "[Stix, Plasma Phys. 14, 367 (1972)](https://doi.org/10.1088/0032-1028/14/4/002)",
@@ -923,7 +983,7 @@ def slow_down(
     orbit_average: bool = True,
     thermal_factor: float = 0.0,
     minimum_energy: float = 0.0,
-    trapped_electron_correction: TrappedElectronCorrection | None = None,
+    trapped_electron_correction: TrappedElectronCorrection | str | None = None,
     modes: int = 8,
     speed_points: int = 201,
     comm: MPI.Comm | None = None,
@@ -947,16 +1007,28 @@ def slow_down(
         thermal_factor: The ions are thermal below ``thermal_factor`` $\times\, T_i$ ...
         minimum_energy: ... or below this energy [eV], whichever is higher; a
             quantity such as ``"1 keV"``.
-        trapped_electron_correction: $G$ per shell; if None,
-            `sauter_trapped_electron_correction` on axisymmetric surfaces, and
-            in 3D none: the driven current is NaN, with a warning (pass a
-            correction to take the tokamak fits anyway).
+        trapped_electron_correction: $G$ per shell, a function of the surfaces
+            and the plasma or one of the names of `TRAPPED_ELECTRON_CORRECTIONS`:
+            ``"sauter"`` (`sauter_trapped_electron_correction`), ``"start_cordey"``
+            or ``"none"`` ($G = 0$). If None, ``"sauter"`` on axisymmetric
+            surfaces, and in 3D none: the driven current is NaN, with a
+            warning. In 3D, ``"sauter"`` takes $L_{31}$ with the effective trapped
+            fraction of the 3D surfaces, an approximation (module docstring).
         modes: Pitch modes of the orbit average.
         speed_points: Points of the speed integrals (equal steps in $\ln v$),
             odd.
         comm: Communicator over which the births are split; serial if None.
     """
     minimum_energy = to_unit(minimum_energy, "eV", "minimum_energy")
+    if isinstance(trapped_electron_correction, str):
+        if trapped_electron_correction not in TRAPPED_ELECTRON_CORRECTIONS:
+            raise ValueError(
+                f"unknown trapped_electron_correction {trapped_electron_correction!r}; "
+                f"one of {sorted(TRAPPED_ELECTRON_CORRECTIONS)} or a function"
+            )
+        trapped_electron_correction = TRAPPED_ELECTRON_CORRECTIONS[
+            trapped_electron_correction
+        ]
     if orbit_average and not surfaces.axisymmetric:
         raise ValueError(
             "the orbit average uses the bounce averages of axisymmetric surfaces "
@@ -1061,7 +1133,9 @@ def slow_down(
         warnings.warn(
             "3D surfaces: the trapped-electron correction of the driven current "
             "(Sauter, Start-Cordey) assumes axisymmetry, so current_density and "
-            "driven_current are NaN; pass trapped_electron_correction to use one",
+            "driven_current are NaN; pass trapped_electron_correction='sauter' for "
+            "L31 with the effective trapped fraction of the 3D surfaces (an "
+            "approximation) or 'none' for G = 0",
             stacklevel=2,
         )
         g = np.full(n_shells, np.nan)

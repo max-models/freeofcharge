@@ -170,7 +170,13 @@ def test_surface_averages_match_desc(example):
     # the Jacobian weights of the 3D flux-surface average
     average = surfaces.surface_average(surfaces.field_strength**2)
     np.testing.assert_allclose(average, b2, rtol=1e-4)
-    np.testing.assert_allclose(surfaces.trapped_fraction, trapped, rtol=0.02)
+    # 0.13 % at most: DESC's B_max (its "max_tz |B|") is 0.08 % below the largest
+    # |B| of a 129 x 129 grid at rho = 0.9; ours converges at 32 x 32 points
+    np.testing.assert_allclose(surfaces.trapped_fraction, trapped, rtol=3e-3)
+    # W7-X: f_t grows from 0.35 at rho = 0.2 to 0.50 at rho = 0.8
+    assert np.all(np.diff(surfaces.trapped_fraction) > 0)
+    assert 0.34 < surfaces.trapped_fraction[0] < 0.37
+    assert 0.49 < surfaces.trapped_fraction[-1] < 0.52
 
 
 def test_vmec_reads_desc_wout(example, tmp_path):

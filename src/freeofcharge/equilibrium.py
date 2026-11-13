@@ -159,8 +159,8 @@ class FluxSurfaces:
     r"""$(R_\mathrm{max} + R_\mathrm{min}) / 2$ of the surface at each shell centre [m]."""
     r"""The flux $\rho$ is the root of: ``"poloidal"`` or ``"toroidal"`` (`rho_coordinate`)."""
     """Whether the shells are axisymmetric; False for those of a 3D equilibrium, where
-    the orbit average and the trapped-electron correction of the slowing down do not
-    hold."""
+    the orbit average of the slowing down does not hold and its trapped-electron
+    correction is an approximation (`freeofcharge.slowing_down`)."""
 
     @property
     def rho(self) -> np.ndarray:
@@ -332,9 +332,11 @@ class FluxSurfaces:
         },
         assumptions=(
             r"64-point Gauss-Legendre in $s$, which resolves the square-root end point",
+            r"$B_\max$ the largest $|B|$ of the field points; on 3D surfaces the averages over the $(\theta, \zeta)$ grid with the Jacobian weights: the effective trapped fraction",
         ),
         references=(
             "[Lin-Liu and Miller, Phys. Plasmas 2, 1666 (1995)](https://doi.org/10.1063/1.871315)",
+            "[Landreman, Buller and Drevlak, Phys. Plasmas (2022)](https://doi.org/10.1063/5.0098166), the same definition on stellarator surfaces",
         ),
     )
     def trapped_fraction(self) -> np.ndarray:
@@ -346,7 +348,11 @@ class FluxSurfaces:
         $$
 
         (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995), by Gauss-Legendre
-        quadrature in $\lambda$.
+        quadrature in $\lambda$. The flux-surface averages make it hold on the
+        surfaces of a 3D equilibrium too, as the effective trapped fraction
+        (DESC's ``"trapped fraction"``; Landreman, Buller and Drevlak, Phys.
+        Plasmas, 2022), which the tests check against DESC for W7-X and against
+        the axisymmetric path for a Solov'ev equilibrium.
         """
         if self.field_strength is None or self.surface_weight is None:
             raise ValueError("these surfaces have no field points")
@@ -359,6 +365,22 @@ class FluxSurfaces:
         average = np.sum(self.surface_weight[:, None, :] * root, axis=-1)
         integral = np.sum(0.5 * weights * lam * 2.0 * s / average, axis=-1)
         return 1.0 - 0.75 * self.surface_average(b**2) * integral
+
+    @property
+    def field_epsilon(self) -> np.ndarray:
+        r"""Return $(B_\max - B_\min) / (B_\max + B_\min)$ on each surface centre.
+
+        The inverse aspect ratio $\epsilon$ where $|B| \propto 1/R$, and the
+        $\epsilon$ that Landreman, Buller and Drevlak (Phys. Plasmas, 2022,
+        doi:10.1063/5.0098166) put into the tokamak bootstrap formulas on
+        stellarator surfaces, where the geometric $\epsilon$ says little about
+        the trapped particles.
+        """
+        if self.field_strength is None:
+            raise ValueError("these surfaces have no field points")
+        b_max = self.field_strength.max(axis=1)
+        b_min = self.field_strength.min(axis=1)
+        return (b_max - b_min) / (b_max + b_min)
 
     def shell_index(self, rho):
         r"""Return the shell of each $\rho$, -1 outside $[0, 1)$."""
@@ -438,7 +460,6 @@ class Equilibrium:
     """
 
     radial_coordinate = "poloidal"
-    r"""$\rho = \sqrt{\psi_n}$, the root of the normalised poloidal flux."""
 
     def __init__(
         self,
@@ -497,6 +518,8 @@ class Equilibrium:
             fill_value=np.nan,
         )
         self._f_psi_n = xp.linspace(0.0, 1.0, len(self.f))
+
+    r"""$\rho = \sqrt{\psi_n}$, the root of the normalised poloidal flux."""
 
     # ------------------------------------------------------------------
     # Constructors
