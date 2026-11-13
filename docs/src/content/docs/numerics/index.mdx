@@ -60,6 +60,17 @@ MPI ranks. A run is `deposit`, then `slow_down` on the flux shells of the equili
 
 <MethodCard name="freeofcharge.orbits.follow_orbits" headingLevel={3} />
 
+Further outputs from the same births and slowing down: the
+**[beam torque](/freeofcharge/numerics/torque/)** (collisional and J×B), the
+**[neutron rates](/freeofcharge/numerics/neutrons/)** (beam–target and thermonuclear), the
+**[fast-ion distribution](/freeofcharge/numerics/distribution/)** $f(\rho, E, \xi)$, the
+response to a time-varying source (**[beam modulation](/freeofcharge/numerics/time-dependent/)**),
+the **[charge-exchange losses](/freeofcharge/numerics/charge-exchange/)** on background neutrals,
+the first-orbit redistribution of the births (**[orbit width](/freeofcharge/numerics/orbit-width/)**),
+the **[shine-through loads](/freeofcharge/numerics/shine-through/)** on the wall, and
+**[stopping tables](/freeofcharge/numerics/stopping-tables/)** for other stopping models.
+`run_nbi` calls the pipeline and these in one go.
+
 The **[injector chain](/freeofcharge/numerics/chain/)** adds closed forms for the stages before
 the plasma (the source, the extraction, the neutralizer and the duct), for an end-to-end scan
 of an injector.
@@ -74,11 +85,14 @@ their COCOS signs.
 ## Not in the model
 
 - No Grad-Shafranov solve: the equilibrium is given.
-- No fast-ion distribution function: only its moments along the slowing-down trajectories.
-- Zero orbit width in `slow_down`: the ions stay on their birth surface. `follow_orbits`
+- The fast-ion distribution of the local slowing down has no mirror force or trapping
+  (`slowing_down_distribution`); the orbits' histogram has them.
+- Zero orbit width in `slow_down`: the ions stay on their birth surface (`orbit_average_births`
+  corrects the births for their first orbit). `follow_orbits`
   follows guiding-centre orbits with prompt and orbit losses and wall loads, without an electric
   field and without finite-Larmor-radius effects beyond an optional Larmor-circle wall test.
-- No charge-exchange losses, no radial transport, no anomalous diffusion of the fast ions.
+- Charge-exchange losses only on cold ground-state neutrals and without re-ionisation
+  (`slow_down_with_charge_exchange`); no radial transport, no anomalous diffusion of the fast ions.
 - No energy diffusion in `slow_down`: the energy loss is the mean drag only (`follow_orbits`
   adds it).
 - Stix's drag assumes $v_{Ti} \ll v \ll v_{Te}$; the ions join the thermal ions when they
