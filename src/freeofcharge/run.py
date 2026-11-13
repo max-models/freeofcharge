@@ -785,10 +785,7 @@ def summary(dataset: xr.Dataset) -> str:
         label = str(variable.attrs.get("long_name", name))
         label = label.replace("$", "").replace(r"\times", "x")
         value = float(variable.values)
-        lines.append(
-            f"  {label:48s} "
-            f"{value:12.4g} {units}".rstrip()
-        )
+        lines.append(f"  {label:48s} {value:12.4g} {units}".rstrip())
     return "\n".join(lines)
 
 
