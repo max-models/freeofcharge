@@ -7,6 +7,41 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Beam torque (`freeofcharge.torque`, `beam_torque`): collisional torque on electrons and
+  ions from the parallel momentum of the slowing down, and J×B torque from the guiding-centre
+  jump at birth (axisymmetric equilibria), with the angular-momentum balance. Docs example
+  "Beam torque".
+- Neutron rates (`freeofcharge.neutrons`, `neutron_rates`, `NeutronRates`): beam–target rates
+  along the classical slowing down with Maxwellian-averaged reactivities, and thermonuclear
+  rates, from plasmacoll's Bosch–Hale fits. Docs example "Neutron rates".
+- Fast-ion distribution (`freeofcharge.distribution`, `slowing_down_distribution`,
+  `distribution_moments`): f(ρ, E, ξ) from the local slowing down (Legendre modes of the
+  pitch-angle scattering) and, with `follow_orbits(..., histogram=...)`, from the orbits.
+  Docs example "Fast-ion distribution".
+- Time-dependent slowing down (`freeofcharge.time_dependent`, `slowing_down_response`,
+  `SlowingDownResponse`, `time_dependent_slow_down`): the response of heating, fast-ion
+  density, energy and current to any source power P(t), and its transfer function. Docs
+  example "Beam modulation".
+- Shine-through loads (`freeofcharge.shine_through`, `shine_through_loads`): the unabsorbed
+  beam followed to the first wall, heat flux per face and footprint maps;
+  `Deposition.transmission`; the face tally of the orbits' wall loads shared as
+  `orbits.face_loads` and `orbits.load_map`. Docs example "Shine-through loads".
+- Current drive on 3D shells: `slow_down(..., trapped_electron_correction="sauter" |
+  "start_cordey" | "none")`, Sauter's correction with the effective trapped fraction and
+  `FluxSurfaces.field_epsilon` of 3D surfaces. Docs example "Stellarator current drive".
+- Stopping tables (`freeofcharge.stopping_tables`, `TabulatedStopping`): tabulated stopping
+  cross sections from any stopping model or from ADAS adf21 files, with the composite rule
+  of mixed plasmas. Docs example "Stopping tables".
+- Charge-exchange losses (`freeofcharge.charge_exchange`, `slow_down_with_charge_exchange`):
+  the slowing down with losses on background neutrals (plasmacoll's Janev–Smith cross
+  section), the lost power and the fast-neutral spectrum. Docs example "Charge-exchange
+  losses".
+- First-orbit correction (`freeofcharge.orbit_width`, `orbit_average_births`,
+  `FirstOrbitDeposition`): births averaged over their collisionless orbit, with prompt
+  losses. Docs example "Orbit width".
+- One-call runs (`freeofcharge.run`, `run_nbi`): deposition, slowing down, torque and neutron
+  rates in one Dataset; TOML parameter files and the `freeofcharge run` / `freeofcharge
+  summary` command. Docs example "One-call run".
 - Guiding-centre orbits of the fast ions with Monte Carlo Coulomb collisions
   (`freeofcharge.orbits`, `follow_orbits`, `OrbitFollowing`): confinement, losses and wall
   loads. The guiding-centre equations with $\mathbf{B}^*$ (parallel motion, mirror force,
