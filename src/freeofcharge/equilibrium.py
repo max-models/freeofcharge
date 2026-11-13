@@ -130,6 +130,27 @@ class _StarShapedPolygon:
         return self._ex[k] * (z - self._ay[k]) - self._ey[k] * (r - self._ax[k]) > 0.0
 
 
+def effective_trapped_fraction(field_strength, weights) -> np.ndarray:
+    r"""Return the effective trapped fraction of surfaces given by points on them.
+
+    ``field_strength`` holds $|B|$ at points on each surface, shape
+    ``(surfaces, points)``, and ``weights`` their weights in the flux-surface
+    average (summing to one per surface). See `FluxSurfaces.trapped_fraction`
+    for the formula (Lin-Liu and Miller, Phys. Plasmas 2, 1666, 1995).
+    """
+    field_strength = np.asarray(field_strength, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+    b = field_strength / field_strength.max(axis=1, keepdims=True)
+    nodes, quadrature = np.polynomial.legendre.leggauss(64)
+    # lambda B_max = 1 - s^2 resolves the square-root end point
+    s = 0.5 * (nodes + 1.0)
+    lam = 1.0 - s**2
+    root = np.sqrt(np.maximum(1.0 - lam[None, :, None] * b[:, None, :], 0.0))
+    average = np.sum(weights[:, None, :] * root, axis=-1)
+    integral = np.sum(0.5 * quadrature * lam * 2.0 * s / average, axis=-1)
+    return 1.0 - 0.75 * np.sum(weights * b**2, axis=-1) * integral
+
+
 @dataclass(frozen=True)
 class FluxSurfaces:
     """Volumes and shapes of the shells between the radii ``rho_edges``."""
@@ -356,15 +377,7 @@ class FluxSurfaces:
         """
         if self.field_strength is None or self.surface_weight is None:
             raise ValueError("these surfaces have no field points")
-        b = self.field_strength / self.field_strength.max(axis=1, keepdims=True)
-        nodes, weights = np.polynomial.legendre.leggauss(64)
-        # lambda B_max = 1 - s^2 resolves the square-root end point
-        s = 0.5 * (nodes + 1.0)
-        lam = 1.0 - s**2
-        root = np.sqrt(np.maximum(1.0 - lam[None, :, None] * b[:, None, :], 0.0))
-        average = np.sum(self.surface_weight[:, None, :] * root, axis=-1)
-        integral = np.sum(0.5 * weights * lam * 2.0 * s / average, axis=-1)
-        return 1.0 - 0.75 * self.surface_average(b**2) * integral
+        return effective_trapped_fraction(self.field_strength, self.surface_weight)
 
     @property
     def field_epsilon(self) -> np.ndarray:

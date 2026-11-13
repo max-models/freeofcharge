@@ -24,6 +24,7 @@ from freeofcharge.orbits import OrbitFollowing, follow_orbits
 from freeofcharge.profiles import IonSpecies, Plasma
 from freeofcharge.slowing_down import SlowingDown, slow_down
 from freeofcharge.stopping import ConstantStopping, StoppingModel, SuzukiStopping
+from freeofcharge.transport_geometry import surface_geometry
 
 __version__ = "0.1.0"
 
@@ -55,5 +56,6 @@ __all__ = [
     "monte_carlo_volumes",
     "rho_coordinate",
     "slow_down",
+    "surface_geometry",
     "tangential_injection",
 ]
