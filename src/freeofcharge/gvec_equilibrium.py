@@ -27,10 +27,12 @@ from pathlib import Path
 
 import cunumpy as xp
 import numpy as np
+import xarray as xr
 from methodcard import method
 from scipy.spatial import KDTree
 
 from freeofcharge.equilibrium import FluxSurfaces
+from freeofcharge.transport_geometry import surface_geometry
 
 __all__ = ["GVECEquilibrium"]
 
@@ -70,7 +72,6 @@ class GVECEquilibrium:
 
     has_wall = False
     radial_coordinate = "toroidal"
-    r"""$\rho = \sqrt{\Phi_n}$, the root of the normalised toroidal flux."""
 
     def __init__(
         self,
@@ -107,6 +108,8 @@ class GVECEquilibrium:
             np.array([-r_max, -r_max, float(edge_z.min())]),
             np.array([r_max, r_max, float(edge_z.max())]),
         )
+
+    r"""$\rho = \sqrt{\Phi_n}$, the root of the normalised toroidal flux."""
 
     @classmethod
     def from_files(
@@ -269,4 +272,46 @@ class GVECEquilibrium:
         """Return the shells, see `FluxSurfaces.from_flux_coordinates`."""
         return FluxSurfaces.from_flux_coordinates(
             self._shape, self.nfp, rho_edges, **kwargs
+        )
+
+    def transport_geometry(self, rho, angles: tuple[int, int] = (48, 48)) -> xr.Dataset:
+        r"""Return the flux-surface averages of a 1.5D transport code at the radii ``rho``.
+
+        GVEC's covariant metric $g_{\theta\theta}$, $g_{\theta\zeta}$, $g_{\zeta\zeta}$,
+        its Jacobian, $R$, $Z$ and $|B|$ on an ``angles`` $(\theta, \zeta)$ grid of
+        each surface over one field period go to `freeofcharge.surface_geometry`;
+        $\iota$, the enclosed toroidal current and the edge toroidal flux come from
+        GVEC's profiles. ``rho`` must be above zero.
+        """
+        gvec = _require_gvec()
+        n_theta, n_zeta = angles
+        ev = gvec.evaluate(
+            self.state,
+            "g_tt",
+            "g_tz",
+            "g_zz",
+            "Jac",
+            "mod_B",
+            "pos",
+            "iota",
+            "I_tor",
+            "Phi_edge",
+            rho=np.asarray(rho, dtype=float),
+            theta=n_theta,
+            zeta=n_zeta,
+        )
+        jacobian = ev["Jac"].values
+        grad_rho2 = (ev["g_tt"] * ev["g_zz"] - ev["g_tz"] ** 2).values / jacobian**2
+        pos = ev["pos"].transpose("rad", "pol", "tor", "xyz").values
+        return surface_geometry(
+            ev["rho"].values,
+            jacobian,
+            grad_rho2,
+            np.hypot(pos[..., 0], pos[..., 1]),
+            pos[..., 2],
+            ev["mod_B"].values,
+            self.nfp,
+            rotational_transform=ev["iota"].values,
+            toroidal_current=ev["I_tor"].values,
+            toroidal_flux_edge=float(ev["Phi_edge"].values),
         )

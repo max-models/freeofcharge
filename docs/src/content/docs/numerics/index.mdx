@@ -69,7 +69,9 @@ the **[charge-exchange losses](/freeofcharge/numerics/charge-exchange/)** on bac
 the first-orbit redistribution of the births (**[orbit width](/freeofcharge/numerics/orbit-width/)**),
 the **[shine-through loads](/freeofcharge/numerics/shine-through/)** on the wall, and
 **[stopping tables](/freeofcharge/numerics/stopping-tables/)** for other stopping models.
-`run_nbi` calls the pipeline and these in one go.
+`run_nbi` calls the pipeline and these in one go. For transport codes, the
+**[transport geometry](/freeofcharge/numerics/transport-geometry/)** gives the flux-surface
+averages ($V'$, $\langle|\nabla\rho|^2\rangle$, $\langle 1/R^2\rangle$, ...) of an equilibrium.
 
 The **[injector chain](/freeofcharge/numerics/chain/)** adds closed forms for the stages before
 the plasma (the source, the extraction, the neutralizer and the duct), for an end-to-end scan

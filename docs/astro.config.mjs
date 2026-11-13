@@ -35,6 +35,7 @@ export default defineDocs({
 			'freeofcharge.orbits': 'Orbits',
 			'freeofcharge.shine_through': 'Shine-through loads',
 			'freeofcharge.chain': 'Injector chain',
+			'freeofcharge.transport_geometry': 'Transport geometry',
 		},
 	},
 	nav: [

@@ -7,6 +7,12 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Transport geometry (`freeofcharge.transport_geometry`, `surface_geometry`,
+  `GVECEquilibrium.transport_geometry`): the flux-surface averages a 1.5D transport code needs
+  ($V'$, $\langle|\nabla\rho|\rangle$, $\langle|\nabla\rho|^2\rangle$, $\langle|\nabla\rho|^2/R^2\rangle$,
+  $\langle 1/R\rangle$, $\langle 1/R^2\rangle$, $\langle B^2\rangle$, $\langle 1/B^2\rangle$, the effective
+  trapped fraction, shape), from GVEC's metric; `effective_trapped_fraction` shared with
+  `FluxSurfaces`. Used by slowcooker.
 - Beam torque (`freeofcharge.torque`, `beam_torque`): collisional torque on electrons and
   ions from the parallel momentum of the slowing down, and J×B torque from the guiding-centre
   jump at birth (axisymmetric equilibria), with the angular-momentum balance. Docs example

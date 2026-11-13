@@ -142,3 +142,46 @@ def test_gridded(ellipse):
     )
     np.testing.assert_allclose(gridded.rho_at(pos), rr, atol=1e-2)
     np.testing.assert_allclose(gridded.field_at(pos), field, rtol=1e-2, atol=1e-2)
+
+
+def test_transport_geometry_matches_gvec_and_the_shells(ellipse):
+    rho = np.linspace(0.05, 1.0, 12)
+    geo = ellipse.transport_geometry(rho)
+    ev = gvec.evaluate(ellipse.state, "dV_dPhi_n", "iota", rho=rho, theta=8, zeta=8)
+    # V' = dV/drho = 2 rho dV/dPhi_n, GVEC's own
+    np.testing.assert_allclose(
+        geo.volume_derivative, 2.0 * rho * ev["dV_dPhi_n"].values, rtol=1e-10
+    )
+    np.testing.assert_allclose(geo.rotational_transform, ev["iota"].values)
+    # the integral of V' over a shell is the shell volume of FluxSurfaces
+    edges = np.array([0.2, 0.5, 0.8])
+    shells = ellipse.flux_surfaces(edges)
+    nodes, weights = np.polynomial.legendre.leggauss(6)
+    for k in range(2):
+        lo, hi = edges[k], edges[k + 1]
+        points = 0.5 * (lo + hi) + 0.5 * (hi - lo) * nodes
+        vp = ellipse.transport_geometry(points).volume_derivative.values
+        np.testing.assert_allclose(
+            0.5 * (hi - lo) * np.sum(weights * vp), shells.volume[k], rtol=1e-6
+        )
+    centres = ellipse.transport_geometry(shells.rho)
+    np.testing.assert_allclose(
+        centres.trapped_fraction, shells.trapped_fraction, rtol=1e-2
+    )
+    assert np.all(geo.grad_rho2 > geo.grad_rho**2 * (1 - 1e-12))
+
+
+def test_transport_geometry_gradient_from_the_shape(ellipse):
+    """|grad rho|^2 from GVEC's metric against cross products of the (R, Z) map."""
+    rho = np.array([0.3, 0.7])
+    geo = ellipse.transport_geometry(rho, angles=(32, 32))
+    ev = gvec.evaluate(ellipse.state, "X1", "X2", rho=rho, theta=32, zeta=32)
+    r = ev["X1"].values
+    e_t = np.stack([ev["dX1_dt"].values, np.zeros_like(r), ev["dX2_dt"].values], -1)
+    e_z = np.stack([ev["dX1_dz"].values, -r, ev["dX2_dz"].values], -1)
+    e_r = np.stack([ev["dX1_dr"].values, np.zeros_like(r), ev["dX2_dr"].values], -1)
+    normal = np.cross(e_t, e_z)
+    jac = np.einsum("...i,...i", e_r, normal)
+    grad2 = np.einsum("...i,...i", normal, normal) / jac**2
+    w = np.abs(jac) / np.abs(jac).sum(axis=(1, 2), keepdims=True)
+    np.testing.assert_allclose(geo.grad_rho2, (w * grad2).sum(axis=(1, 2)), rtol=1e-8)

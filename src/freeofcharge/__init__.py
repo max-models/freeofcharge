@@ -36,6 +36,7 @@ from freeofcharge.time_dependent import (
     time_dependent_slow_down,
 )
 from freeofcharge.torque import beam_torque
+from freeofcharge.transport_geometry import surface_geometry
 
 __version__ = "0.1.0"
 
@@ -109,6 +110,7 @@ __all__ = [
     "slow_down_with_charge_exchange",
     "slowing_down_distribution",
     "slowing_down_response",
+    "surface_geometry",
     "tangential_injection",
     "time_dependent_slow_down",
 ]
