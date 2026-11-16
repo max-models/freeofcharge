@@ -19,7 +19,7 @@ import cunumpy as xp
 import numpy as np
 from methodcard import method
 from plasmacoll.constants import ATOMIC_MASS
-from plasmacoll.units import to_array, to_unit
+from plasmacoll.units import convert_units, to_unit, unit_metadata
 
 __all__ = ["IonSpecies", "Plasma"]
 
@@ -30,14 +30,14 @@ class IonSpecies:
 
     mass_number: int
     charge: int
-    density: np.ndarray
+    density: np.ndarray = field(metadata=unit_metadata("m^-3", array=True))
     """Atomic mass number (1 to 3 for hydrogen isotopes)."""
     """Charge number."""
     r"""Density on `Plasma.rho` [$\mathrm{m^{-3}}$]."""
 
     def __post_init__(self) -> None:
         r"""Convert a density given as a quantity to $\mathrm{m^{-3}}$."""
-        object.__setattr__(self, "density", to_array(self.density, "m^-3", "density"))
+        convert_units(self)
 
     @property
     def mass(self) -> float:
@@ -55,9 +55,9 @@ class Plasma:
     """
 
     rho: np.ndarray
-    ne: np.ndarray
-    te: np.ndarray
-    ti: np.ndarray
+    ne: np.ndarray = field(metadata=unit_metadata("m^-3", array=True))
+    te: np.ndarray = field(metadata=unit_metadata("eV", array=True))
+    ti: np.ndarray = field(metadata=unit_metadata("eV", array=True))
     ions: Mapping[str, IonSpecies] = field(default_factory=dict)
     radial_coordinate: str | None = None
     """Increasing radius grid, from 0 to 1."""
@@ -71,8 +71,7 @@ class Plasma:
 
     def __post_init__(self) -> None:
         """Convert the quantities; check the shapes and quasi-neutrality (to 1%)."""
-        for name, unit in (("ne", "m^-3"), ("te", "eV"), ("ti", "eV")):
-            object.__setattr__(self, name, to_array(getattr(self, name), unit, name))
+        convert_units(self)
         n = len(self.rho)
         for name in ("ne", "te", "ti"):
             if len(getattr(self, name)) != n:

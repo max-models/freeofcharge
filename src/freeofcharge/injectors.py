@@ -36,7 +36,7 @@ import xarray as xr
 from maybempi import MPI
 from methodcard import method
 from plasmacoll.constants import ATOMIC_MASS
-from plasmacoll.units import to_array, to_unit
+from plasmacoll.units import convert_units, to_array, to_unit, unit_field, unit_metadata
 
 from freeofcharge.beam import NeutralBeam
 from freeofcharge.deposition import Deposition, deposit
@@ -71,16 +71,16 @@ class BeamSource:
     """
 
     name: str
-    position: np.ndarray
+    position: np.ndarray = field(metadata=unit_metadata("m", array=True))
     direction: np.ndarray
-    energy: float
-    power: float
+    energy: float = field(metadata=unit_metadata("eV"))
+    power: float = field(metadata=unit_metadata("W"))
     power_fractions: tuple[float, float, float] = (1.0, 0.0, 0.0)
     mass_number: int = 1
-    width: float | tuple[float, float] = 0.0
-    divergence: float | tuple[float, float] = 0.0
+    width: float | tuple[float, float] = unit_field("m", 0.0)
+    divergence: float | tuple[float, float] = unit_field("rad", 0.0)
     halo_fraction: float = 0.0
-    halo_divergence: float | tuple[float, float] = 0.0
+    halo_divergence: float | tuple[float, float] = unit_field("rad", 0.0)
     """Name, unique among the sources deposited together."""
     """Centre of the source grid [m]."""
     """Axis of the source (any length)."""
@@ -95,21 +95,12 @@ class BeamSource:
 
     def __post_init__(self) -> None:
         """Convert the quantities and check the power fractions."""
+        convert_units(self)
         direction = np.asarray(self.direction, dtype=float)
-        for name, value in (
-            ("position", to_array(self.position, "m", "position")),
-            ("direction", direction / np.linalg.norm(direction)),
-            ("energy", to_unit(self.energy, "eV", "energy")),
-            ("power", to_unit(self.power, "W", "power")),
-            ("width", to_unit(self.width, "m", "width")),
-            ("divergence", to_unit(self.divergence, "rad", "divergence")),
-            (
-                "halo_divergence",
-                to_unit(self.halo_divergence, "rad", "halo_divergence"),
-            ),
-            ("power_fractions", tuple(float(f) for f in self.power_fractions)),
-        ):
-            object.__setattr__(self, name, value)
+        object.__setattr__(self, "direction", direction / np.linalg.norm(direction))
+        object.__setattr__(
+            self, "power_fractions", tuple(float(f) for f in self.power_fractions)
+        )
         fractions = np.asarray(self.power_fractions)
         if fractions.shape != (3,) or np.any(fractions < 0.0):
             raise ValueError("power_fractions are three shares, none negative")
