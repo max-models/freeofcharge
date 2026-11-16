@@ -14,6 +14,8 @@ $5\times10^{19}$ and below 0.1% at $10^{20}$. The Solov'ev shape is wider
 inboard than ITER's, and the trapped-electron correction of the current is a
 fit still to be checked, so the numbers show what the model computes rather
 than ITER's.
+
+This example is also a study in the [max-models gallery](https://max-models.github.io/gallery/studies/iter-like-injection/), with its cached results and what it verifies.
 """
 
 import numpy as np

@@ -37,6 +37,8 @@ What is modelled, and what is not:
   V-curve), round apertures and beamlet groups, stripping and optics in the accelerator
   (a fixed transmission and an adiabatic shrink of the angles), the residual-ion dump,
   re-ionization in the duct, and beam halos.
+
+This example is also a study in the [max-models gallery](https://max-models.github.io/gallery/studies/injector-chain/), with its cached results and what it verifies.
 """
 
 import numpy as np
