@@ -7,6 +7,10 @@ format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- A live demo in the docs (Getting started, "Live demo"): the quickstart's beam deposited and
+  slowed down in the reader's browser with Pyodide, with sliders for the beam energy, the
+  density, the temperature and the tangency radius; a Pyodide workflow checks that every
+  module imports and the demo runs in Pyodide.
 - `Equilibrium.plasma_current` (Ampère's law around the boundary), and `Equilibrium.to_geqdsk`
   now writes $q$, the axis field and radius and the plasma current, so that codes that check the
   COCOS convention from the signs (TORAX) read the files; used by slowcooker's tokamak geometry.

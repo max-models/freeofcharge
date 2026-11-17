@@ -25,6 +25,8 @@ jobs:
     uses: max-models/starlight-theme/.github/workflows/docs.yml@v0
     with:
       node-version: "24"
+      # the wheels of the live demo (getting-started/live-demo), into docs/public/pyodide/
+      pyodide: true
       xvfb: true
       apt-packages: gfortran cmake libblas-dev liblapack-dev libnetcdf-dev libnetcdff-dev
       # The W7-X notebook takes DESC's example (the desc extra) and evaluates it through
@@ -39,6 +41,7 @@ jobs:
       smoke-paths: |
         getting-started/installation/index.html
         getting-started/quickstart/index.html
+        getting-started/live-demo/index.html
         examples/index.html
         examples/equilibrium-and-flux-surfaces/index.html
         examples/injector-design-scan/index.html

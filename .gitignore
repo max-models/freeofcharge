@@ -70,6 +70,8 @@ instance/
 .scrapy
 
 # Documentation site (docs/.gitignore has the Astro build output)
+# wheels of the live demo, built by `npx starlight-pyodide wheels`
+docs/public/pyodide/
 
 # PyBuilder
 .pybuilder/

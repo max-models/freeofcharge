@@ -1,0 +1,50 @@
+---
+title: Live demo
+description: Deposit a neutral beam and slow its fast ions down in your browser, with sliders for the beam and the plasma.
+---
+
+import PyodideDemo from '@max-models/starlight-theme/components/PyodideDemo.astro';
+import code from '../../../components/freeofcharge_demo.py?raw';
+
+This demo runs freeofcharge in your browser with [Pyodide](https://pyodide.org) (Python compiled
+to WebAssembly): nothing is installed and nothing is sent to a server. It is the beam of the
+[quickstart](/freeofcharge/getting-started/quickstart/), with fewer markers and shells.
+
+<PyodideDemo
+	code={code}
+	controls={[
+		{ name: 'energy', label: 'Beam energy', min: 1.7, max: 3.3, step: 0.05, value: 1000, log: true, unit: 'keV' },
+		{ name: 'density', label: 'Central density', min: 19, max: 20.5, step: 0.05, value: 1e20, log: true, unit: 'm<sup>-3</sup>' },
+		{ name: 'temperature', label: 'Central temperature', min: 0, max: 1.5, step: 0.05, value: 20, log: true, unit: 'keV' },
+		{ name: 'tangency_radius', label: 'Tangency radius', min: 4, max: 7.5, step: 0.1, value: 5.3, unit: 'm' },
+	]}
+	captions={[
+		'Deposited power density of a 16.5 MW deuterium beam and the heating of electrons and ions it gives when its fast ions slow down, on 25 flux shells.',
+		'Net current density driven by the beam: the fast-ion current less the shielding by the electrons.',
+	]}
+/>
+
+The beam is deposited along straight lines with Suzuki's stopping cross sections (`deposit`), and
+each fast ion slows down on its flux shell (`slow_down`). Lower the beam energy or raise the
+density and the beam stops near the edge; raise the energy or lower the density and more of it
+shines through to the wall. Fast ions above the critical energy heat mainly the electrons, those
+below it mainly the ions: the critical energy grows with the electron temperature, so a hotter
+plasma or a slower beam moves the heating to the ions. A hotter plasma also drives more
+current, since the fast ions take longer to slow down. Moving the tangency radius out towards
+the magnetic axis makes the beam more parallel to the field and drives more current, until
+beyond the axis the path through the plasma gets short and more of the beam shines through.
+
+The same in a script:
+
+```python
+import freeofcharge as foc
+
+equilibrium = foc.Equilibrium.solovev(6.2, 1.8, 1.7, 5.3)
+plasma = foc.Plasma.parabolic(1e20, 2e4, ions={"D": (2, 1, 0.96), "He": (4, 2, 0.02)})
+origin, direction = foc.tangential_injection(5.3, 12.0)
+beam = foc.NeutralBeam.gaussian(
+    origin, direction, 1e6, 16.5e6, width=0.3, divergence=5e-3, markers=1000, seed=1
+)
+deposition = foc.deposit(beam, equilibrium, plasma, step=0.02, births_per_marker=2, seed=2)
+steady = foc.slow_down(deposition, plasma, equilibrium.flux_surfaces(deposition.rho_edges))
+```

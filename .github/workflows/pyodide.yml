@@ -1,0 +1,23 @@
+name: Pyodide
+
+# Checks that freeofcharge runs in the browser, as the live demo of the docs does: the wheels
+# installed in Pyodide under Node, every module imported and the demo's run() called, with the
+# shared workflow of max-models/starlight-theme.
+
+on:
+  push:
+    branches: ["main", "devel"]
+  pull_request:
+    branches: ["main", "devel"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pyodide-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pyodide:
+    uses: max-models/starlight-theme/.github/workflows/pyodide.yml@v0
