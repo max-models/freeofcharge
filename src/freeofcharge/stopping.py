@@ -16,13 +16,13 @@ arrays.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 import cunumpy as xp
 import numpy as np
 from methodcard import method
-from plasmacoll.units import convert_units, to_unit, unit_field
+from plasmacoll.units import convert_units, to_unit, unit_metadata
 
 __all__ = [
     "ConstantStopping",
@@ -52,7 +52,7 @@ class StoppingModel(Protocol):
 class ConstantStopping:
     """A constant stopping cross section, for tests and estimates."""
 
-    sigma: float = unit_field("m^2")
+    sigma: float = field(metadata=unit_metadata("m^2"))
     r"""The cross section [$\mathrm{m^2}$], or a quantity such as ``"1e-20 m^2"``."""
 
     def __post_init__(self) -> None:

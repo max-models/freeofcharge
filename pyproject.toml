@@ -24,7 +24,7 @@ dependencies = [
   "maybempi>=0.1",
   "methodcard",
   "numpy",
-  "plasmacoll>=0.5.0",
+  "plasmacoll>=0.6.0",
   "scipy",
   "scope-profiler>=0.7.5",
   "simgeometry>=0.1.0",
