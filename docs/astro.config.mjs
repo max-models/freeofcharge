@@ -51,6 +51,7 @@ export default defineDocs({
 			items: [
 				{ label: 'Installation', slug: 'getting-started/installation' },
 				{ label: 'Quickstart', slug: 'getting-started/quickstart' },
+				{ label: 'Live demo', slug: 'getting-started/live-demo' },
 			],
 		},
 		{
