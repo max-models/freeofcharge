@@ -51,7 +51,7 @@ optional-dependencies.docs = [
 ]
 optional-dependencies.chain = [
   "tree-d-3d @ git+https://github.com/max-models/tree-d-3d@devel",
-  "carafe-plasma>=0.1.0",
+  "plasma-carafe>=0.1.0",
 ]
 optional-dependencies.coils = [ "plasma-plots>=0.2.3" ]
 optional-dependencies.cr = [ "opencr" ]
@@ -98,7 +98,7 @@ methodcard = { git = "https://github.com/max-models/methodcard", branch = "devel
 plasma-plots = { git = "https://github.com/max-models/plasma-plots", branch = "devel" }
 plasmacoll = { git = "https://github.com/max-models/plasmacoll", branch = "devel" }
 simgeometry = { git = "https://github.com/max-models/simgeometry", branch = "devel" }
-carafe-plasma = { git = "https://github.com/max-models/carafe", branch = "devel" }
+plasma-carafe = { git = "https://github.com/max-models/carafe", branch = "devel" }
 
 [tool.ruff]
 target-version = "py310"
