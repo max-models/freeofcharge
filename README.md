@@ -16,7 +16,7 @@ ionised, how much shines through onto the wall, and where the fast ions
 put their power and current as they slow down. Fast enough to sit inside
 a design optimisation of the injector, which is what it is for: the last
 stage of the max-models chain from the ion source through the
-accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
+accelerator and the neutralizer (picnic, carafe) into the plasma.
 
 - **Equilibrium** (`Equilibrium`): the poloidal flux on an (R, Z) grid,
   from a G-EQDSK file or the Solov’ev solution; the field,
@@ -48,7 +48,7 @@ accelerator and the neutralizer (picnic, wellbalanced) into the plasma.
   moments with finite orbit width, the losses and the wall loads.
 - **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
   stages before the plasma, from the other max-models codes: a
-  wellbalanced global model of the D- source, tree-d-3d slit optics
+  carafe global model of the D- source, tree-d-3d slit optics
   (divergence against perveance), the plasmacoll gas neutralizer and the
   duct transmission. `examples/injector_chain.py` scans RF power and
   neutralizer gas against the neutral power, driven current and

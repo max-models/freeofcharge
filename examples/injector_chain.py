@@ -3,7 +3,7 @@ r"""Injector chain.
 An injector from source to plasma: RF power and neutralizer gas against current drive.
 
 A negative-ion neutral-beam injector of ITER's size, one stage per max-models code. The
-deuterium RF source is a wellbalanced global model: more RF power gives a denser plasma
+deuterium RF source is a carafe global model: more RF power gives a denser plasma
 at the same electron temperature, and the extracted D$^-$ current density is taken as 30 %
 of the positive-ion Bohm flux to the plasma grid, from $78\,\mathrm{A/m^2}$ at 200 kW to $430\,\mathrm{A/m^2}$
 at 1.1 MW. Against the Child-Langmuir limit of a 9 kV first gap of 6 mm, $914\,\mathrm{A/m^2}$,
@@ -137,7 +137,7 @@ with plasma_plots.figure(figsize=(6, 4)) as fig:
     ax.plot(RF_POWER / 1e3, current_density, "o-")
     ax.set_xlabel("RF power [kW]")
     ax.set_ylabel("D$^-$ current density [A/m$^2$]")
-    ax.set_title("1. Source (wellbalanced)")
+    ax.set_title("1. Source (carafe)")
     ax.text(
         0.04,
         0.96,

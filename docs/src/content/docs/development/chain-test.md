@@ -4,7 +4,7 @@ description: The injector chain run end to end against the releases and the deve
 ---
 
 The injector chain (`freeofcharge.chain`, `examples/injector_chain.py`) joins several
-max-models packages: the source is a wellbalanced global model, the slit beamlet uses
+max-models packages: the source is a carafe global model, the slit beamlet uses
 tree-d-3d and simgeometry, the gas neutralizer plasmacoll's charge states, and the plasma
 freeofcharge itself. The chain test, `src/freeofcharge/tests/integration`, runs it end to
 end at a small size (two RF powers, three perveances, 200 beam markers; a few seconds), so
@@ -14,10 +14,10 @@ that a release of one package that no longer fits the others shows up.
 
 - **The stages run**: source, slit optics, gas neutralizer, duct and plasma.
 - **The interfaces between them**:
-  - species named by formula (`"e"`, `"D2"`, `"D"`, `"D2+"` in wellbalanced) and the
+  - species named by formula (`"e"`, `"D2"`, `"D"`, `"D2+"` in carafe) and the
     charge states in plasmacoll's order (`"-"`, `"0"`, `"+"`, the neutral share second);
   - units: temperatures in eV, not K; the chain's Bohm flux from $T_e$ in eV against
-    wellbalanced's D2+ wall loss; marker energies in eV and weights in atoms/s that carry
+    carafe's D2+ wall loss; marker energies in eV and weights in atoms/s that carry
     the beam power;
   - shapes: one divergence and transmitted share per perveance, `(N, 3)` positions and
     velocities and `(N,)` weights of plasmacoll's `ParticleArrays`, one value per shell;
@@ -30,7 +30,7 @@ that a release of one package that no longer fits the others shows up.
 When a stage raises, the test fails with a `StageError` that names the stage, its package
 and the installed version, for example
 `stage 3 gas neutralizer (plasmacoll 0.3.0) raised TypeError: ...`; every interface
-assertion starts with the two stages it joins (`wellbalanced -> source: ...`). The
+assertion starts with the two stages it joins (`carafe -> source: ...`). The
 workflow lists the installed versions and a table of the tests with these messages in the
 run's summary.
 
@@ -44,7 +44,7 @@ uv run pytest src/freeofcharge/tests/integration -v
 
 The `Chain Test` workflow (`.github/workflows/chain_test.yml`) runs the test twice:
 
-- **pypi**: the latest PyPI releases of plasmacoll, wellbalanced, simgeometry, cunumpy and
+- **pypi**: the latest PyPI releases of plasmacoll, carafe, simgeometry, cunumpy and
   the others, unpinned (no `uv.lock`, `UV_NO_SOURCES=true`). tree-d-3d has no PyPI release,
   so the slit optics stage is skipped and the beam line takes a fixed divergence of
   5 mrad. picnic is not part of the chain.
@@ -77,7 +77,7 @@ secret `CHAIN_TEST_TOKEN` in the package's repository (or once as an organizatio
 ```
 
 The step ids (`version`, `pypi-check`) are those of the max-models release template
-(plasmacoll, wellbalanced, simgeometry, mpiarray, maybempi, tree-d-3d); in cunumpy's
+(plasmacoll, carafe, simgeometry, mpiarray, maybempi, tree-d-3d); in cunumpy's
 `publish.yml` and scope-profiler's `publish-pypi.yml` take the version from their own
 steps. The run waits up to ten minutes for the version to appear on PyPI before it
 installs the releases.

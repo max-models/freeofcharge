@@ -38,7 +38,7 @@ def test_duct_transmission_limits():
 
 
 def test_source_current_grows_with_rf_power():
-    pytest.importorskip("wellbalanced")
+    pytest.importorskip("carafe")
     low, high = chain.deuterium_source(2e5), chain.deuterium_source(4e5)
     assert high.current_density > low.current_density > 0.0
     # the same temperature, twice the power: twice the density (a power balance)
