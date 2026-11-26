@@ -47,10 +47,10 @@ accelerator and the neutralizer (picnic, carafe) into the plasma.
   down’s drags, until they thermalise or cross the wall: the same
   moments with finite orbit width, the losses and the wall loads.
 - **Injector chain** (`freeofcharge.chain`, the `chain` extra): the
-  stages before the plasma, from the other max-models codes: a
-  carafe global model of the D- source, tree-d-3d slit optics
-  (divergence against perveance), the plasmacoll gas neutralizer and the
-  duct transmission. `examples/injector_chain.py` scans RF power and
+  stages before the plasma, from the other max-models codes: a carafe
+  global model of the D- source, tree-d-3d slit optics (divergence
+  against perveance), the plasmacoll gas neutralizer and the duct
+  transmission. `examples/injector_chain.py` scans RF power and
   neutralizer gas against the neutral power, driven current and
   shine-through.
 
