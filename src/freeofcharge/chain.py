@@ -6,7 +6,7 @@ end to end (see ``examples/injector_chain.py``); the plasma side is freeofcharge
 other max-models codes, imported only when called (``pip install 'freeofcharge[chain]'``):
 
 1. `deuterium_source`: the plasma of a deuterium RF source from a
-   `wellbalanced.GlobalModel`, and the negative-ion current density it supplies,
+   `carafe.GlobalModel`, and the negative-ion current density it supplies,
    taken as a share ``extraction_ratio`` of the positive-ion Bohm flux to the plasma grid.
    The negative-ion surface production on caesiated walls is not modelled: that share is
    an input.
@@ -38,7 +38,7 @@ from plasmacoll.units import to_array, to_unit
 from scipy.special import erf
 
 if TYPE_CHECKING:
-    from wellbalanced import GlobalState
+    from carafe import GlobalState
 
 ELEMENTARY_CHARGE = 1.602176634e-19
 EPSILON_0 = 8.8541878128e-12
@@ -48,7 +48,7 @@ DEUTERIUM_MASS = 2.014 * ATOMIC_MASS
 
 #: Charge-changing cross sections (m^2) of a 1 MeV D- beam on D2 gas: single stripping,
 #: double stripping and re-ionization of the neutrals. Round numbers of plausible size
-#: (wellbalanced's illustrative neutralizer), not data: they give a neutral maximum of
+#: (carafe's illustrative neutralizer), not data: they give a neutral maximum of
 #: about 58 % near 1.4e20 m^-2, close to the 55-60 % quoted for gas neutralizers of
 #: 1 MeV D- beams (Hemsworth et al., Nucl. Fusion 49, 045006, 2009). Replace with
 #: evaluated data (ORNL Redbook, IAEA ALADDIN) for design work.
@@ -130,7 +130,7 @@ class Source:
         "current": r"j_- = \text{extraction\_ratio}\cdot e\, h\, n_{D_2^+} u_B, \qquad u_B = \sqrt{\frac{e T_e}{m_{D_2^+}}}",
     },
     assumptions=(
-        r"a wellbalanced global model of e, D$_2$, D, D$_2^+$ at fixed D$_2$ density $p/(e T_g)$",
+        r"a carafe global model of e, D$_2$, D, D$_2^+$ at fixed D$_2$ density $p/(e T_g)$",
         r"illustrative Arrhenius rates, not data: ionisation ($a = 2\cdot10^{-14}$ m³/s, $c = 15.4$ eV), dissociation ($10^{-14}$, 8.8 eV), elastic ($3\cdot10^{-14}$ m³/s)",
         r"the negative-ion surface production is an input share (`extraction_ratio`)",
     ),
@@ -149,11 +149,11 @@ def deuterium_source(
 ) -> Source:
     r"""The steady plasma of a deuterium RF source, and its negative-ion current density.
 
-    A `wellbalanced.GlobalModel` of $\mathrm{D_2}$ at ``pressure`` [Pa] in a chamber
+    A `carafe.GlobalModel` of $\mathrm{D_2}$ at ``pressure`` [Pa] in a chamber
     of ``volume`` [$\mathrm{m^3}$] and ``wall_area`` [$\mathrm{m^2}$] absorbs
     ``absorbed_fraction`` of ``rf_power``. Its reactions (ionization and dissociation of
     $\mathrm{D_2}$, elastic collisions) use Arrhenius rates of plausible size,
-    wellbalanced's illustrative deuterium set, not data; the atoms recombine to
+    carafe's illustrative deuterium set, not data; the atoms recombine to
     $\mathrm{D_2}$ at the walls with probability ``recombination``. The negative-ion
     current density is ``extraction_ratio`` times the charge flux of the positive ions
     to the grid, $e h n_e u_B$ ($u_B$ of $\mathrm{D_2^+}$).
@@ -168,8 +168,7 @@ def deuterium_source(
     volume = to_unit(volume, "m^3", "volume")
     wall_area = to_unit(wall_area, "m^2", "wall_area")
     gas_temperature = to_unit(gas_temperature, "eV", "gas_temperature")
-    from plasmacoll.constants import ELECTRON_MASS
-    from wellbalanced import (
+    from carafe import (
         ELECTRON,
         Chamber,
         GlobalModel,
@@ -177,6 +176,7 @@ def deuterium_source(
         Species,
         WallReaction,
     )
+    from plasmacoll.constants import ELECTRON_MASS
 
     d2 = Species("D2", 2 * DEUTERIUM_MASS)
     d = Species("D", DEUTERIUM_MASS)

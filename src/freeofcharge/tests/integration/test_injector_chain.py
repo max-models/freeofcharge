@@ -24,7 +24,7 @@ import pytest
 import freeofcharge as foc
 from freeofcharge import chain
 
-pytest.importorskip("wellbalanced", reason="the chain needs freeofcharge[chain]")
+pytest.importorskip("carafe", reason="the chain needs freeofcharge[chain]")
 
 RF_POWER = np.array([3.0e5, 6.0e5])  # W
 PERVEANCE = np.array([0.02, 0.15, 0.45])  # j / j_CL of the optics scan
@@ -39,7 +39,7 @@ SHRINK = np.sqrt(EXTRACTION_VOLTAGE / BEAM_ENERGY)  # the angles after the accel
 SOURCE_WIDTH, DUCT_LENGTH, DUCT_HALF_APERTURE = 0.1, 23.0, 0.25  # m
 FIXED_DIVERGENCE = 5.0e-3  # rad, the beam line's divergence without tree-d-3d
 
-# wellbalanced names species by formula; these are the ones deuterium_source builds
+# carafe names species by formula; these are the ones deuterium_source builds
 SOURCE_SPECIES = {"e", "D2", "D", "D2+"}
 SOURCE_VOLUME, SOURCE_WALL_AREA = 0.4, 6.0  # deuterium_source's defaults [m^3, m^2]
 
@@ -73,7 +73,7 @@ def stage(name: str, package: str):
 
 @pytest.fixture(scope="module")
 def sources():
-    with stage("1 source", "wellbalanced"):
+    with stage("1 source", "carafe"):
         return [chain.deuterium_source(p) for p in RF_POWER]
 
 
@@ -172,19 +172,19 @@ def plasma_runs(divergence, delivered):
 
 
 def test_stage_1_source(sources):
-    from wellbalanced import ELECTRON
+    from carafe import ELECTRON
 
-    assert ELECTRON.name == "e", "wellbalanced: the electron is no longer named 'e'"
+    assert ELECTRON.name == "e", "carafe: the electron is no longer named 'e'"
     for source in sources:
         state = source.state
         assert state.converged
         assert set(state.densities) == SOURCE_SPECIES, (
-            f"wellbalanced -> source: species {sorted(state.densities)}, "
+            f"carafe -> source: species {sorted(state.densities)}, "
             f"expected the formulas {sorted(SOURCE_SPECIES)}"
         )
         # temperatures in eV, not K; densities in m^-3
         assert 1.0 < source.electron_temperature < 30.0, (
-            f"wellbalanced -> source: T_e = {source.electron_temperature:g}, not in eV"
+            f"carafe -> source: T_e = {source.electron_temperature:g}, not in eV"
         )
         assert state.gas_temperature == pytest.approx(0.05)
         assert 1e16 < source.electron_density < 1e20
@@ -196,7 +196,7 @@ def test_stage_1_source(sources):
         # the chain's Bohm flux (u_B from T_e in eV and the D2+ mass) is the ion wall loss
         assert source.positive_flux * SOURCE_WALL_AREA / SOURCE_VOLUME == pytest.approx(
             state.wall_losses["D2+"], rel=1e-6
-        ), "wellbalanced -> source: the D2+ wall loss differs from h n_e u_B"
+        ), "carafe -> source: the D2+ wall loss differs from h n_e u_B"
         assert source.current_density == pytest.approx(
             0.3 * chain.ELEMENTARY_CHARGE * source.positive_flux
         )

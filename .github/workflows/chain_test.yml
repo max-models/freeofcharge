@@ -67,7 +67,7 @@ jobs:
           UV_NO_SOURCES: true
         run: |
           uv venv
-          uv pip install --refresh -e . wellbalanced pytest
+          uv pip install --refresh -e . plasma-carafe pytest
 
       # The devel branches from [tool.uv.sources], at their latest commits.
       - name: Install the GVEC build dependencies (GVEC has no Linux wheel)
@@ -89,7 +89,7 @@ jobs:
               echo "Triggered by the release of $PACKAGE $VERSION."
             fi
             echo '```'
-            uv pip freeze | grep -E '^(cunumpy|freeofcharge|maybempi|mpiarray|plasmacoll|scope-profiler|simgeometry|tree-d-3d|wellbalanced)( |=|@)'
+            uv pip freeze | grep -E '^(cunumpy|freeofcharge|maybempi|mpiarray|plasmacoll|scope-profiler|simgeometry|tree-d-3d|plasma-carafe)( |=|@)'
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 

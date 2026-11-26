@@ -193,7 +193,7 @@ def test_chain_stages_take_quantities():
 
 
 def test_deuterium_source_takes_quantities():
-    pytest.importorskip("wellbalanced")
+    pytest.importorskip("carafe")
     plain = chain.deuterium_source(2e5, gas_temperature=0.05)
     gas = (0.05 * u.eV).to(u.K, u.temperature_energy())
     quantities = chain.deuterium_source(

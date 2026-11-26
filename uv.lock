@@ -1986,8 +1986,8 @@ dependencies = [
 
 [package.optional-dependencies]
 chain = [
+    { name = "plasma-carafe" },
     { name = "tree-d-3d" },
-    { name = "wellbalanced" },
 ]
 coils = [
     { name = "plasma-plots" },
@@ -2012,6 +2012,7 @@ dev = [
     { name = "nbclient" },
     { name = "nbformat" },
     { name = "opencr" },
+    { name = "plasma-carafe" },
     { name = "plasma-plots", extra = ["scene", "web"], marker = "extra == 'extra-12-freeofcharge-dev' or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
     { name = "pre-commit" },
     { name = "pyccel" },
@@ -2022,7 +2023,6 @@ dev = [
     { name = "ruff", version = "0.17.3", source = { registry = "https://pypi.org/simple" } },
     { name = "tree-d-3d" },
     { name = "vmecpp" },
-    { name = "wellbalanced" },
 ]
 docs = [
     { name = "griffe" },
@@ -2033,10 +2033,10 @@ docs = [
     { name = "matplotlib" },
     { name = "nbclient" },
     { name = "nbformat" },
+    { name = "plasma-carafe" },
     { name = "plasma-plots", extra = ["scene", "web"], marker = "extra == 'extra-12-freeofcharge-dev' or extra == 'extra-12-freeofcharge-docs' or extra != 'extra-12-freeofcharge-struphy'" },
     { name = "tree-d-3d" },
     { name = "vmecpp" },
-    { name = "wellbalanced" },
 ]
 gvec = [
     { name = "gvec" },
@@ -2050,6 +2050,7 @@ test = [
     { name = "gvec" },
     { name = "methodcard", extra = ["symbolic"] },
     { name = "opencr" },
+    { name = "plasma-carafe" },
     { name = "plasma-plots" },
     { name = "pyccel" },
     { name = "pytest", version = "9.1.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-12-freeofcharge-struphy'" },
@@ -2057,7 +2058,6 @@ test = [
     { name = "pytest-cov" },
     { name = "tree-d-3d" },
     { name = "vmecpp" },
-    { name = "wellbalanced" },
 ]
 vmec = [
     { name = "vmecpp" },
@@ -2084,6 +2084,7 @@ requires-dist = [
     { name = "nbformat", marker = "extra == 'docs'", specifier = ">=5.11.1" },
     { name = "numpy" },
     { name = "opencr", marker = "extra == 'cr'", git = "https://github.com/max-models/opencr?branch=devel" },
+    { name = "plasma-carafe", marker = "extra == 'chain'", git = "https://github.com/max-models/carafe?branch=devel" },
     { name = "plasma-plots", marker = "extra == 'coils'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasma-plots", extras = ["scene", "web"], marker = "extra == 'docs'", git = "https://github.com/max-models/plasma-plots?branch=devel" },
     { name = "plasmacoll", git = "https://github.com/max-models/plasmacoll?branch=devel" },
@@ -2101,7 +2102,6 @@ requires-dist = [
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=1.1" },
     { name = "tree-d-3d", marker = "extra == 'chain'", git = "https://github.com/max-models/tree-d-3d?rev=devel" },
     { name = "vmecpp", marker = "extra == 'vmec'", specifier = ">=0.9" },
-    { name = "wellbalanced", marker = "extra == 'chain'", git = "https://github.com/max-models/wellbalanced?branch=devel" },
     { name = "xarray" },
 ]
 provides-extras = ["dev", "docs", "chain", "coils", "cr", "desc", "gvec", "struphy", "vmec", "test"]
@@ -5395,6 +5395,22 @@ wheels = [
 ]
 
 [[package]]
+name = "plasma-carafe"
+version = "0.1.0"
+source = { git = "https://github.com/max-models/carafe?branch=devel#b933eb9534fd80a0375d8477ac513b57ef5b8cd8" }
+dependencies = [
+    { name = "methodcard" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "plasmacoll" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "scope-profiler" },
+    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
+]
+
+[[package]]
 name = "plasma-plots"
 version = "0.2.5"
 source = { git = "https://github.com/max-models/plasma-plots?branch=devel#5f832b09ea9f9b4a0e6884bab85ca0a7fdb5b0e7" }
@@ -8413,21 +8429,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d8/cb/a5abcc2891249f393827c650c6296660ce40374ac22d99ab9aea41f9d2a2/websocket_client-1.9.2.tar.gz", hash = "sha256:0fcb57545848be86992e128218fd96dd87a6769ffdb1a968dff79632b85604d0", size = 84110, upload-time = "2026-08-31T14:08:40.964Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d5/d2/cc4dc1271e464942db7ee278baae2daa99ee77cb2af744025c04da585a3e/websocket_client-1.9.2-py3-none-any.whl", hash = "sha256:e1a673830a9c7bfa47b1cd3d5e4178f4c9651d80a4eab02c9c23a1c3ec6250ce", size = 95786, upload-time = "2026-08-31T14:08:39.899Z" },
-]
-
-[[package]]
-name = "wellbalanced"
-version = "0.1.0"
-source = { git = "https://github.com/max-models/wellbalanced?branch=devel#d1c67f625e0be7133066eba6c2b8083eaf68a602" }
-dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "plasmacoll" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "scope-profiler" },
-    { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
-    { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'extra-12-freeofcharge-dev' and extra == 'extra-12-freeofcharge-struphy') or (extra == 'extra-12-freeofcharge-docs' and extra == 'extra-12-freeofcharge-struphy')" },
 ]
 
 [[package]]
